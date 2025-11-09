@@ -1,0 +1,12 @@
+.custom-error-toast {
+  background-color: #d32f2f;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.custom-error-progress {
+  background-color: #ffffff; /* Білий прогрес-бар */
+  height: 5px; /* Товщина лінії */
+  border-radius: 4px; /* Заокруглення */
+}
