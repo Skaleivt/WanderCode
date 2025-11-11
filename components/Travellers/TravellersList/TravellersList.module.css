@@ -1,0 +1,64 @@
+/* components/Travellers/TravellersList/TravellersList.module.css */
+
+.section {
+    padding: 40px 0;
+}
+
+.title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.list {
+    /* Layout for the list of cards */
+    display: grid;
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 40px;
+    gap: 20px;
+
+    /* Mobile First approach (320px + 375px) */
+    /* Mobile/Tablet default: 2 columns */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+    /* Tablet breakpoint (768px): 2 columns or adjust based on UI */
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Desktop breakpoint (1440px): 4 columns for 12/4 */
+    @media (min-width: 1440px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.loadMoreButton {
+    display: block;
+    margin: 0 auto;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    background-color: var(--color-accent);
+    color: var(--color-white);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.loadMoreButton:hover:not(:disabled) {
+    background-color: var(--color-accent-dark);
+}
+
+.loadMoreButton:disabled {
+    background-color: var(--color-grey-light);
+    cursor: not-allowed;
+}
+
+.error,
+.empty {
+    text-align: center;
+    color: var(--color-error);
+    font-size: 1.2rem;
+    padding: 20px;
+}
