@@ -55,7 +55,6 @@ export default function RootLayout({
         <TanStackProvider>
           <AuthProvider>
             <Header />
-            {/* The main element must grow to push the Footer down (using flexbox styles defined in global.css on <body>) */}{' '}
             <main style={{ flexGrow: 1 }}>{children} </main>
             {modal} <div id="modal-root"></div>
             <Footer />

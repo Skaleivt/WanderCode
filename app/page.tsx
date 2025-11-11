@@ -1,12 +1,7 @@
 // app/page.tsx
 import React from 'react';
-// Import the Container component. Assuming '@/components' path alias is set.
 import Container from '@/components/layout/Container/Container';
 
-/**
- * The Home Page component (route: /).
- * Uses the Container component to test adaptive padding, max-width, and sticky footer behavior.
- */
 export default function HomePage() {
   return (
     <Container className="homepage-container">
@@ -19,7 +14,7 @@ export default function HomePage() {
         the following functionality:
       </p>
 
-      {/* Test Section 1: Visual Padding and Max-Width Check */}
+      {}
       <section
         style={{
           padding: '20px',
@@ -32,7 +27,7 @@ export default function HomePage() {
           Adaptive Container Test
         </h2>
         <ul style={{ color: 'var(--color-neutral-dark)' }}>
-          {/* FIX: Changed < to &lt; and >= to &gt;= to avoid JSX parsing errors */}
+          {}
           <li>
             **Mobile ( &lt; 375px ):** The container should be fluid (100%
             width) with 20px padding.
@@ -52,10 +47,10 @@ export default function HomePage() {
         </ul>
       </section>
 
-      {/* Test Section 2: Footer Stickiness Check */}
+      {}
       <section
         style={{
-          height: '1000px', // Large height to force page scrolling
+          height: '1000px',
           backgroundColor: 'var(--color-neutral-lightest)',
           border: '1px solid var(--color-scheme-1-border)',
           padding: '20px',

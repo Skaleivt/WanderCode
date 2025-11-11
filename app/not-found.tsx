@@ -1,17 +1,10 @@
 // app/not-found.tsx
 import React from 'react';
 import Link from 'next/link';
-// We need to import the Container component for proper layout handling
 import Container from '@/components/layout/Container/Container';
 
-/**
- * Custom Not Found page (404 Page) for Next.js App Router.
- * This function MUST be the default export and return valid JSX.
- */
 export default function NotFound() {
   return (
-    // We use a <section> or <div> here, and ensure it grows to fill the layout space (flexGrow: 1),
-    // which is provided by the <main> tag in the global layout.
     <section
       style={{
         textAlign: 'center',
