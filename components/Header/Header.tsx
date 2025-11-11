@@ -1,0 +1,92 @@
+// components/Header/Header.tsx
+import React from 'react';
+import Link from 'next/link';
+import Container from '../layout/Container/Container';
+
+export const Header: React.FC = () => {
+  // Navigation links for non-authorized users (MVP)
+  const publicNavItems = [
+    { href: '/', label: 'Головна' },
+    { href: '/stories', label: 'Історії' },
+    { href: '/travellers', label: 'Мандрівники' },
+  ];
+
+  return (
+    <header
+      style={{
+        backgroundColor: 'var(--color-scheme-1-background)',
+        borderBottom: '1px solid var(--color-scheme-1-border)',
+        padding: '16px 0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      <Container className="header-container">
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          {/* Logo Placeholder */}
+          <Link
+            href="/"
+            style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: 'var(--color-royal-blue)',
+              textDecoration: 'none',
+            }}
+          >
+            WanderCode LOGO
+          </Link>
+
+          {/* Primary Navigation (Desktop view) */}
+          <nav className="desktop-nav" style={{ display: 'flex', gap: '20px' }}>
+            {publicNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  color: 'var(--color-neutral-dark)',
+                  textDecoration: 'none',
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Auth Buttons for Non-Logged-in User */}
+          <div
+            className="auth-buttons"
+            style={{ display: 'flex', gap: '10px' }}
+          >
+            <Link
+              href="/auth/login"
+              style={{
+                color: 'var(--color-scheme-1-accent)',
+                textDecoration: 'none',
+              }}
+            >
+              Вхід
+            </Link>
+            <Link
+              href="/auth/register"
+              style={{
+                color: 'var(--color-scheme-1-accent)',
+                textDecoration: 'none',
+              }}
+            >
+              Реєстрація
+            </Link>
+          </div>
+        </div>
+      </Container>
+    </header>
+  );
+};
+
+export default Header;
