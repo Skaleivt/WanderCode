@@ -51,21 +51,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk" className={`${nunitoSans.variable}${sora.variable}`}>
-      {' '}
       <body>
-        {' '}
         <TanStackProvider>
-          {' '}
           <AuthProvider>
-            <Header />{' '}
+            <Header />
             {/* The main element must grow to push the Footer down (using flexbox styles defined in global.css on <body>) */}{' '}
             <main style={{ flexGrow: 1 }}>{children} </main>
             {modal} <div id="modal-root"></div>
-            <Footer />{' '}
+            <Footer />
           </AuthProvider>
-          <ToastContainer />{' '}
-        </TanStackProvider>{' '}
-      </body>{' '}
+          <ToastContainer />
+        </TanStackProvider>
+      </body>
     </html>
   );
 }

@@ -7,10 +7,6 @@ interface ContainerProps {
   className?: string;
 }
 
-/**
- * Container component.
- * Ensures content is centered and applies adaptive horizontal padding.
- */
 export const Container: React.FC<ContainerProps> = ({
   children,
   className = '',

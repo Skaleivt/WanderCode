@@ -23,11 +23,13 @@ export const Header: React.FC = () => {
       }}
     >
       <Container className="header-container">
+        {' '}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
           }}
         >
           {/* Logo Placeholder */}

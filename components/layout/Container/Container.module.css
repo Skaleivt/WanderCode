@@ -5,11 +5,14 @@
   Layout is fluid (stretches). Padding is 20px.
 */
 .container {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    /* margin-left: auto;
+    margin-right: auto; */
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
+    box-sizing: border-box;
+    max-width: 374px;
 }
 
 /*

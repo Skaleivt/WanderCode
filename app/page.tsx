@@ -9,8 +9,6 @@ import Container from '@/components/layout/Container/Container';
  */
 export default function HomePage() {
   return (
-    // Note: The outer <main> tag is already provided by app/layout.tsx.
-    // We start directly with the Container component.
     <Container className="homepage-container">
       <h1 style={{ marginTop: '40px', color: 'var(--color-royal-blue)' }}>
         Welcome to WanderCode
