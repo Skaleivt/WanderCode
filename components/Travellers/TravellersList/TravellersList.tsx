@@ -1,11 +1,12 @@
 // components/Travellers/TravellersList/TravellersList.tsx
 'use client';
 
-import React, { useMemo } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchTravellers,
-  FetchTravellersResponse,
+  FetchTravellersResponse as PaginationResult,
+  Traveller,
 } from '@/lib/api/travellersApi';
 import {
   TRAVELLERS_INITIAL_PER_PAGE_DESKTOP,
@@ -17,17 +18,37 @@ import TravellerCard from '../TravellerCard/TravellerCard';
 import Loader from '@/components/Loader/Loader';
 import styles from './TravellersList.module.css';
 
-// Helper to determine initial card count based on screen size (client-side logic required for true adaptation)
+// Helper to determine initial card count based on screen size
 const useInitialPerPage = (isMobileView: boolean) => {
+  // Mobile/Tablet: 8, Desktop: 12
   return isMobileView
     ? TRAVELLERS_INITIAL_PER_PAGE_MOBILE_TABLET
     : TRAVELLERS_INITIAL_PER_PAGE_DESKTOP;
 };
 
 const TravellersList: React.FC = () => {
-  // Placeholder: True adaptation requires client-side state
-  // This should ideally use window size detection or CSS media queries for true responsiveness
-  const isMobileView = false;
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1440
+  );
+
+  const [isClient, setIsClient] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    setIsClient(true);
+
+    queryClient.removeQueries({ queryKey: ['travellers'] });
+
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [queryClient]);
+
+  const isMobileView = windowWidth < 1440;
   const initialPerPage = useInitialPerPage(isMobileView);
 
   const {
@@ -38,12 +59,12 @@ const TravellersList: React.FC = () => {
     isFetching,
     isFetchingNextPage,
     status,
-  } = useInfiniteQuery<FetchTravellersResponse>({
+  } = useInfiniteQuery<PaginationResult>({
     queryKey: ['travellers'],
+
     queryFn: ({ pageParam = 1 }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
 
-      // Logic to request 12/8 items on the first page, and 4 items on subsequent pages
       const perPageAmount =
         page === 1 ? initialPerPage : TRAVELLERS_LOAD_MORE_AMOUNT;
 
@@ -61,25 +82,30 @@ const TravellersList: React.FC = () => {
     },
 
     initialPageParam: 1,
+    enabled: isClient,
+
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
-  const allTravellers = useMemo(
-    // NOTE: page.data is correct now because fetchTravellers was modified to return only PaginationResult
-    () => data?.pages.flatMap((page) => page.data) ?? [],
-    [data]
-  );
+  const allTravellers = useMemo(() => {
+    const flatList = data?.pages.flatMap((page) => page.data) ?? [];
 
-  const loadedPagesCount = data?.pages.length ?? 0;
+    const uniqueTravellers = flatList.reduce((acc, current) => {
+      if (!acc.some((item) => item._id === current._id)) {
+        acc.push(current);
+      }
+      return acc;
+    }, [] as Traveller[]);
 
-  // Logic to calculate how many items to display in total (initial load + subsequent loads)
-  const itemsToDisplay =
-    initialPerPage +
-    Math.max(0, (loadedPagesCount - 1) * TRAVELLERS_LOAD_MORE_AMOUNT);
-  const travellersToShow = allTravellers.slice(0, itemsToDisplay);
+    return uniqueTravellers;
+  }, [data]);
 
   // --- UI STATUS HANDLING ---
 
-  if (status === 'pending') {
+  if (status === 'pending' || !isClient) {
     return <Loader />;
   }
 
@@ -91,22 +117,21 @@ const TravellersList: React.FC = () => {
     );
   }
 
-  if (travellersToShow.length === 0) {
+  if (allTravellers.length === 0) {
     return <p className={styles.empty}>No travellers found.</p>;
   }
 
   // --- MAIN RENDER ---
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Мандрівники</h2>
+      <h2 className={styles.title}>Мандрівнікі</h2>
 
       <ul className={styles.list}>
-        {travellersToShow.map((traveller) => (
-          <TravellerCard key={traveller.id} traveller={traveller} />
+        {allTravellers.map((traveller) => (
+          <TravellerCard key={traveller._id} traveller={traveller} />
         ))}
       </ul>
 
-      {/* Show "Показати ще" if more pages exist */}
       {hasNextPage && (
         <button
           onClick={() => fetchNextPage()}
@@ -117,7 +142,6 @@ const TravellersList: React.FC = () => {
         </button>
       )}
 
-      {/* Show loader for background refetching (not next page) */}
       {isFetching && !isFetchingNextPage && <Loader />}
     </section>
   );

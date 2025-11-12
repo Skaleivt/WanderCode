@@ -26,6 +26,7 @@ const TravellerCard: React.FC<TravellerCardProps> = ({ traveller }) => {
             width={150}
             height={150}
             className={styles.avatar}
+            priority={true}
           />
         ) : (
           <div className={styles.placeholder}>[Avatar Placeholder]</div>

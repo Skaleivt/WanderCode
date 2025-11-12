@@ -38,7 +38,7 @@
     margin: 0 auto;
     padding: 12px 24px;
     font-size: 1.1rem;
-    background-color: var(--color-accent);
+    background-color: var(--color-royal-blue);
     color: var(--color-white);
     border: none;
     border-radius: 6px;
@@ -47,7 +47,7 @@
 }
 
 .loadMoreButton:hover:not(:disabled) {
-    background-color: var(--color-accent-dark);
+    background-color: var(--color-royal-blue-dark);
 }
 
 .loadMoreButton:disabled {

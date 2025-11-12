@@ -1,7 +1,9 @@
+// lib/api/travellersApi.ts
 import { nextServer } from './api';
 
 export type Traveller = {
   id: string;
+  _id: string;
   name: string;
   avatarUrl?: string;
   description?: string;
@@ -13,7 +15,6 @@ export type FetchTravellersParams = {
   page: number;
 };
 
-// Define the structure of the data that the fetchTravellers function will return
 export type PaginationResult = {
   data: Traveller[];
   totalItems: number;
@@ -24,7 +25,6 @@ export type PaginationResult = {
   perPage: number;
 };
 
-// The function will return this structure
 export type FetchTravellersResponse = PaginationResult;
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -46,19 +46,33 @@ function getStringFromKeys(
 
 function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
   let id = `generated-${Date.now()}-${fallbackIndex}`;
+  let _id = '';
   let name = '';
   let avatarUrl: string | undefined = undefined;
   let description: string | undefined = undefined;
 
   if (isObject(raw)) {
-    const _id = raw['_id'];
-    if (isObject(_id)) {
-      const oid = _id['$oid'];
-      if (typeof oid === 'string' && oid.length > 0) id = oid;
-    } else if (typeof _id === 'string' && _id.length > 0) {
+    const raw_id_field = raw['_id'];
+    const raw_id_alt = raw['id'];
+
+    if (typeof raw_id_field === 'string' && raw_id_field.length > 0) {
+      _id = raw_id_field;
+    } else if (
+      isObject(raw_id_field) &&
+      typeof raw_id_field['$oid'] === 'string' &&
+      raw_id_field['$oid'].length > 0
+    ) {
+      _id = raw_id_field['$oid'];
+    }
+
+    if (_id.length > 0) {
       id = _id;
-    } else if (typeof raw['id'] === 'string' && raw['id'].length > 0) {
-      id = raw['id'];
+    } else if (typeof raw_id_alt === 'string' && raw_id_alt.length > 0) {
+      id = raw_id_alt;
+    }
+
+    if (_id.length === 0) {
+      _id = id;
     }
 
     name =
@@ -78,6 +92,7 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
 
   return {
     id,
+    _id,
     name,
     avatarUrl,
     description,
@@ -97,19 +112,15 @@ export async function fetchTravellers(
       },
     });
 
-    // Axios response data: {status: 200, message: "...", data: PaginationResult}
     const payload: unknown = res.data;
 
-    // Extract the PaginationResult object from the outer 'data' wrapper
     const paginationResult = isObject(payload) ? payload.data : null;
 
     let items: unknown[] = [];
 
-    // Check if the actual list of travellers (paginationResult.data) is an array
     if (isObject(paginationResult) && Array.isArray(paginationResult.data)) {
-      items = paginationResult.data; // Now items is the array of raw travellers
+      items = paginationResult.data;
 
-      // Extract pagination details from paginationResult
       const totalItems =
         typeof paginationResult.totalItems === 'number'
           ? paginationResult.totalItems
@@ -137,7 +148,6 @@ export async function fetchTravellers(
 
       const normalized = items.map((it, idx) => normalizeRaw(it, idx));
 
-      // Return the PaginationResult structure
       return {
         data: normalized,
         totalItems: totalItems,
@@ -149,7 +159,6 @@ export async function fetchTravellers(
       };
     }
 
-    // Return empty result on failure to parse
     return {
       data: [],
       totalItems: 0,
