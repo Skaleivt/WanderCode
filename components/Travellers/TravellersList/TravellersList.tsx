@@ -13,9 +13,8 @@ import {
   TRAVELLERS_INITIAL_PER_PAGE_MOBILE_TABLET,
 } from '@/constants/pagination';
 
-// IMPORTS FIXED: Importing the single card component correctly
 import TravellerCard from '../TravellerCard/TravellerCard';
-import Loader from '@/components/Loader/Loader'; // Use your existing Loader
+import Loader from '@/components/Loader/Loader';
 import styles from './TravellersList.module.css';
 
 // Helper to determine initial card count based on screen size (client-side logic required for true adaptation)
@@ -27,6 +26,7 @@ const useInitialPerPage = (isMobileView: boolean) => {
 
 const TravellersList: React.FC = () => {
   // Placeholder: True adaptation requires client-side state
+  // This should ideally use window size detection or CSS media queries for true responsiveness
   const isMobileView = false;
   const initialPerPage = useInitialPerPage(isMobileView);
 
@@ -43,9 +43,13 @@ const TravellersList: React.FC = () => {
     queryFn: ({ pageParam = 1 }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
 
+      // Logic to request 12/8 items on the first page, and 4 items on subsequent pages
+      const perPageAmount =
+        page === 1 ? initialPerPage : TRAVELLERS_LOAD_MORE_AMOUNT;
+
       return fetchTravellers({
         page: page,
-        perPage: TRAVELLERS_LOAD_MORE_AMOUNT,
+        perPage: perPageAmount,
       });
     },
 
@@ -60,13 +64,14 @@ const TravellersList: React.FC = () => {
   });
 
   const allTravellers = useMemo(
+    // NOTE: page.data is correct now because fetchTravellers was modified to return only PaginationResult
     () => data?.pages.flatMap((page) => page.data) ?? [],
     [data]
   );
 
   const loadedPagesCount = data?.pages.length ?? 0;
 
-  // Logic to show initial 12/8 + all subsequently loaded blocks of 4
+  // Logic to calculate how many items to display in total (initial load + subsequent loads)
   const itemsToDisplay =
     initialPerPage +
     Math.max(0, (loadedPagesCount - 1) * TRAVELLERS_LOAD_MORE_AMOUNT);
@@ -79,7 +84,6 @@ const TravellersList: React.FC = () => {
   }
 
   if (status === 'error') {
-    // Error handling: show toast or inline message
     return (
       <p className={styles.error}>
         Error loading travellers: {(error as Error).message}
@@ -98,7 +102,6 @@ const TravellersList: React.FC = () => {
 
       <ul className={styles.list}>
         {travellersToShow.map((traveller) => (
-          // Using the TravellerCard component
           <TravellerCard key={traveller.id} traveller={traveller} />
         ))}
       </ul>

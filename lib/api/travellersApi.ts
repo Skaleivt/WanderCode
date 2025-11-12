@@ -1,4 +1,3 @@
-// lib/api/travellersApi.ts
 import { nextServer } from './api';
 
 export type Traveller = {
@@ -14,7 +13,8 @@ export type FetchTravellersParams = {
   page: number;
 };
 
-export type FetchTravellersResponse = {
+// Define the structure of the data that the fetchTravellers function will return
+export type PaginationResult = {
   data: Traveller[];
   totalItems: number;
   totalPages: number;
@@ -23,6 +23,9 @@ export type FetchTravellersResponse = {
   page: number;
   perPage: number;
 };
+
+// The function will return this structure
+export type FetchTravellersResponse = PaginationResult;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -48,7 +51,6 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
   let description: string | undefined = undefined;
 
   if (isObject(raw)) {
-    // id: support {_id: {$oid: string}} or {_id: string} or id
     const _id = raw['_id'];
     if (isObject(_id)) {
       const oid = _id['$oid'];
@@ -95,27 +97,47 @@ export async function fetchTravellers(
       },
     });
 
+    // Axios response data: {status: 200, message: "...", data: PaginationResult}
     const payload: unknown = res.data;
+
+    // Extract the PaginationResult object from the outer 'data' wrapper
+    const paginationResult = isObject(payload) ? payload.data : null;
+
     let items: unknown[] = [];
-    if (isObject(payload) && Array.isArray(payload.data)) {
-      items = payload.data;
+
+    // Check if the actual list of travellers (paginationResult.data) is an array
+    if (isObject(paginationResult) && Array.isArray(paginationResult.data)) {
+      items = paginationResult.data; // Now items is the array of raw travellers
+
+      // Extract pagination details from paginationResult
       const totalItems =
-        typeof payload.totalItems === 'number' ? payload.totalItems : 0;
+        typeof paginationResult.totalItems === 'number'
+          ? paginationResult.totalItems
+          : 0;
       const totalPages =
-        typeof payload.totalPages === 'number' ? payload.totalPages : 1;
+        typeof paginationResult.totalPages === 'number'
+          ? paginationResult.totalPages
+          : 1;
       const hasNextPage =
-        typeof payload.hasNextPage === 'boolean' ? payload.hasNextPage : false;
+        typeof paginationResult.hasNextPage === 'boolean'
+          ? paginationResult.hasNextPage
+          : false;
       const hasPreviousPage =
-        typeof payload.hasPreviousPage === 'boolean'
-          ? payload.hasPreviousPage
+        typeof paginationResult.hasPreviousPage === 'boolean'
+          ? paginationResult.hasPreviousPage
           : false;
       const currentPage =
-        typeof payload.page === 'number' ? payload.page : params.page;
+        typeof paginationResult.page === 'number'
+          ? paginationResult.page
+          : params.page;
       const currentPerPage =
-        typeof payload.perPage === 'number' ? payload.perPage : params.perPage;
+        typeof paginationResult.perPage === 'number'
+          ? paginationResult.perPage
+          : params.perPage;
 
       const normalized = items.map((it, idx) => normalizeRaw(it, idx));
 
+      // Return the PaginationResult structure
       return {
         data: normalized,
         totalItems: totalItems,
@@ -127,6 +149,7 @@ export async function fetchTravellers(
       };
     }
 
+    // Return empty result on failure to parse
     return {
       data: [],
       totalItems: 0,
