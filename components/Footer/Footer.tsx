@@ -1,140 +1,86 @@
-// components/Footer/Footer.tsx
-import React from 'react';
 import Link from 'next/link';
-import Container from '../layout/Container/Container';
+import styles from './Footer.module.css';
+// import Image from 'next/image';
 
-export const Footer: React.FC = () => {
-  // Navigation links
-  const navItems = [
-    { href: '/', label: 'Головна' },
-    { href: '/stories', label: 'Історії' },
-    { href: '/travellers', label: 'Мандрівники' },
-    { href: '/profile', label: 'Профіль' },
+const socialLinks = [
+    { name: 'Facebook', href: 'https://www.facebook.com/', iconId: 'icon-Facebook' },
+    { name: 'Instagram', href: 'https://www.instagram.com/', iconId: 'icon-Instagram' },
+    { name: 'X', href: 'https://x.com/', iconId: 'icon-X' },
+    { name: 'YouTube', href: 'https://www.youtube.com/', iconId: 'icon-Youtube' },
   ];
 
-  // Social media links (placeholders)
-  const socialLinks = [
-    { href: 'https://www.facebook.com/', label: 'Facebook' },
-    { href: 'https://www.instagram.com/', label: 'Instagram' },
-    { href: 'https://x.com/', label: 'X' },
-    { href: 'https://www.youtube.com/', label: 'YouTube' },
+  const navAuth = [
+    { label: 'Головна', href: '/' },
+    { label: 'Історії', href: '/stories' },
+    { label: 'Мандрівники', href: '/travellers' },
   ];
+
+  const navGuest = [
+    { label: 'Головна', href: '/auth/register' },
+    { label: 'Історії', href: '/auth/register' },
+    { label: 'Мандрівники', href: '/auth/register' },
+    { label: 'Профіль', href: '/auth/register' },
+  ];
+
+export default function Footer() {
+  const isAuthenticated = false; // заміниш на свій стейт
+
+  const navLinks = isAuthenticated ? navAuth : navGuest;
 
   return (
-    <footer
-      style={{
-        backgroundColor: 'var(--color-neutral-darker)',
-        color: 'var(--color-white)',
-        padding: '40px 0',
-        marginTop: 'auto',
-      }}
-    >
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: 'column',
-            gap: '30px',
-          }}
-        >
-          {/* Top section: Logo, Nav, Social (Simple Flex Layout) */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: '30px',
-            }}
-          >
-            {/* Logo Placeholder */}
-            <Link
-              href="/"
-              style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: 'var(--color-white)',
-                textDecoration: 'none',
-              }}
-            >
-              WanderCode LOGO
-            </Link>
-
-            {/* Navigation Block */}
-            <nav>
-              <h4 style={{ marginBottom: '10px', color: 'var(--color-white)' }}>
-                Навігація
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {navItems.map((item) => (
-                  <li key={item.href} style={{ marginBottom: '5px' }}>
-                    <Link
-                      href="/auth/register"
-                      style={{
-                        color: 'var(--color-neutral-light)',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            {/* Social Media Block */}
-            <div>
-              <h4 style={{ marginBottom: '10px', color: 'var(--color-white)' }}>
-                Соцмережі
-              </h4>
-              <ul
-                style={{
-                  listStyle: 'none',
-                  padding: 0,
-                  margin: 0,
-                  display: 'flex',
-                  gap: '15px',
-                }}
+    <footer className={styles.footer}>
+      <div className={styles.container}>
+        <div className={styles.content}>
+        {/* logo */}
+        <div className={styles.topRow}>
+          <Link href="/" className={styles.logo}>
+           <svg
+                className={styles.logo}
+                width="22"
+                height="22"
+                aria-hidden="true"
               >
-                {socialLinks.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--color-white)' }}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom section: Copyright */}
-          <div
-            style={{
-              borderTop: '1px solid var(--opacity-white-15)',
-              paddingTop: '20px',
-              textAlign: 'center',
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: '14px',
-                color: 'var(--color-neutral-light)',
-              }}
-            >
-              © 2025 Подорожники. Усі права захищені.
-            </p>
-          </div>
+                <use href="/symbol-defs.svg#icon-logo" />
+              </svg>
+           
+            <span className={styles.logoText}>Подорожники</span>
+          </Link>
+           </div>
+          {/* соціальні мережі */}
+          <ul className={styles.socialList}>
+            {socialLinks.map(({ name, href, iconId }) => (
+              <li key={name}>
+                <a href={href} target="_blank" rel="noreferrer" aria-label={name}>
+                    <svg
+                    className={styles.socialIcon}
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                  >
+                    <use href={`/symbol-defs.svg#${iconId}`} />
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        
+       {/* Навігація */}
+        <ul className={styles.navList}>
+          {navLinks.map(({ label, href }) => (
+            <li key={label}>
+              <Link href={href} className={styles.navLink}>
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
         </div>
-      </Container>
+        <div className={styles.divider} />
+
+       
+
+        <p className={styles.copy}>© 2025 Подорожники. Усі права захищені.</p>
+      </div>
     </footer>
   );
-};
-
-export default Footer;
+}
