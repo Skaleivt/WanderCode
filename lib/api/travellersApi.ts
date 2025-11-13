@@ -7,6 +7,7 @@ export type Traveller = {
   name: string;
   avatarUrl?: string;
   description?: string;
+  articlesAmount?: number;
   raw?: unknown;
 };
 
@@ -44,12 +45,26 @@ function getStringFromKeys(
   return undefined;
 }
 
+function getNumberFromKeys(
+  obj: Record<string, unknown>,
+  keys: string[]
+): number | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (typeof v === 'number') {
+      return v;
+    }
+  }
+  return undefined;
+}
+
 function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
   let id = `generated-${Date.now()}-${fallbackIndex}`;
   let _id = '';
   let name = '';
   let avatarUrl: string | undefined = undefined;
   let description: string | undefined = undefined;
+  let articlesAmount: number | undefined = undefined;
 
   if (isObject(raw)) {
     const raw_id_field = raw['_id'];
@@ -88,6 +103,8 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
       'bio',
       'about',
     ]);
+
+    articlesAmount = getNumberFromKeys(raw, ['articlesAmount']);
   }
 
   return {
@@ -96,6 +113,7 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
     name,
     avatarUrl,
     description,
+    articlesAmount,
     raw,
   };
 }
@@ -170,5 +188,35 @@ export async function fetchTravellers(
     };
   } catch (error) {
     throw error;
+  }
+}
+
+/* Fetch a single traveller by ID */
+export async function getTravellerById(id: string): Promise<Traveller | null> {
+  try {
+    const res = await nextServer.get(`/users/${id}`);
+
+    // 1. Перевірка, чи отримано дані
+    if (!res.data) {
+      return null;
+    }
+
+    const payload = res.data;
+
+    // 2. 🚀 ВИПРАВЛЕННЯ: Доступ до вкладеного об'єкта user
+    const rawUserData =
+      isObject(payload) && isObject(payload.data)
+        ? payload.data.user // Отримуємо об'єкт user з data.user
+        : null;
+
+    if (!rawUserData) {
+      return null;
+    }
+
+    // 3. Нормалізація
+    return normalizeRaw(rawUserData, 0);
+  } catch (error) {
+    console.error(`Error fetching traveller ${id}:`, error);
+    return null;
   }
 }
