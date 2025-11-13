@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import styles from './Footer.module.css';
-import Image from 'next/image';
+// import Image from 'next/image';
 
 const socialLinks = [
-    { name: 'Facebook', href: 'https://www.facebook.com/', icon: '/icons/facebook.svg' },
-    { name: 'Instagram', href: 'https://www.instagram.com/', icon: '/icons/instagram.svg' },
-    { name: 'X', href: 'https://x.com/', icon: '/icons/x.svg' },
-    { name: 'YouTube', href: 'https://www.youtube.com/', icon: '/icons/youtube.svg' },
+    { name: 'Facebook', href: 'https://www.facebook.com/', iconId: 'icon-Facebook' },
+    { name: 'Instagram', href: 'https://www.instagram.com/', iconId: 'icon-Instagram' },
+    { name: 'X', href: 'https://x.com/', iconId: 'icon-X' },
+    { name: 'YouTube', href: 'https://www.youtube.com/', iconId: 'icon-Youtube' },
   ];
 
   const navAuth = [
@@ -36,22 +36,31 @@ export default function Footer() {
         {/* logo */}
         <div className={styles.topRow}>
           <Link href="/" className={styles.logo}>
-            <Image src="/icons/logo.svg" alt="Подорожники" width={22} height={22} />
+           <svg
+                className={styles.logo}
+                width="22"
+                height="22"
+                aria-hidden="true"
+              >
+                <use href="/symbol-defs.svg#icon-logo" />
+              </svg>
+           
             <span className={styles.logoText}>Подорожники</span>
           </Link>
            </div>
           {/* соціальні мережі */}
           <ul className={styles.socialList}>
-            {socialLinks.map(({ name, href, icon }) => (
+            {socialLinks.map(({ name, href, iconId }) => (
               <li key={name}>
                 <a href={href} target="_blank" rel="noreferrer" aria-label={name}>
-                  <Image
-                    src={icon}
-                    alt={name}
-                    width={24}
-                    height={24}
+                    <svg
                     className={styles.socialIcon}
-                  />
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                  >
+                    <use href={`/symbol-defs.svg#${iconId}`} />
+                  </svg>
                 </a>
               </li>
             ))}
