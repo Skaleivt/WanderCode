@@ -1,6 +1,7 @@
 // app/page.tsx
 import React from 'react';
 import Container from '@/components/layout/Container/Container';
+import PopularSection from '@/components/PopularSection/PopularSection';
 
 export default function HomePage() {
   return (
@@ -13,6 +14,8 @@ export default function HomePage() {
         This content is wrapped within the **Container** component. Please test
         the following functionality:
       </p>
+
+      <PopularSection/>
 
       {}
       <section

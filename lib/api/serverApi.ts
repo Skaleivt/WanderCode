@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // lib/api/serverApi.ts
 
 import { NextRequest } from 'next/server';
@@ -11,3 +12,15 @@ export function checkServerSession(request: NextRequest): boolean {
 
   return false;
 }
+=======
+// серверні запити
+
+// тимчасова заглушка
+export async function checkServerSession() {
+  return {
+    headers: {
+      'set-cookie': [],
+    },
+  };
+}
+>>>>>>> Stashed changes
