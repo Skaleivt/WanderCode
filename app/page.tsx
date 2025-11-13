@@ -1,6 +1,7 @@
 // app/page.tsx
 import React from 'react';
 import Container from '@/components/layout/Container/Container';
+import PopularSection from '@/components/PopularSection/PopularSection';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -30,6 +31,11 @@ export default function HomePage() {
           Go to the Travellers Page to test the Infinite Scroll functionality:
         </p>
 
+
+      <PopularSection/>
+
+      {}
+
         {/* Link for navigation */}
         <Link
           href="/travellers"
@@ -46,6 +52,7 @@ export default function HomePage() {
         </Link>
       </section>
       {/* End Navigation Block */}{' '}
+
       <section
         style={{
           padding: '20px',
