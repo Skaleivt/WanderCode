@@ -7,7 +7,7 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import AuthProvider from '@/components/AuthProvider/AuthProvider';
-import Container from '@/components/layout/Container/Container'; // 🚀 ІМПАРТ КАМПАНЕНТА КАНТЭЙНЕРА
+import Container from '@/components/layout/Container/Container';
 
 const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
@@ -24,24 +24,13 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: 'Подорожники - WanderCode | Вашыя гісторыі падарожжаў',
+  title: 'Подорожники - WanderCode | Ваші історії подорожей',
   description:
-    'Чытайце натхняльныя нататкі падарожнікаў пра дзіўныя месцы і стварайце ўласныя гісторыі падарожжаў.',
+    'Читайте натхненні нотатки мандрівників про дивовижні місця та створюйте власні історії подорожей.',
   openGraph: {
     title: 'Подорожники - WanderCode',
     description:
-      'Прачытаць заметкі падарожнікаў аб месцах, дзе яны былі, і напісаць нататку пра свае падарожжы.',
-    url: 'localhost:3000',
-    siteName: 'Подорожники - WanderCode',
-    images: [
-      {
-        url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Подорожники - WanderCode preview',
-      },
-    ],
-    type: 'website',
+      'Прочитати нотатки мандрівників про місця, де вони були, та написати нотатку про власні подорожі.',
   },
 };
 
