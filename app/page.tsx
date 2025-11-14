@@ -3,8 +3,11 @@ import React from 'react';
 import Container from '@/components/layout/Container/Container';
 import Link from 'next/link';
 import StoriesList from '@/components/StoriesList/StoriesList';
+import { fetchStories } from '@/lib/api/storiesApi';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const initialStories: any = await fetchStories(1);
+
   return (
     <Container className="homepage-container">
       {' '}
@@ -49,20 +52,7 @@ export default function HomePage() {
       {/* End Navigation Block */}{' '}
 
       <section>
-        <StoriesList stories={[
-          {
-            title: 'Венеція без туристів: маршрути для справжніх м',
-            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
-          },
-          {
-            title: 'Північне сяйво в Норвегії: погоня за світлом',
-            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
-          },
-          {
-            title: 'Північне сяйво в Норвегії: погоня за світлом',
-            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
-          }
-        ]} />
+        <StoriesList stories={initialStories.data.data} />
       </section>
 
       <section

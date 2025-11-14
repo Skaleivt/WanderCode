@@ -23,13 +23,28 @@ export default function StoriesList({ stories }: StoriesListProps) {
     // setDeletingId]=useState<string | null>(null);
     // const queryClient=useQueryClient();
 
+    function getDateString(date: Date): string {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}.${month}.${year}`;
+    }
+
     
     return <>
         <h2>Популярні історії</h2> 
         <ul className={css.list}>
-            {stories.map(item => <li className={css.listItem} key={item}>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
+            {stories.map(item => <li className={css.listItem} key={item._id}>
+                <img className={css.img} src={item.img} alt={item.title} />
+                <div className={css.content}>
+                    <div className={css.category}>{item.category}</div>
+                    <h3 className={css.title}>{item.title}</h3>
+                    <p className={css.description}>{item.article}</p>
+                    <div>{item.ownerId}</div>
+                    <div>{getDateString(new Date(item.date))}</div>
+                    <div>{item.favoriteCount}</div>
+                </div>
             </li>)}
         </ul>
     </>;

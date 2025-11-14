@@ -10,9 +10,8 @@
 
 .listItem {
     background-color: #E8EEFF;
-    /* border: 1px solid #dee2e6; */
+    overflow: hidden;
     border-radius: 16px;
-    padding: 24px;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
@@ -21,22 +20,34 @@
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 700;
     margin: 0 0 8px 0;
-    color: #212529;
+    color: #000000;
 }
 
-.content {
-    margin: 0;
-    flex-grow: 1;
-    font-size: 14px;
-    color: #495057;
-    margin-bottom: 12px;
+.description {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    margin: 0;
+}
+
+.img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* .category {
+
+} */
+
+.content {
+    padding: 24px;
 }
 
 .button {
