@@ -252,15 +252,16 @@ export default function AddStoryForm() {
       </section>
 
       {/* Модалка підтвердження помилки */}
-      <ConfirmModal
-        isOpen={errorOpen}
-        title="Помилка збереження"
-        description="Не вдалося зберегти історію. Спробуйте ще раз."
-        onConfirm={() => setErrorOpen(false)}
-        onClose={() => setErrorOpen(false)}
-        confirmText="OK"
-        cancelText="Закрити"
-      />
+     <ConfirmModal
+  isOpen={errorOpen}
+  title="Помилка під час збереження"
+  description="Щоб зберегти статтю вам треба увійти, якщо ще немає облікового запису — зареєструйтесь."
+  cancelText="Увійти"
+  confirmText="Зареєструватись"
+  onClose={() => setErrorOpen(false)}                 // бекдроп/ESC — просто закрити
+  onCancel={() => { setErrorOpen(false); router.push('/login'); }}   // Ліва кнопка
+  onConfirm={() => { setErrorOpen(false); router.push('/register'); }} // Права кнопка
+/>
     </>
   );
 }

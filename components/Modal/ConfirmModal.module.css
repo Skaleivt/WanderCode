@@ -1,7 +1,167 @@
-.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: grid; place-items: center; z-index: 1000; }
-.card { background: #fff; border-radius: 12px; padding: 20px; width: min(480px, 92vw); box-shadow: 0 10px 30px rgba(0,0,0,.15); }
-.title { margin: 0 0 8px; font-weight: 600; }
-.desc { margin: 0 0 16px; color: #444; }
-.actions { display: flex; gap: 12px; justify-content: flex-end; }
-.primary { padding: 8px 14px; border-radius: 8px; border: 1px solid #4169E1; background: #4169E1; color: #fff; }
-.ghost { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(0,0,0,.15); background: rgba(0,0,0,.05); }
+
+ .backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+}
+
+/* MOBILE (база) */
+.card {
+  width: 100%;
+  max-width: 343px;
+  padding: 24px 20px;
+  border-radius: 24px;
+  background: #f7f9ff;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Sora', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: #000000;
+}
+
+.desc {
+  font-family: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #000000;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.primary,
+.ghost {
+  width: 100%;
+  height: 48px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  cursor: pointer;
+}
+
+/* primary — синя кнопка */
+.primary {
+  
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+/* ghost — сіра */
+.ghost {
+    
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+/* HOVER/FOCUS трохи приємні */
+.primary:focus-visible,
+.ghost:focus-visible {
+  outline: 2px solid #4169e1;
+  outline-offset: 2px;
+}
+
+.primary:hover {
+    color: #ffffff;
+    border: 1px solid #4169e1;
+    background: #4169e1;
+}
+
+.ghost:hover {
+    color: #ffffff;
+    background: #4169e1;
+  
+}
+
+/* TABLET ≥ 768px */
+@media (min-width: 768px) {
+  .backdrop {
+    padding: 32px 24px;
+  }
+
+  .card {
+    max-width: 600px;
+    padding: 40px 32px;
+    gap: 24px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .desc {
+    font-size: 18px;
+  }
+
+  .actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .primary,
+  .ghost {
+    width: 50%;
+    font-size: 18px;
+  }
+}
+
+/* DESKTOP ≥ 1200px (близько до Figma 768x400) */
+@media (min-width: 1200px) {
+  .backdrop {
+    padding: 64px 0;
+  }
+
+  .card {
+    max-width: 768px;
+    padding: 64px;
+    gap: 32px;
+  }
+
+  .title {
+    font-size: 48px; /* Display/lg із макету */
+  }
+
+  .desc {
+    font-size: 20px;
+  }
+
+  .actions {
+    max-width: 430px; /* як у Figma */
+    margin-top: 8px;
+  }
+
+  .primary,
+  .ghost {
+    height: 48px;
+  }
+}
