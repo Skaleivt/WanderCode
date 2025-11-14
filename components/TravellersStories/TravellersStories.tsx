@@ -1,3 +1,4 @@
+// components/TravellersStories/TravellersStories.tsx
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -6,14 +7,10 @@ import Loader from '@/components/Loader/Loader';
 import StoriesList from '@/components/StoriesList/StoriesList';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 
-type Story = {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  createdAt: string;
-  // додай сюди решту полів, які треба StoriesList
-};
+// !!! ВЫПРАЎЛЕННЕ: ІМПАРТ АЎТАРЫТЭТНАГА ТЫПУ STORY І STORIESRESPONSE !!!
+import { Story } from '@/types/story';
+// Імаверна, вам спатрэбіцца імпарт StoriesResponse, калі ваш API яго выкарыстоўвае.
+// Для прастаты пакідаем толькі Story, як патрабуецца ў useQuery.
 
 // TODO: заміни на свій реальний API-запит (наприклад, clientApi.getStories())
 const fetchStories = async (): Promise<Story[]> => {
@@ -47,9 +44,8 @@ const useMediaQuery = (query: string) => {
 const TravellersStories = () => {
   const isDesktop = useMediaQuery('(min-width: 1280px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1279px)');
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMediaQuery('(max-width: 767px)'); // стартові кількості: desktop 9, tablet 8, mobile 9
 
-  // стартові кількості: desktop 9, tablet 8, mobile 9
   const initialCount = useMemo(() => {
     if (isDesktop) return 9;
     if (isTablet) return 8;
@@ -71,34 +67,34 @@ const TravellersStories = () => {
   } = useQuery<Story[]>({
     queryKey: ['stories'],
     queryFn: fetchStories, // тут можеш підставити свою функцію з api.ts
-  });
+  }); // показати toast один раз при помилці
 
-  // показати toast один раз при помилці
   useEffect(() => {
     if (isError) {
       const message =
         error instanceof Error ? error.message : 'Сталася помилка';
       showErrorToast(message);
     }
-  }, [isError, error]);
+  }, [isError, error]); // ЛОАДЕР
 
-  // ЛОАДЕР
   if (isLoading) {
     return (
       <div className="stories-loader">
-        <Loader />
+                <Loader />     {' '}
       </div>
     );
-  }
+  } // ПОРОЖНІЙ СТАН, якщо з бекенда прийшов пустий масив
 
-  // ПОРОЖНІЙ СТАН, якщо з бекенда прийшов пустий масив
   if (!stories.length) {
     return (
       <div className="stories-empty">
-        <h2 className="stories-empty__title">Поки що немає історій</h2>
+                <h2 className="stories-empty__title">Поки що немає історій</h2> 
+             {' '}
         <p className="stories-empty__text">
-          Станьте першим, хто поділиться власною мандрівкою та надихне інших!
+                    Станьте першим, хто поділиться власною мандрівкою та надихне
+          інших!        {' '}
         </p>
+             {' '}
       </div>
     );
   }
@@ -112,19 +108,21 @@ const TravellersStories = () => {
 
   return (
     <section className="stories">
-      <StoriesList stories={visibleStories} />
-
+            <StoriesList stories={visibleStories} />     {' '}
       {canLoadMore && (
         <div className="stories__load-more-wrap">
+                   {' '}
           <button
             type="button"
             className="stories__load-more-btn"
             onClick={handleLoadMore}
           >
-            Переглянути всі
+                        Переглянути всі          {' '}
           </button>
+                 {' '}
         </div>
       )}
+         {' '}
     </section>
   );
 };

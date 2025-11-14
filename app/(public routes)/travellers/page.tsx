@@ -1,4 +1,4 @@
-// app/travellers/page.tsx
+// app/(public routes)/travelers/page.tsx
 import { Suspense } from 'react';
 import TravellersList from '@/components/Travellers/TravellersList/TravellersList';
 import Loader from '@/components/Loader/Loader';

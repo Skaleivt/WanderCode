@@ -9,9 +9,11 @@ type StoryDraftStore = {
 };
 
 const initialDraft: NewStory = {
+  img: '',
   title: '',
-  content: '',
-  tag: 'Todo',
+  category: '',
+  article: '',
+
   // поля для історії перевизначити
 };
 

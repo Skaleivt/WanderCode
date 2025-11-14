@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     if (refreshToken) {
       // Якщо accessToken відсутній, але є refreshToken — потрібно перевірити сесію навіть для публічного маршруту,
       // адже сесія може залишатися активною, і тоді потрібно заборонити доступ до публічного маршруту.
-      const data = await checkServerSession();
+      const data = await checkServerSession(request);
       const setCookie = data.headers['set-cookie'];
 
       if (setCookie) {
