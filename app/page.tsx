@@ -2,6 +2,7 @@
 import React from 'react';
 import Container from '@/components/layout/Container/Container';
 import Link from 'next/link';
+import StoriesList from '@/components/StoriesList/StoriesList';
 
 export default function HomePage() {
   return (
@@ -46,6 +47,24 @@ export default function HomePage() {
         </Link>
       </section>
       {/* End Navigation Block */}{' '}
+
+      <section>
+        <StoriesList stories={[
+          {
+            title: 'Венеція без туристів: маршрути для справжніх м',
+            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
+          },
+          {
+            title: 'Північне сяйво в Норвегії: погоня за світлом',
+            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
+          },
+          {
+            title: 'Північне сяйво в Норвегії: погоня за світлом',
+            description: 'Венеція — це не лише площа Святого Марка і гондоли на Канале Ґранде. Ми вирішили дослідити місто з іншого боку — вулицями, де не ходять натовпи'
+          }
+        ]} />
+      </section>
+
       <section
         style={{
           padding: '20px',
