@@ -1,7 +1,7 @@
 // components/Header/Header.tsx
 import React from 'react';
 import Link from 'next/link';
-import Container from '../layout/Container/Container';
+import Container from '../Layout/Container/Container';
 
 export const Header: React.FC = () => {
   // Navigation links for non-authorized users (MVP)

@@ -7,7 +7,7 @@ import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import AuthProvider from '@/components/AuthProvider/AuthProvider';
-import Container from '@/components/layout/Container/Container';
+import Container from '@/components/Layout/Container/Container';
 
 const nunitoSans = Nunito_Sans({
   subsets: ['latin'],

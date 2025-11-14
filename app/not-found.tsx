@@ -1,7 +1,7 @@
 // app/not-found.tsx
 import React from 'react';
 import Link from 'next/link';
-import Container from '@/components/layout/Container/Container';
+import Container from '@/components/Layout/Container/Container';
 
 export default function NotFound() {
   return (

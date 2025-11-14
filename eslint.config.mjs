@@ -11,6 +11,14 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    rules: {
+      // Адключэнне правіла, якое блакуе выкарыстанне 'any'
+      '@typescript-eslint/no-explicit-any': 'off',
+      // Адключэнне правіла, якое выклікае лішняе папярэджанне
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+    },
+  },
 ];
 
 export default eslintConfig;
