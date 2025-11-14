@@ -1,0 +1,7 @@
+.backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: grid; place-items: center; z-index: 1000; }
+.card { background: #fff; border-radius: 12px; padding: 20px; width: min(480px, 92vw); box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+.title { margin: 0 0 8px; font-weight: 600; }
+.desc { margin: 0 0 16px; color: #444; }
+.actions { display: flex; gap: 12px; justify-content: flex-end; }
+.primary { padding: 8px 14px; border-radius: 8px; border: 1px solid #4169E1; background: #4169E1; color: #fff; }
+.ghost { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(0,0,0,.15); background: rgba(0,0,0,.05); }
