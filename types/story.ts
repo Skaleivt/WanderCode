@@ -1,4 +1,4 @@
-export interface Story { 
+export interface Story {
   _id: string;
   img: string;
   title: string;
@@ -10,8 +10,15 @@ export interface Story {
 }
 
 export interface StoriesResponse {
-  stories: Story[];
-  hasMore: boolean;
+  data: {
+    data: Story[];
+    hasNextPage: boolean;
+    page: number;
+    perPage: number;
+    totalItems: number;
+    totalPages: number;
+    hasPreviousPage: boolean;
+  };
 }
 
 export interface NewStory {

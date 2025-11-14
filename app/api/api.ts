@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: '',
-  //посилання на бек
+  baseURL: `${process.env.BASE_URL}`,
   withCredentials: true,
 });

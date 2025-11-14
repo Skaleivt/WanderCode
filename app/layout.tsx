@@ -6,8 +6,8 @@ import './globals.css';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
-import AuthProvider from '@/components/AuthProvider/AuthProvider';
-import Container from '@/components/layout/Container/Container'; // 🚀 ІМПАРТ КАМПАНЕНТА КАНТЭЙНЕРА
+// import AuthProvider from '@/components/AuthProvider/AuthProvider';
+import Container from '@/components/layout/Container/Container';
 
 const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
@@ -56,14 +56,14 @@ export default function RootLayout({
     <html lang="uk" className={`${nunitoSans.variable}${sora.variable}`}>
       <body>
         <TanStackProvider>
-          <AuthProvider>
-            <Header />
-            <main style={{ flexGrow: 1 }}>
-              <Container>{children}</Container>
-            </main>
-            {modal} <div id="modal-root"></div>
-            <Footer />
-          </AuthProvider>
+          {/* <AuthProvider> */}
+          <Header />
+          <main style={{ flexGrow: 1 }}>
+            <Container>{children}</Container>
+          </main>
+          {modal} <div id="modal-root"></div>
+          <Footer />
+          {/* </AuthProvider> */}
           <ToastContainer />
         </TanStackProvider>
       </body>

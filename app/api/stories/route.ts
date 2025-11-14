@@ -8,15 +8,18 @@ export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
 
-    const page = Number(request.nextUrl.searchParams.get('page') ?? 1);
-    const rawTag = request.nextUrl.searchParams.get('tag') ?? '';
-    const tag = rawTag === 'All' ? '' : rawTag;
+    const searchParams = request.nextUrl.searchParams;
+    const page = Number(searchParams.get('page') ?? 1);
+    const perPage = Number(searchParams.get('perPage') ?? 9);
+    const filter = searchParams.get('filter') ?? undefined;
+    const sort = searchParams.get('sort') ?? 'asc';
 
     const res = await api('/stories', {
       params: {
-        ...(tag && { tag }),
-        perPage: 9,
         page,
+        perPage,
+        filter,
+        sort,
       },
       headers: {
         Cookie: cookieStore.toString(),
@@ -39,6 +42,8 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// переписати post
 
 export async function POST(request: NextRequest) {
   try {

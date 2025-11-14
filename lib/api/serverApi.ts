@@ -1,26 +1,51 @@
-<<<<<<< Updated upstream
-// lib/api/serverApi.ts
+import { cookies } from 'next/headers';
+import { nextServer } from './api';
+import { StoriesResponse } from '@/types/story';
+import { AxiosResponse } from 'axios';
 
-import { NextRequest } from 'next/server';
+async function getServerCookies(): Promise<string> {
+  const cookieStore = await cookies();
 
-export function checkServerSession(request: NextRequest): boolean {
-  const token = request.cookies.get('auth_token')?.value;
-
-  if (token && token.length > 10) {
-    return true;
-  }
-
-  return false;
+  return cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join('; ');
 }
-=======
-// серверні запити
 
-// тимчасова заглушка
-export async function checkServerSession() {
-  return {
+export const checkServerSession = async (): Promise<AxiosResponse> => {
+  const res = await nextServer.get('/auth/session', {
     headers: {
-      'set-cookie': [],
+      Cookie: await getServerCookies(),
     },
+  });
+
+  return res;
+};
+
+export async function fetchAllStoriesServer({
+  page,
+  perPage,
+  filter,
+  sort,
+}: {
+  page?: number;
+  perPage?: string;
+  filter?: string;
+  sort?: string;
+}): Promise<StoriesResponse> {
+  const response = await nextServer.get<StoriesResponse>(`/stories`, {
+    params: {
+      perPage,
+      page,
+      filter,
+      sort,
+    },
+    // headers: {
+    //   Cookie: await getServerCookies(),
+    // },
+  });
+
+  return {
+    ...response.data,
   };
 }
->>>>>>> Stashed changes

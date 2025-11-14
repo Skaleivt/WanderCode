@@ -1,5 +1,5 @@
-// lib/api/clientApi.ts
-import axios from 'axios';
+'use client';
+import { nextServer } from '@/lib/api/api';
 import { StoriesResponse } from '@/types/story';
 
 export async function checkSession(): Promise<boolean> {
@@ -22,14 +22,25 @@ export async function checkSession(): Promise<boolean> {
   }
 }
 
-export async function getMe() {
-  return null;
+export async function fetchAllStoriesClient({
+  page,
+  perPage,
+  filter,
+  sort,
+}: {
+  page?: number;
+  perPage?: string;
+  filter?: string;
+  sort?: string;
+}): Promise<StoriesResponse> {
+  const response = await nextServer.get<StoriesResponse>('/stories', {
+    params: {
+      page,
+      perPage,
+      filter,
+      sort,
+    },
+  });
+
+  return response.data;
 }
-
-export const getPopularStories = async (page = 1): Promise<StoriesResponse> => {
-    const response = await axios.get(
-        `/api/stories?type=popular&page=${page}&limit=6`
-    );
-    return response.data;
-};
-
