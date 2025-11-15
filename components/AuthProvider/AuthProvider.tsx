@@ -1,7 +1,6 @@
 'use client';
 
-import { checkSession } from '@/lib/api/clientApi';
-import { getMe } from '@/lib/api/clientApi';
+import { getMe, checkSession } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useEffect } from 'react';
 
@@ -17,12 +16,24 @@ export default function AuthProvider({ children }: Props) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const sessionIsValid = await checkSession();
-
-      if (sessionIsValid) {
+      try {
+        // спробувати отримати користувача
         const user = await getMe();
-        if (user) setUser(user);
-      } else {
+        if (user) {
+          setUser(user);
+          return;
+        }
+
+        // якщо getMe не вдався, спробувати рефреш
+        const refreshed = await checkSession(); // новий метод на /api/auth/refresh
+        if (refreshed) {
+          const userAfterRefresh = await getMe();
+          if (userAfterRefresh) setUser(userAfterRefresh);
+          else clearIsAuthenticated();
+        } else {
+          clearIsAuthenticated();
+        }
+      } catch {
         clearIsAuthenticated();
       }
     };

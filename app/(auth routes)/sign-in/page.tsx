@@ -1,7 +1,7 @@
 'use client';
 
 import css from './SignInPage.module.css';
-import { AuthorizationRequest, loginUser } from '@/lib/api/clientApi';
+import { AuthorizationRequest, getMe, loginUser } from '@/lib/api/clientApi';
 
 import { useEffect, useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
@@ -21,10 +21,10 @@ export default function SignIn() {
     };
     try {
       const res = await loginUser(formValues);
-      console.log('sing-inasdfvdz c', res);
 
       if (res) {
-        setUser(res);
+        const me = await getMe();
+        if (me) setUser(me);
       } else {
         setError('Invalid email or password');
       }

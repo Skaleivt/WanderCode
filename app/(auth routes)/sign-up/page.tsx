@@ -1,6 +1,6 @@
 'use client';
 import css from './SignUpPage.module.css';
-import { RegisterRequest, registerUser } from '@/lib/api/clientApi';
+import { getMe, RegisterRequest, registerUser } from '@/lib/api/clientApi';
 import { useEffect, useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
@@ -22,7 +22,8 @@ export default function SingUp() {
       const res = await registerUser(formValues);
 
       if (res) {
-        setUser(res);
+        const me = await getMe();
+        if (me) setUser(me);
       } else {
         setError('Invalid email or password');
       }
