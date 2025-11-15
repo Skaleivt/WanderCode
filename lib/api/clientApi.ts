@@ -69,3 +69,27 @@ export const checkSession = async (): Promise<boolean> => {
 export const logout = async (): Promise<void> => {
   await nextServer.post('/auth/logout');
 };
+
+export async function addStoryToSaved(storyId: string): Promise<void> {
+  try {
+    await nextServer.post('/saved', { storyId });
+  } catch (error: unknown) {
+    let message = 'Не вдалося додати в збережені';
+    if (error instanceof Error) {
+      message = error.message || message;
+    }
+    throw new Error(message);
+  }
+}
+
+export async function removeStoryFromSaved(storyId: string): Promise<void> {
+  try {
+    await nextServer.delete('/saved', { data: { storyId } });
+  } catch (error: unknown) {
+    let message = 'Не вдалося видалити із збережених';
+    if (error instanceof Error) {
+      message = error.message || message;
+    }
+    throw new Error(message);
+  }
+}
