@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+/* <<<<<<< Updated upstream
 // lib/api/serverApi.ts
 
 import { NextRequest } from 'next/server';
@@ -24,3 +24,13 @@ export async function checkServerSession() {
   };
 }
 >>>>>>> Stashed changes
+ */
+
+// ======= тимчасова заглушка =======
+export async function checkServerSession() {
+  return {
+    headers: {
+      'set-cookie': [],
+    },
+  };
+}
