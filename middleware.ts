@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import { parse } from 'cookie';
 import { checkServerSession } from './lib/api/serverApi';
 
-const privateRoutes = ['/profile', '/stories'];
-const publicRoutes = ['/auth/login', '/auth/register'];
+const privateRoutes = ['/profile', '/stories/create'];
+const publicRoutes = ['/auth/login', '/auth/register', '/stories'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
