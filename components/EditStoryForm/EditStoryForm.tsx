@@ -12,7 +12,7 @@ import Loader from '@/components/Loader/Loader';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 
 import { nextServer } from '@/lib/api/api';
-import styles from './AddStoryForm.module.css';
+import styles from './EditStoryForm.module.css';
 
 // ===== Типи з бекенду =====
 type StoryFromApi = {
@@ -28,6 +28,7 @@ type Category = {
   value: string;
   label: string;
 };
+
 
 // ----- ShortDesc counter -----
 const ShortDescCounter = () => {
@@ -87,7 +88,7 @@ export default function EditStoryForm({ storyId }: { storyId: string }) {
     queryKey: ['story', storyId],
     queryFn: () => fetchStory(storyId),
   });
-  
+
   // === GET categories ===
   const { data: categories } = useQuery<Category[]>({
     queryKey: ['categories'],
