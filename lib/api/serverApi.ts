@@ -1,3 +1,4 @@
+// lib/api/serverApi.ts
 import { cookies } from 'next/headers';
 import { nextServer } from './api';
 import { StoriesResponse } from '@/types/story';

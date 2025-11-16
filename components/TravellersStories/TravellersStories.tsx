@@ -1,139 +1,107 @@
+// components/TravellersStories/TravellersStories.tsx
 
-// "use client";
+'use client';
 
-// import { useEffect, useMemo, useState } from "react";
-// import { useQuery } from "@tanstack/react-query";
-// import Loader from "@/components/Loader/Loader";
-// import StoriesList from "@/components/StoriesList/StoriesList";
-// import { showErrorToast } from "@/components/ShowErrorToast/ShowErrorToast";
+import { useMemo, useEffect } from 'react';
+import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
+import { fetchStoriesPage, StoriesPage } from '@/lib/api/clientApi';
+import Loader from '@/components/Loader/Loader';
+import StoriesList from '@/components/StoriesList/StoriesList';
+import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
+import { Story } from '@/types/story';
 
+const TravellersStories = () => {
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('filter') || 'all';
 
-// type Story = {
-//   id: string;
-//   title: string;
-//   excerpt: string;
-//   category: string;
-//   createdAt: string;
-//   // додай сюди решту полів, які треба StoriesList
-// };
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<
+    StoriesPage,
+    Error,
+    InfiniteData<StoriesPage, number>,
+    ['stories', { filter: string }],
+    number
+  >({
+    queryKey: ['stories', { filter }],
 
-// // TODO: заміни на свій реальний API-запит (наприклад, clientApi.getStories())
-// const fetchStories = async (): Promise<Story[]> => {
-//   const res = await fetch("/api/stories");
+    queryFn: ({ pageParam = 1, queryKey }) => {
+      const [, { filter }] = queryKey as ['stories', { filter: string }];
+      return fetchStoriesPage({ pageParam, filter });
+    },
 
-//   if (!res.ok) {
-//     throw new Error("Не вдалося завантажити історії");
-//   }
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
 
-//   return res.json();
-// };
+  const allStories: Story[] = useMemo(() => {
+    return data?.pages.flatMap((page) => page.stories) ?? [];
+  }, [data]);
 
-// const useMediaQuery = (query: string) => {
-//   const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    if (isError) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Виникла помилка під час завантаження даних';
+      showErrorToast(message);
+    }
+  }, [isError, error]);
 
-//   useEffect(() => {
-//     if (typeof window === "undefined") return;
+  if (isLoading) {
+    return (
+      <div className="stories-loader">
+        <Loader />
+      </div>
+    );
+  }
 
-//     const mql = window.matchMedia(query);
-//     const listener = (event: MediaQueryListEvent) =>
-//       setMatches(event.matches);
+  const noStoriesMessage =
+    filter === 'all'
+      ? 'Наразі немає жодної історії'
+      : `Наразі немає історій у категорії "${filter}"`;
 
-//     setMatches(mql.matches);
-//     mql.addEventListener("change", listener);
+  if (!allStories.length) {
+    return (
+      <div className="stories-empty">
+        <h2 className="stories-empty__title">{noStoriesMessage}</h2>
+        <p className="stories-empty__text">
+          Станьте першим, хто поділиться власною подорожжю та надихне інших!
+        </p>
+      </div>
+    );
+  }
 
-//     return () => mql.removeEventListener("change", listener);
-//   }, [query]);
+  const handleLoadMore = () => {
+    fetchNextPage();
+  };
 
-//   return matches;
-// };
+  return (
+    <section className="stories">
+      <StoriesList stories={allStories} />
 
-// const TravellersStories = () => {
-//   const isDesktop = useMediaQuery("(min-width: 1280px)");
-//   const isTablet = useMediaQuery(
-//     "(min-width: 768px) and (max-width: 1279px)"
-//   );
-//   const isMobile = useMediaQuery("(max-width: 767px)");
+      {hasNextPage && (
+        <div className="stories__load-more-wrap">
+          <button
+            type="button"
+            className="stories__load-more-btn"
+            onClick={handleLoadMore}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? 'Завантаження...' : 'Переглянути ще'}
+          </button>
+        </div>
+      )}
+      {isFetchingNextPage && <Loader />}
+    </section>
+  );
+};
 
-//   // стартові кількості: desktop 9, tablet 8, mobile 9
-//   const initialCount = useMemo(() => {
-//     if (isDesktop) return 9;
-//     if (isTablet) return 8;
-//     if (isMobile) return 9;
-//     return 9;
-//   }, [isDesktop, isTablet, isMobile]);
-
-//   const [visibleCount, setVisibleCount] = useState(initialCount);
-
-//   useEffect(() => {
-//     setVisibleCount(initialCount);
-//   }, [initialCount]);
-
-//   const {
-//     data: stories = [],
-//     isLoading,
-//     isError,
-//     error,
-//   } = useQuery<Story[]>({
-//     queryKey: ["stories"],
-//     queryFn: fetchStories, // тут можеш підставити свою функцію з api.ts
-//   });
-
-//   // показати toast один раз при помилці
-//   useEffect(() => {
-//     if (isError) {
-//       const message =
-//         error instanceof Error ? error.message : "Сталася помилка";
-//       showErrorToast(message);
-//     }
-//   }, [isError, error]);
-
-//   // ЛОАДЕР
-//   if (isLoading) {
-//     return (
-//       <div className="stories-loader">
-//         <Loader />
-//       </div>
-//     );
-//   }
-
-//   // ПОРОЖНІЙ СТАН, якщо з бекенда прийшов пустий масив
-//   if (!stories.length) {
-//     return (
-//       <div className="stories-empty">
-//         <h2 className="stories-empty__title">Поки що немає історій</h2>
-//         <p className="stories-empty__text">
-//           Станьте першим, хто поділиться власною мандрівкою та надихне
-//           інших!
-//         </p>
-//       </div>
-//     );
-//   }
-
-//   const visibleStories = stories.slice(0, visibleCount);
-//   const canLoadMore = visibleCount < stories.length;
-
-//   const handleLoadMore = () => {
-//     setVisibleCount((prev) => Math.min(prev + 3, stories.length));
-//   };
-
-//   return (
-//     <section className="stories">
-//       <StoriesList stories={visibleStories} />
-
-//       {canLoadMore && (
-//         <div className="stories__load-more-wrap">
-//           <button
-//             type="button"
-//             className="stories__load-more-btn"
-           
-//              onClick={handleLoadMore}
-//           >
-//             Переглянути всі
-//           </button>
-//         </div>
-//       )}
-//     </section>
-//   );
-// };
-
-// export default TravellersStories;
+export default TravellersStories;

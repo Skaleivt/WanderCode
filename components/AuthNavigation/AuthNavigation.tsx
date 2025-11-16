@@ -1,3 +1,4 @@
+// components/AuthNavigation/AuthNavigation.tsx
 'use client';
 
 import Link from 'next/link';
@@ -30,7 +31,7 @@ export default function AuthNavigation() {
         </li>
         <li>
           <Link
-            href="/createStory"
+            href="/stories/create"
             prefetch={false}
             className={css.createStory}
           >
