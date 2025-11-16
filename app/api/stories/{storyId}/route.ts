@@ -1,82 +1,96 @@
-// import { NextRequest, NextResponse } from 'next/server';
-// import { updateStory } from '@/lib/db/stories';
-// import { refreshStoryValidationSchema } from '@/lib/validation/story';
-// import { getUserFromToken } from '@/lib/auth/getUserFromToken';
-// import { isValidObjectId } from 'mongoose';
-// import { uploadFile } from '@/lib/upload/uploadFile'; // cloudinary / local etc.
+// app/api/stories/[storyId]/route.ts
 
-// // -------- PATCH /api/stories/[id] -------------
-// export async function PATCH(req: NextRequest, { params }) {
-//   try {
-//     const id = params.id;
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { AxiosError } from 'axios';
+import { nextServer } from '@/lib/api/api';
 
-//     // 1. Validate ID
-//     if (!isValidObjectId(id)) {
-//       return NextResponse.json(
-//         { status: 400, message: 'Invalid ID' },
-//         { status: 400 }
-//       );
-//     }
+interface RouteParams {
+  params: Promise<{ storyId: string }>;
+}
 
-//     // 2. Authorization — get user
-//     const user = await getUserFromToken(req);
-//     if (!user) {
-//       return NextResponse.json(
-//         { status: 401, message: 'Unauthorized' },
-//         { status: 401 }
-//       );
-//     }
+// Helper to compile all cookies into a single string for the external API call
+async function getServerCookiesString(): Promise<string> {
+  const cookieStore = await cookies();
+  return cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join('; ');
+}
 
-//     // 3. Read multipart/form-data
-//     const form = await req.formData();
-//     const imgFile = form.get('img') as File | null;
+// Generic error logging
+function logErrorResponse(error: AxiosError) {
+  console.error('API Proxy Error Status:', error.response?.status);
+  console.error('API Proxy Error Data:', error.response?.data);
+}
 
-//     // Body fields except file
-//     const updateBody: any = {};
-//     form.forEach((value, key) => {
-//       if (key !== 'img') updateBody[key] = value;
-//     });
+// GET /api/stories/[storyId]
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { storyId } = await params;
 
-//     // 4. Validate body (Zod/Yup)
-//     const validation = refreshStoryValidationSchema.safeParse(updateBody);
-//     if (!validation.success) {
-//       return NextResponse.json(
-//         { status: 400, message: validation.error.errors },
-//         { status: 400 }
-//       );
-//     }
+  try {
+    const res = await nextServer.get(`/stories/${storyId}`, {
+      headers: {
+        Cookie: await getServerCookiesString(),
+      },
+    });
 
-//     // 5. Upload file if exists
-//     let uploadedImg = null;
-//     if (imgFile) {
-//       uploadedImg = await uploadFile(imgFile); // return URL
-//     }
+    return NextResponse.json(res.data, { status: res.status });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    logErrorResponse(axiosError);
 
-//     // 6. Update DB
-//     const updatedStory = await updateStory(
-//       id,
-//       user._id,
-//       uploadedImg,
-//       updateBody
-//     );
+    return NextResponse.json(
+      axiosError.response?.data || { message: 'Server error during GET' },
+      { status: axiosError.response?.status || 500 }
+    );
+  }
+}
 
-//     if (!updatedStory) {
-//       return NextResponse.json(
-//         { status: 404, message: 'Story not found or not yours' },
-//         { status: 404 }
-//       );
-//     }
+// PATCH /api/stories/[storyId]
+export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  const { storyId } = await params;
 
-//     return NextResponse.json({
-//       status: 200,
-//       message: 'Update story successfully!',
-//       data: updatedStory,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json(
-//       { status: 500, message: 'Server error' },
-//       { status: 500 }
-//     );
-//   }
-// }
+  try {
+    const formData = await req.formData();
+
+    const res = await nextServer.patch(`/stories/${storyId}`, formData, {
+      headers: {
+        Cookie: await getServerCookiesString(),
+      },
+    });
+
+    return NextResponse.json(res.data, { status: res.status });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    logErrorResponse(axiosError);
+
+    return NextResponse.json(
+      axiosError.response?.data || { message: 'Server error during PATCH' },
+      { status: axiosError.response?.status || 500 }
+    );
+  }
+}
+
+// DELETE /api/stories/[storyId]
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  const { storyId } = await params;
+
+  try {
+    const res = await nextServer.delete(`/stories/${storyId}`, {
+      headers: {
+        Cookie: await getServerCookiesString(),
+      },
+    });
+
+    return new NextResponse(null, { status: res.status || 204 });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    logErrorResponse(axiosError);
+
+    return NextResponse.json(
+      axiosError.response?.data || { message: 'Server error during DELETE' },
+      { status: axiosError.response?.status || 500 }
+    );
+  }
+}

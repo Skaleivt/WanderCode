@@ -1,7 +1,14 @@
+// lib/api/clientApi.ts
 'use client';
 import { User } from '@/types/user';
 import { nextServer } from './api';
-import { StoriesResponse } from '@/types/story';
+import { StoriesResponse, Story } from '@/types/story';
+// import { QueryFunctionContext } from '@tanstack/react-query';
+
+export type StoriesPage = {
+  stories: Story[];
+  nextPage: number | undefined;
+};
 
 export type RegisterRequest = {
   name: string;
@@ -14,9 +21,11 @@ export type AuthorizationRequest = {
   password: string;
 };
 
+const ITEMS_PER_PAGE = 9;
+
 export async function fetchAllStoriesClient({
-  page,
-  perPage,
+  page = 1,
+  perPage = ITEMS_PER_PAGE,
   filter,
   sortField,
   sortOrder,
@@ -40,6 +49,18 @@ export async function fetchAllStoriesClient({
   return response.data;
 }
 
+export const fetchStoriesPage = async ({
+  pageParam,
+  filter,
+}: {
+  pageParam: number;
+  filter: string;
+}): Promise<StoriesPage> => {
+  const res = await fetch(`/api/stories?page=${pageParam}&filter=${filter}`);
+  if (!res.ok) throw new Error('Не ўдалося загрузіць гісторыі');
+  return res.json();
+};
+
 export async function registerUser(data: RegisterRequest): Promise<User> {
   const response = await nextServer.post(`/auth/register`, data, {
     withCredentials: true,
@@ -57,12 +78,14 @@ export async function loginUser(data: AuthorizationRequest): Promise<User> {
     ...response.data,
   };
 }
+
 export const getMe = async () => {
   const res = await nextServer.get('/users/current', {
     withCredentials: true,
   });
   return res.data.data;
 };
+
 export const checkSession = async (): Promise<boolean> => {
   try {
     const res = await nextServer.post('/auth/refresh', {

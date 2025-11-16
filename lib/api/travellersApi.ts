@@ -172,3 +172,30 @@ export async function fetchTravellers(
     throw error;
   }
 }
+
+/* Fetch single traveller (user) by id */
+export async function getTravellerById(id: string): Promise<Traveller | null> {
+  try {
+    const res = await nextServer.get(`/users/${id}`);
+    const payload: unknown = res.data;
+
+    // Swagger shows GET /api/users/{id} returns { status, message, data: { user: {...}, stories: [...] } }
+    if (isObject(payload) && isObject(payload.data)) {
+      const inner = payload.data as Record<string, unknown>;
+      // Prefer inner.user; if not present, try inner directly
+      const userRaw = inner['user'] ?? inner;
+      // normalizeRaw expects a record-like object
+      return normalizeRaw(userRaw, 0);
+    }
+
+    // fallback: if payload itself is a user object
+    if (isObject(payload)) {
+      return normalizeRaw(payload, 0);
+    }
+
+    return null;
+  } catch (err) {
+    // rethrow so caller can distinguish network errors vs 404 handling
+    throw err;
+  }
+}

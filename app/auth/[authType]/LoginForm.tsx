@@ -1,3 +1,4 @@
+// app/(auth routes)/sign-in/page.tsx
 'use client';
 
 import css from './AuthPage.module.css';
