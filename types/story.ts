@@ -29,3 +29,21 @@ export interface NewStory {
   category: string;
   date?: string;
 }
+
+export interface DetailedStory {
+  _id: string;
+  img: string;
+  title: string;
+  article: string;
+  category: {
+    _id: string;
+    title: string;
+  };
+  owner: {
+    _id: string;
+    name: string;
+    avatarUrl: string;
+  };
+  date: string;
+  favoriteCount: number;
+}
