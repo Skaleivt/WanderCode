@@ -1,64 +1,77 @@
 /* components/Travellers/TravellersList/TravellersList.module.css */
 
 .section {
-    padding: 40px 0;
+    padding-top: 48px;
+    padding-bottom: 40px;
 }
 
 .title {
-    font-size: 2.5rem;
+    font-family: var(--second-family);
+    font-weight: 700;
+    line-height: 110%;
+    letter-spacing: -0.01em;
     text-align: center;
-    margin-bottom: 30px;
+    color: var(--color-scheme-1-text);
+    margin-bottom: 24px;
+    font-size: 36px;
+
+    @media (min-width: 1440px) {
+        font-size: 56px;
+    }
 }
 
 .list {
-    /* Layout for the list of cards */
     display: grid;
     list-style: none;
     padding: 0;
-    margin: 0 auto 40px;
-    gap: 20px;
+    gap: 24px;
+    margin: 0 auto 24px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    justify-content: center;
+    max-width: 100%;
+}
 
-    /* Mobile First approach (320px + 375px) */
-    /* Mobile/Tablet default: 2 columns */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-
-    /* Tablet breakpoint (768px): 2 columns or adjust based on UI */
-    @media (min-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    /* Desktop breakpoint (1440px): 4 columns for 12/4 */
-    @media (min-width: 1440px) {
-        grid-template-columns: repeat(4, 1fr);
+@media (min-width: 1440px) {
+    .list {
+        grid-template-columns: repeat(4, 310px);
+        max-width: 1312px;
     }
 }
 
 .loadMoreButton {
     display: block;
     margin: 0 auto;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    background-color: var(--color-royal-blue);
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 150%;
     color: var(--color-white);
-    border: none;
-    border-radius: 6px;
+    background: var(--color-royal-blue);
+    border: 1px solid var(--color-royal-blue);
+    border-radius: 8px;
+    padding: 6px 12px;
+    height: 48px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.loadMoreButton:hover:not(:disabled) {
-    background-color: var(--color-royal-blue-dark);
+.loadMoreButton:hover:not(:disabled),
+.loadMoreButton:focus:not(:disabled) {
+    background: var(--color-royal-blue-lighter);
+    border: 1px solid var(--color-royal-blue);
+    color: var(--color-neutral-darkest);
+
 }
 
 .loadMoreButton:disabled {
-    background-color: var(--color-grey-light);
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .error,
 .empty {
     text-align: center;
-    color: var(--color-error);
+    color: var(--color-red);
     font-size: 1.2rem;
     padding: 20px;
 }
