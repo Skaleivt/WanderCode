@@ -54,6 +54,8 @@ export function StoryDetailsClient({ storyId }: Props) {
     );
   }
 
+  console.log('story.img:', story?.img);
+
   return (
     <div className={css.container}>
       <h2 className={css.title}>{story.title}</h2>

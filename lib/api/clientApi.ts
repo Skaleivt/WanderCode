@@ -5,8 +5,6 @@ import { nextServer } from './api';
 import { StoriesResponse, Story, DetailedStory } from '@/types/story';
 import axios from 'axios';
 
-// import { QueryFunctionContext } from '@tanstack/react-query';
-
 export type StoriesPage = {
   stories: Story[];
   nextPage: number | undefined;
@@ -104,28 +102,38 @@ export const logout = async (): Promise<void> => {
 };
 
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
-  const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/stories/${id}`,
-    {
-      withCredentials: true,
-    }
-  );
-  const story = response.data.data;
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/stories/${id}`
+    );
 
-  // Створюємо правильний формат для DetailedStory
-  return {
-    _id: story._id,
-    img: story.img,
-    title: story.title,
-    article: story.article,
-    date: story.date,
-    favoriteCount: story.favoriteCount,
-    owner: story.owner, // з бекенду приходить { _id, name, avatarUrl }
-    category: story.category, // з бекенду приходить { _id, title }
-  };
+    const story = response.data.data;
+
+    return {
+      _id: story._id,
+      img: story.img,
+      title: story.title,
+      article: story.article,
+      date: story.date,
+      favoriteCount: story.favoriteCount,
+      owner: story.owner,
+      category: story.category,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        'Помилка fetchStoryById:',
+        error.response?.data || error.message
+      );
+    } else if (error instanceof Error) {
+      console.error('Помилка fetchStoryById:', error.message);
+    } else {
+      console.error('Невідома помилка fetchStoryById');
+    }
+    throw new Error('Не вдалося завантажити історію');
+  }
 };
 
-/* Додаю функцію для кнопки зберігти історію  */
 export const saveStory = async (id: string) => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_API_URL}/api/stories/save/${id}`,

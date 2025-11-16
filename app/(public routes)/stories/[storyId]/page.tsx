@@ -1,33 +1,38 @@
 // app/(public routes)/stories/[storyId]/page.tsx
 
-import React from 'react';
+import { fetchStoryById } from '@/lib/api/clientApi';
+import { StoryDetailsClient } from './routesStory.client';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+import PopularSection from '@/components/PopularSection/PopularSection';
 
-type StoryParams = {
-  storyId: string;
+type Props = {
+  params: { storyId: string };
 };
 
-type SearchParams = {
-  [key: string]: string | string[] | undefined;
-};
+export default async function StoryPage({ params }: Props) {
+  const resolvedParams = await params;
+  const { storyId } = resolvedParams;
 
-interface StoryPageProps {
-  params: Promise<StoryParams>;
-  searchParams?: Promise<SearchParams>;
-}
+  // Створюємо клієнт для prefetching даних
+  const queryClient = new QueryClient();
 
-export default async function StoryDetailPage(props: StoryPageProps) {
-  const { storyId } = await props.params;
-  const searchParams = props.searchParams ? await props.searchParams : {};
-
-  if (!storyId) {
-    return <h1>Помилка: Story ID не передано</h1>;
-  }
+  // Завантажуємо дані про конкретну історію з бекенду на сервері
+  await queryClient.prefetchQuery({
+    queryKey: ['story', storyId],
+    queryFn: () => fetchStoryById(storyId),
+  });
 
   return (
-    <div>
-      <h1>Сторінка історії</h1>
-      <p>ID історії: {storyId}</p>
-      <pre>{JSON.stringify(searchParams, null, 2)}</pre>
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      {/* Деталі історії */}
+      <StoryDetailsClient storyId={storyId} />
+
+      {/* Блок популярних статей */}
+      <PopularSection />
+    </HydrationBoundary>
   );
 }
