@@ -203,7 +203,7 @@ export default function AddStoryForm() {
                 <span className={styles.label}>Категорія</span>
                 <Field as="select" name="category"  className={`${styles.select} ${values.category === '' ? styles.placeholder : ''}`}>
                  <option value="" disabled>Категорія</option> 
-                  {categories?.map((c:Category) => (
+                  {categories?.map((c: Category) => (
                     <option key={c._id} value={c.value}>
                       {c.title}
                     </option>

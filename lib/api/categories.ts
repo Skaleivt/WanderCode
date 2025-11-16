@@ -1,7 +1,12 @@
-import axios from "axios";
-import type { Category } from "@/types/story";
+import { nextServer } from "@/lib/api/api";
+
+export interface Category {
+  _id: string;
+  value: string;
+  label: string;
+}
 
 export async function getCategories(): Promise<Category[]> {
-  const { data } = await axios.get("/api/categories");
-  return data;
+  const res = await nextServer.get("/categories");
+  return res.data.data;  // бекенд повертає data: { data: [] }
 }
