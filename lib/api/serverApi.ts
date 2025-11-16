@@ -1,36 +1,69 @@
-/* <<<<<<< Updated upstream
-// lib/api/serverApi.ts
+import { cookies } from 'next/headers';
+import { nextServer } from './api';
+import { StoriesResponse } from '@/types/story';
+import { AxiosResponse } from 'axios';
+import { User } from '@/types/user';
 
-import { NextRequest } from 'next/server';
+async function getServerCookies(): Promise<string> {
+  const cookieStore = await cookies();
 
-export function checkServerSession(request: NextRequest): boolean {
-  const token = request.cookies.get('auth_token')?.value;
+  return cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join('; ');
+}
 
-  if (token && token.length > 10) {
-    return true;
+export const checkServerSession = async (): Promise<AxiosResponse> => {
+  const res = await nextServer.get('/auth/refresh', {
+    headers: {
+      Cookie: await getServerCookies(),
+    },
+  });
+
+  return res;
+};
+
+export async function fetchAllStoriesServer({
+  page,
+  perPage,
+  filter,
+  sortField,
+  sortOrder,
+}: {
+  page?: number;
+  perPage?: number;
+  filter?: string;
+  sortField?: string;
+  sortOrder?: string;
+}): Promise<StoriesResponse> {
+  const response = await nextServer.get<StoriesResponse>(`/stories`, {
+    params: {
+      page,
+      perPage,
+      filter,
+      sortField,
+      sortOrder,
+    },
+    headers: {
+      Cookie: await getServerCookies(),
+    },
+  });
+
+  return {
+    ...response.data,
+  };
+}
+
+export const getMeServer = async (): Promise<User | null> => {
+  try {
+    const res = await nextServer.get<User>('/users/current', {
+      headers: {
+        Cookie: await getServerCookies(),
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch user on server:', error);
+    return null;
   }
-
-  return false;
-}
-=======
-// серверні запити
-
-// тимчасова заглушка
-export async function checkServerSession() {
-  return {
-    headers: {
-      'set-cookie': [],
-    },
-  };
-}
->>>>>>> Stashed changes
- */
-
-// ======= тимчасова заглушка =======
-export async function checkServerSession() {
-  return {
-    headers: {
-      'set-cookie': [],
-    },
-  };
-}
+};

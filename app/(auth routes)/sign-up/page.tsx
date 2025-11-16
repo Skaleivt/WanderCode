@@ -1,13 +1,12 @@
 'use client';
 import css from './SignUpPage.module.css';
 import { RegisterRequest, registerUser } from '@/lib/api/clientApi';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
+import Link from 'next/link';
 
 export default function SingUp() {
-  const router = useRouter();
   const [error, setError] = useState('');
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -15,6 +14,7 @@ export default function SingUp() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const formValues: RegisterRequest = {
+      name: String(formData.get('name')),
       email: String(formData.get('email')),
       password: String(formData.get('password')),
     };
@@ -23,7 +23,6 @@ export default function SingUp() {
 
       if (res) {
         setUser(res);
-        router.push('/profile');
       } else {
         setError('Invalid email or password');
       }
@@ -31,7 +30,7 @@ export default function SingUp() {
       setError((error as ApiError).message ?? 'Oops... some error');
     }
   };
-
+  // переписати матадані
   useEffect(() => {
     document.title = `Sign-up | NoteHub`;
     document
@@ -44,33 +43,60 @@ export default function SingUp() {
 
   return (
     <main className={css.mainContent}>
-      <h1 className={css.formTitle}>Sign up</h1>
+      <ul>
+        <li className={css.navigationItem}>
+          <Link href="/sign-in" prefetch={false} className={css.navigationLink}>
+            Вхід
+          </Link>
+        </li>
+
+        <li className={css.navigationItem}>
+          <Link href="/sign-up" prefetch={false} className={css.navigationLink}>
+            Реєстрація
+          </Link>
+        </li>
+      </ul>
+      <h1 className={css.formTitle}>Реєстрація</h1>
       <form onSubmit={handleSubmit} className={css.form}>
         <div className={css.formGroup}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="name">Імʼя та Прізвище*</label>
+          <input
+            id="name"
+            type="name"
+            name="name"
+            className={css.input}
+            required
+            placeholder="Ваше імʼя та прізвище"
+          />
+        </div>
+
+        <div className={css.formGroup}>
+          <label htmlFor="email">Пошта*</label>
           <input
             id="email"
             type="email"
             name="email"
             className={css.input}
             required
+            placeholder="hello@podorozhnyky.ua"
           />
         </div>
 
         <div className={css.formGroup}>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Пароль*</label>
           <input
             id="password"
             type="password"
             name="password"
             className={css.input}
             required
+            placeholder="********"
           />
         </div>
 
         <div className={css.actions}>
           <button type="submit" className={css.submitButton}>
-            Register
+            Зареєструватись
           </button>
         </div>
         {error && <p className={css.error}>{error}</p>}

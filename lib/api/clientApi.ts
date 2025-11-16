@@ -1,39 +1,74 @@
-// lib/api/clientApi.ts
-import axios from 'axios';
-import { StoriesResponse } from '@/types/story';
-
+'use client';
+import { User } from '@/types/user';
 import { nextServer } from './api';
-import { Story, DetailedStory } from '@/types/story';
+import { StoriesResponse, Story, DetailedStory } from '@/types/story';
+import axios from 'axios';
 
-export async function checkSession(): Promise<boolean> {
+export type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export type AuthorizationRequest = {
+  email: string;
+  password: string;
+};
+
+export async function fetchAllStoriesClient({
+  page,
+  perPage,
+  filter,
+  sortField,
+  sortOrder,
+}: {
+  page?: number;
+  perPage?: number;
+  filter?: string;
+  sortField?: string;
+  sortOrder?: string;
+}): Promise<StoriesResponse> {
+  const response = await nextServer.get<StoriesResponse>('/stories', {
+    params: {
+      page,
+      perPage,
+      filter,
+      sortField,
+      sortOrder,
+    },
+  });
+
+  return response.data;
+}
+
+export async function registerUser(data: RegisterRequest): Promise<User> {
+  const response = await nextServer.post(`/auth/register`, data);
+  return {
+    ...response.data,
+  };
+}
+
+export async function loginUser(data: AuthorizationRequest): Promise<User> {
+  const response = await nextServer.post(`/auth/login`, data);
+  return {
+    ...response.data,
+  };
+}
+export const getMe = async () => {
+  const { data } = await nextServer.get<User>('/users/current');
+  return data;
+};
+export const checkSession = async (): Promise<boolean> => {
   try {
-    const response = await fetch('/api/auth/session', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    console.error('Error during session check:', error);
+    const res = await nextServer.post('/auth/refresh');
+    return res.status === 200;
+  } catch {
     return false;
   }
-}
+};
 
-export async function getMe() {
-  return null;
-}
-
-export const getPopularStories = async (page = 1): Promise<StoriesResponse> => {
-  const response = await axios.get(
-    `/api/stories?type=popular&page=${page}&limit=6`
-  );
-  return response.data;
+export const logout = async (): Promise<void> => {
+  await nextServer.post('/auth/logout');
 };
 
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {

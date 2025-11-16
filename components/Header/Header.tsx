@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Container from '../layout/Container/Container';
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
 
 export const Header: React.FC = () => {
   // Navigation links for non-authorized users (MVP)
@@ -66,24 +67,7 @@ export const Header: React.FC = () => {
             className="auth-buttons"
             style={{ display: 'flex', gap: '10px' }}
           >
-            <Link
-              href="/auth/login"
-              style={{
-                color: 'var(--color-scheme-1-accent)',
-                textDecoration: 'none',
-              }}
-            >
-              Вхід
-            </Link>
-            <Link
-              href="/auth/register"
-              style={{
-                color: 'var(--color-scheme-1-accent)',
-                textDecoration: 'none',
-              }}
-            >
-              Реєстрація
-            </Link>
+            <AuthNavigation />
           </div>
         </div>
       </Container>
