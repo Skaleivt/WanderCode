@@ -1,12 +1,10 @@
-// app/(private routes)/stories/create/page.tsx
+import AddStoryForm from "@/components/StoriesForm/AddStoryForm";
 
-const CreateStoryPage = () => {
-  return (
-    <div style={{ padding: '30px' }}>
-      <h1>Create New Story</h1>
-      {/* The form for creating and submitting a new story will go here */}
-    </div>
-  );
+export const metadata = {
+  title: "Створити нову історію — Подорожники",
+  description: "Завантажте обкладинку, додайте заголовок, категорію та текст історії.",
 };
 
-export default CreateStoryPage;
+export default function AddStoryPage() {
+  return <AddStoryForm />;
+}

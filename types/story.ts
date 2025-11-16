@@ -8,6 +8,14 @@ export interface Story {
   ownerId: string;
   date: string;
   favoriteCount: number;
+///виправи якщо треба
+  shortDesc?: string;
+  body: string; 
+  coverUrl?: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  isFavorite?: boolean;
 }
 
 export interface StoriesResponse {
@@ -28,4 +36,32 @@ export interface NewStory {
   article: string;
   category: string;
   date?: string;
+
+///виправи якщо треба
+  shortDesc?: string;
+  body: string;
+  cover?: File;        // при створенні
+}
+
+export interface Category {
+  _id: string;
+  value: string;
+  title: string;
+}
+export interface DetailedStory {
+  _id: string;
+  img: string;
+  title: string;
+  article: string;
+  category: {
+    _id: string;
+    title: string;
+  };
+  owner: {
+    _id: string;
+    name: string;
+    avatarUrl: string;
+  };
+  date: string;
+  favoriteCount: number;
 }

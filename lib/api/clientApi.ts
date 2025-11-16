@@ -2,8 +2,8 @@
 'use client';
 import { User } from '@/types/user';
 import { nextServer } from './api';
-import { StoriesResponse, Story } from '@/types/story';
-// import { QueryFunctionContext } from '@tanstack/react-query';
+import { StoriesResponse, Story, DetailedStory } from '@/types/story';
+import axios from 'axios';
 
 export type StoriesPage = {
   stories: Story[];
@@ -99,4 +99,69 @@ export const checkSession = async (): Promise<boolean> => {
 
 export const logout = async (): Promise<void> => {
   await nextServer.post('/auth/logout');
+};
+
+export async function addStoryToSaved(storyId: string): Promise<void> {
+  try {
+    await nextServer.post('/saved', { storyId });
+  } catch (error: unknown) {
+    let message = 'Не вдалося додати в збережені';
+    if (error instanceof Error) {
+      message = error.message || message;
+    }
+    throw new Error(message);
+  }
+}
+
+export async function removeStoryFromSaved(storyId: string): Promise<void> {
+  try {
+    await nextServer.delete('/saved', { data: { storyId } });
+  } catch (error: unknown) {
+    let message = 'Не вдалося видалити із збережених';
+    if (error instanceof Error) {
+      message = error.message || message;
+    }
+    throw new Error(message);
+  }
+}
+export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/stories/${id}`
+    );
+
+    const story = response.data.data;
+
+    return {
+      _id: story._id,
+      img: story.img,
+      title: story.title,
+      article: story.article,
+      date: story.date,
+      favoriteCount: story.favoriteCount,
+      owner: story.owner,
+      category: story.category,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        'Помилка fetchStoryById:',
+        error.response?.data || error.message
+      );
+    } else if (error instanceof Error) {
+      console.error('Помилка fetchStoryById:', error.message);
+    } else {
+      console.error('Невідома помилка fetchStoryById');
+    }
+    throw new Error('Не вдалося завантажити історію');
+  }
+};
+
+export const saveStory = async (id: string) => {
+  const response = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/stories/save/${id}`,
+    {},
+    { withCredentials: true }
+  );
+  return response.data;
 };

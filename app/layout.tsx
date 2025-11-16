@@ -6,6 +6,8 @@ import './globals.css';
 
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import AuthProvider from '@/components/AuthProvider/AuthProvider';
+import { Suspense } from 'react';
+import Loader from '@/components/Loader/Loader';
 
 const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
@@ -54,10 +56,12 @@ export default function RootLayout({
     <html lang="uk" className={`${nunitoSans.variable}${sora.variable}`}>
       <body>
         <TanStackProvider>
-          <AuthProvider>
-            <main style={{ flexGrow: 1 }}>{children}</main>
-            {modal} <div id="modal-root"></div>
-          </AuthProvider>
+          <Suspense fallback={<Loader />}>
+            <AuthProvider>
+              <main style={{ flexGrow: 1 }}>{children}</main>
+              {modal} <div id="modal-root"></div>
+            </AuthProvider>
+          </Suspense>
           <ToastContainer />
         </TanStackProvider>
       </body>
