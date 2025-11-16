@@ -1,178 +1,66 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Bookmark,
-  BookmarkCheck,
-  Loader2,
-  CalendarDays,
-  UserRound,
-} from "lucide-react";
 import Image from "next/image";
 
-import { Story } from "@/types/story";
-import { toggleStoryBookmark } from "@/lib/api/storyApi";
-import { useAuthStore } from "@/lib/store/authStore";
-import { showErrorToast } from "@/components/ShowErrorToast/ShowErrorToast";
-import styles from "./TravellersStoriesItem.module.css";
+import { Story } from '@/types/story';
 
-type TravellersStoriesItemProps = {
+import css from './TravellersStoriesItem.module.css';
+
+type TravelersStoriesItemProps = {
   story: Story;
 };
 
-const TravellersStoriesItem = ({ story }: TravellersStoriesItemProps) => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuthStore();
+export default function TravelersStoriesItem({
+  story,
+}: TravelersStoriesItemProps) {
+  const getDateString = (date: Date): string => {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
 
-const storyId = story._id;
-const imageUrl = story.img;
-const category = story.category;
-const title = story.title;
-const description = story.article;
-const authorName = "Unknown author";
-const authorAvatar = "/default-avatar.png";
-const publishedAt = story.date;
-const initialBookmarksCount = story.favoriteCount ?? 0;
-const initiallySaved = Boolean(story.isFavorite);
+      return `${day}.${month}.${year}`;
+  }
 
-  const [saved, setSaved] = useState<boolean>(initiallySaved);
-  const [bookmarks, setBookmarks] = useState<number>(initialBookmarksCount);
+  const viewStory = (id: string): void => {
+      
+  };
 
-  const dateStr = useMemo(() => {
-    const d = new Date(publishedAt);
-    return d.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  }, [publishedAt]);
-
-  const { mutate: handleToggleBookmark, isPending } = useMutation({
-    mutationFn: () => toggleStoryBookmark(storyId, saved),
-    onMutate: async () => {
-      setSaved((prev) => !prev);
-      setBookmarks((prev) => (saved ? Math.max(0, prev - 1) : prev + 1));
-    },
-    onError: (error: unknown) => {
-      showErrorToast(
-        error instanceof Error
-          ? error.message
-          : "Сталася помилка. Спробуйте ще раз.",
-      );
-      setSaved((prev) => !prev);
-      setBookmarks((prev) =>
-        saved ? prev + 1 : Math.max(0, prev - 1),
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["stories"] });
-      queryClient.invalidateQueries({ queryKey: ["story", storyId] });
-    },
-  });
-
-  const onBookmarkClick = () => {
-    if (!isAuthenticated) {
-      router.push("/sign-up");
-      return;
-    }
-    handleToggleBookmark();
+  const toogleFavoriteStory = (id: string): void => {
+      
   };
 
   return (
-    <article className={styles.card}>
-      <Link href={`/stories/${storyId}`} className={styles.imageLink}>
-        <Image
-          src={imageUrl}
-          alt={title}
-          width={800}
-          height={320}
-          className={styles.image}
-        />
-        <span className={styles.categoryBadge}>{category}</span>
-      </Link>
+    <div className={css.story}>
+      <img className={css.img} src={story.img} alt={story.title} />
+                
+      <div className={css.content}>
+          <div className={css.info}>
+              <div className={css.category}>{story.category}</div>
+              <h3 className={css.title}>{story.title}</h3>
+              <p className={css.description}>{story.article}</p>
+          </div>
 
-      <div className={styles.content}>
-        <header>
-          <Link href={`/stories/${storyId}`}>
-            <h3 className={styles.title}>{title}</h3>
-          </Link>
-        </header>
-
-        <p className={styles.description}>{description}</p>
-
-        <div className={styles.meta}>
-          <Image
-            src={authorAvatar}
-            alt={authorName}
-            width={32}
-            height={32}
-            className={styles.authorAvatar}
-          />
-          <span className={styles.metaInfo}>
-            <UserRound className="h-4 w-4" />
-            {authorName}
-          </span>
-          <span className={styles.metaInfo}>
-            <CalendarDays className="h-4 w-4" />
-            {dateStr}
-          </span>
-          <span className={styles.bookmarks}>
-            {saved ? (
-              <BookmarkCheck className="h-5 w-5" />
-            ) : (
-              <Bookmark className="h-5 w-5" />
-            )}
-            <span className={styles.bookmarksCount}>{bookmarks}</span>
-          </span>
-        </div>
-
-        <div className={styles.actions}>
-          <Link href={`/stories/${storyId}`} className={styles.viewButton}>
-            Переглянути статтю
-          </Link>
-
-          <button
-            type="button"
-            onClick={onBookmarkClick}
-            disabled={isPending}
-            aria-pressed={saved}
-            aria-label={
-              saved
-                ? "Видалити історію із збережених"
-                : "Зберегти історію"
-            }
-            className={[
-              styles.bookmarkButton,
-              saved ? styles.bookmarkButtonSaved : "",
-              isPending ? styles.bookmarkButtonDisabled : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {isPending ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Збереження...
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-2">
-                {saved ? (
-                  <BookmarkCheck className="h-4 w-4" />
-                ) : (
-                  <Bookmark className="h-4 w-4" />
-                )}
-                {saved ? "Видалити з збережених" : "Зберегти"}
-              </span>
-            )}
-          </button>
-        </div>
+          <div className={css.owner}>
+              <img className={css.avatar} src={story.img} alt={story.ownerId} />
+              <div className={css.ownerInfo}>
+                  <div>{story.ownerId}</div>
+                  <div>{getDateString(new Date(story.date))} &#8226; {story.favoriteCount} <Image src="/favorite.svg" width={12} height={12} alt="Favorite" /></div>
+              </div>
+          </div>
+          
+          <div className={css.buttonPanel}>
+              <button 
+                  onClick={() => viewStory(story._id)}
+                  className={css.button} 
+              >
+                  Переглянути статтю
+              </button>
+              <button 
+                  onClick={() => toogleFavoriteStory(story._id)}
+                  className={[css.button, css.favoriteButton].join(" ")}
+              >
+                  <Image src="/favorite.svg" width={20} height={20} alt="Favorite" />
+              </button>
+          </div>
       </div>
-      </article>
+    </div>
   );
-};
-
-export default TravellersStoriesItem;
+}

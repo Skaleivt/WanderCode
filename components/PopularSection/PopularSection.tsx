@@ -14,18 +14,15 @@ export default async function PopularSection({
   sortField = 'favoriteCount',
   sortOrder = 'desc',
 }: PopularSectionProps) {
+
   const initialData = await fetchAllStoriesServer({
     page,
     perPage,
     sortField,
     sortOrder,
   });
+
   return (
-    <PopularSectionClient
-      initialData={initialData}
-      perPage={3}
-      sortField="favoriteCount"
-      sortOrder="desc"
-    />
+    <PopularSectionClient initialData={initialData} />
   );
 }
