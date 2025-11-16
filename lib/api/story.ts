@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { StoriesResponse, Story, NewStory } from '@/types/story';
+import type { StoriesResponse } from '@/types/story';
 import { nextServer } from './api';
 import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
 
@@ -34,8 +34,8 @@ export async function createStory(values: AddStoryFormValues) {
   if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
-  form.append('body', values.body);
-  form.append('shortDesc', values.shortDesc ?? '');
+  form.append('description', values.description);
+  // form.append('shortDesc', values.shortDesc ?? '');
 
   const res = await nextServer.post('/stories', form);
   return res.data;
