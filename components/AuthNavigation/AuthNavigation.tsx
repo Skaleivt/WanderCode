@@ -1,3 +1,4 @@
+// components/AuthNavigation/AuthNavigation.tsx
 'use client';
 
 import Link from 'next/link';
@@ -14,16 +15,15 @@ export default function AuthNavigation() {
     (state) => state.clearIsAuthenticated
   );
 
-  console.log('usbsbvhd:::', isAuthenticated);
-
   const handleLogout = async () => {
     await logout();
     clearIsAuthenticated();
-    router.replace('/sign-in');
+    router.replace('/');
   };
+
   return isAuthenticated ? (
     <>
-      <ul>
+      <ul className={css.container}>
         <li className={css.navigationItem}>
           <Link href="/profile" prefetch={false} className={css.navigationLink}>
             Мій профіль
@@ -31,14 +31,14 @@ export default function AuthNavigation() {
         </li>
         <li>
           <Link
-            href="/createStory"
+            href="/stories/create"
             prefetch={false}
-            className={css.navigationLink}
+            className={css.createStory}
           >
             Опублікувати історію
           </Link>
         </li>
-        <li className={css.navigationItem}>
+        <li className={css.avatar}>
           {user?.avatarUrl ? (
             <Image
               src={user.avatarUrl}
@@ -50,10 +50,10 @@ export default function AuthNavigation() {
           ) : (
             <div className={css.placeholderAvatar}>👤</div>
           )}
-          <p className={css.userEmail}>{user?.username}</p>
+          <p className={css.userEmail}>{user?.name}</p>
           <button className={css.logoutButton} onClick={handleLogout}>
-            <svg>
-              <use href="/symbol-defs.svg#icon-logo#icon-logout"></use>
+            <svg width={24} height={24} className={css.logoutBtnIcon}>
+              <use href="/symbol-defs.svg#icon-logout"></use>
             </svg>
           </button>
         </li>
@@ -63,13 +63,21 @@ export default function AuthNavigation() {
     <>
       <ul>
         <li className={css.navigationItem}>
-          <Link href="/sign-in" prefetch={false} className={css.navigationLink}>
+          <Link
+            href="/auth/login"
+            prefetch={false}
+            className={css.navigationLink}
+          >
             Вхід
           </Link>
         </li>
 
         <li className={css.navigationItem}>
-          <Link href="/sign-up" prefetch={false} className={css.navigationLink}>
+          <Link
+            href="/auth/register"
+            prefetch={false}
+            className={css.navigationLink}
+          >
             Реєстрація
           </Link>
         </li>

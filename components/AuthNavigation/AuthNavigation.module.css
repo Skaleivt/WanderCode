@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  list-style: none;
+}
+
+.createStory {
+  border: 1px solid var(--color-royal-blue);
+  border-radius: 8px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  width: 202px;
+  height: 35px;
+  background: var(--color-royal-blue);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 150%;
+  color: var(--color-white);
+}
+.logoutButton {
+}
+.avatar {
+  display: flex;
+  gap: 16px;
+}

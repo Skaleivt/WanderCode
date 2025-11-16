@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { fetchAllStoriesClient } from '@/lib/api/clientApi';
-import TravelersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
+
 import css from './PopularSection.module.css';
 import { StoriesResponse } from '@/types/story';
+import TravelersStoriesItem from '../TravelersStoriesItem/TravelersStoriesItem';
 
 type PopularClientProps = {
   initialData: StoriesResponse;

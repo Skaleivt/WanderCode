@@ -1,3 +1,4 @@
+// types/story.ts
 export interface Story {
   _id: string;
   img: string;
