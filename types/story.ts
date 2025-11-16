@@ -15,6 +15,7 @@ export interface Story {
   authorId: string;
   createdAt: string;
   updatedAt: string;
+  isFavorite?: boolean;
 }
 
 export interface StoriesResponse {
@@ -46,4 +47,21 @@ export interface Category {
   _id: string;
   value: string;
   title: string;
+}
+export interface DetailedStory {
+  _id: string;
+  img: string;
+  title: string;
+  article: string;
+  category: {
+    _id: string;
+    title: string;
+  };
+  owner: {
+    _id: string;
+    name: string;
+    avatarUrl: string;
+  };
+  date: string;
+  favoriteCount: number;
 }
