@@ -3,11 +3,9 @@ import type { Metadata } from 'next';
 import { ToastContainer } from 'react-toastify';
 import { Nunito_Sans, Sora } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
+
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
 import AuthProvider from '@/components/AuthProvider/AuthProvider';
-import Container from '@/components/layout/Container/Container';
 
 const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
@@ -57,12 +55,8 @@ export default function RootLayout({
       <body>
         <TanStackProvider>
           <AuthProvider>
-            <Header />
-            <main style={{ flexGrow: 1 }}>
-              <Container>{children}</Container>
-            </main>
+            <main style={{ flexGrow: 1 }}>{children}</main>
             {modal} <div id="modal-root"></div>
-            <Footer />
           </AuthProvider>
           <ToastContainer />
         </TanStackProvider>

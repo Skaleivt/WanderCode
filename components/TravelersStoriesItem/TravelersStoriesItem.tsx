@@ -8,7 +8,7 @@ export default function TravelersStoriesItem({
   story,
 }: TravelersStoriesItemProps) {
   return (
-    <div className="story-item">
+    <div>
       <div>
         {story.img}, {story._id}
       </div>

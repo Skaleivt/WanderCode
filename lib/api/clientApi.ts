@@ -75,27 +75,35 @@ export async function fetchStoriesPage(
 // ... existing functions
 
 export async function registerUser(data: RegisterRequest): Promise<User> {
-  const response = await nextServer.post(`/auth/register`, data);
+  const response = await nextServer.post(`/auth/register`, data, {
+    withCredentials: true,
+  });
   return {
     ...response.data,
   };
 }
 
 export async function loginUser(data: AuthorizationRequest): Promise<User> {
-  const response = await nextServer.post(`/auth/login`, data);
+  const response = await nextServer.post(`/auth/login`, data, {
+    withCredentials: true,
+  });
   return {
     ...response.data,
   };
 }
 
 export const getMe = async () => {
-  const { data } = await nextServer.get<User>('/users/current');
-  return data;
+  const res = await nextServer.get('/users/current', {
+    withCredentials: true,
+  });
+  return res.data.data;
 };
 
 export const checkSession = async (): Promise<boolean> => {
   try {
-    const res = await nextServer.post('/auth/refresh');
+    const res = await nextServer.post('/auth/refresh', {
+      withCredentials: true,
+    });
     return res.status === 200;
   } catch {
     return false;

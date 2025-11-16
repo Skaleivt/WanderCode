@@ -1,7 +1,7 @@
 // components/Header/Header.tsx
 import React from 'react';
 import Link from 'next/link';
-import Container from '../layout/Container/Container';
+import Container from '../Container/Container';
 import AuthNavigation from '../AuthNavigation/AuthNavigation';
 
 export const Header: React.FC = () => {

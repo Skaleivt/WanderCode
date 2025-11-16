@@ -1,28 +1,32 @@
 'use client';
-import css from './SignUpPage.module.css';
-import { RegisterRequest, registerUser } from '@/lib/api/clientApi';
+
+import css from './AuthPage.module.css';
+import { AuthorizationRequest, getMe, loginUser } from '@/lib/api/clientApi';
+
 import { useEffect, useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-export default function SingUp() {
+export default function LoginForm() {
   const [error, setError] = useState('');
   const setUser = useAuthStore((state) => state.setUser);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const formValues: RegisterRequest = {
-      name: String(formData.get('name')),
+    const formValues: AuthorizationRequest = {
       email: String(formData.get('email')),
       password: String(formData.get('password')),
     };
     try {
-      const res = await registerUser(formValues);
+      const res = await loginUser(formValues);
 
       if (res) {
-        setUser(res);
+        const me = await getMe();
+        if (me) setUser(me);
+        router.push('/');
       } else {
         setError('Invalid email or password');
       }
@@ -30,46 +34,22 @@ export default function SingUp() {
       setError((error as ApiError).message ?? 'Oops... some error');
     }
   };
-  // переписати матадані
+  // замінити метадані
   useEffect(() => {
-    document.title = `Sign-up | NoteHub`;
+    document.title = `Sign-in | NoteHub`;
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
         'content',
-        `Create a new account on NoteHub. Sign up with your email and password to get started.`
+        `Sign in to your NoteHub account. Enter your email and password to log in.`
       );
   });
 
   return (
     <main className={css.mainContent}>
-      <ul>
-        <li className={css.navigationItem}>
-          <Link href="/sign-in" prefetch={false} className={css.navigationLink}>
-            Вхід
-          </Link>
-        </li>
-
-        <li className={css.navigationItem}>
-          <Link href="/sign-up" prefetch={false} className={css.navigationLink}>
-            Реєстрація
-          </Link>
-        </li>
-      </ul>
-      <h1 className={css.formTitle}>Реєстрація</h1>
       <form onSubmit={handleSubmit} className={css.form}>
-        <div className={css.formGroup}>
-          <label htmlFor="name">Імʼя та Прізвище*</label>
-          <input
-            id="name"
-            type="name"
-            name="name"
-            className={css.input}
-            required
-            placeholder="Ваше імʼя та прізвище"
-          />
-        </div>
-
+        <h1 className={css.formTitle}>Вхід</h1>
+        <p className={css.formText}>Вітаємо знову у спільноту мандрівників!</p>
         <div className={css.formGroup}>
           <label htmlFor="email">Пошта*</label>
           <input
@@ -96,7 +76,7 @@ export default function SingUp() {
 
         <div className={css.actions}>
           <button type="submit" className={css.submitButton}>
-            Зареєструватись
+            Увійти
           </button>
         </div>
         {error && <p className={css.error}>{error}</p>}

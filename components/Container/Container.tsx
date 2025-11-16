@@ -1,4 +1,3 @@
-// components/layout/Container/Container.tsx
 import React, { ReactNode } from 'react';
 import styles from './Container.module.css';
 
