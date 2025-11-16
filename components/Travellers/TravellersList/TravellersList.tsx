@@ -6,7 +6,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   fetchTravellers,
   FetchTravellersResponse as PaginationResult,
-  Traveller,
 } from '@/lib/api/travellersApi';
 import {
   TRAVELLERS_INITIAL_PER_PAGE_DESKTOP,
@@ -51,7 +50,6 @@ const TravellersList: React.FC = () => {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetching,
     isFetchingNextPage,
     status,
   } = useInfiniteQuery<PaginationResult>({
@@ -69,16 +67,25 @@ const TravellersList: React.FC = () => {
       });
     },
 
-    getNextPageParam: (lastPage) => {
-      if (lastPage.hasNextPage) {
-        return lastPage.page + 1;
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage) return undefined;
+      if (typeof lastPage.page === 'number') {
+        const loadedCount = allPages.reduce((sum, p) => {
+          const len = Array.isArray(p.data) ? p.data.length : 0;
+          return sum + len;
+        }, 0);
+        const nextPerPage = TRAVELLERS_LOAD_MORE_AMOUNT;
+        const nextPage = Math.floor(loadedCount / nextPerPage) + 1;
+        return lastPage.hasNextPage ? nextPage : undefined;
       }
+      if (lastPage.hasNextPage) {
+        return allPages.length + 1;
+      }
+
       return undefined;
     },
-
     initialPageParam: 1,
     enabled: isClient,
-
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: true,
@@ -88,14 +95,12 @@ const TravellersList: React.FC = () => {
   const allTravellers = useMemo(() => {
     const flatList = data?.pages.flatMap((page) => page.data) ?? [];
 
-    const uniqueTravellers = flatList.reduce((acc, current) => {
-      if (!acc.some((item) => item._id === current._id)) {
-        acc.push(current);
-      }
-      return acc;
-    }, [] as Traveller[]);
+    const uniqueMap = flatList.reduce((map, traveller) => {
+      map.set(traveller._id, traveller);
+      return map;
+    }, new Map<string, (typeof flatList)[number]>());
 
-    return uniqueTravellers;
+    return Array.from(uniqueMap.values());
   }, [data]);
 
   if (status === 'pending' || !isClient) {
@@ -105,7 +110,7 @@ const TravellersList: React.FC = () => {
   if (status === 'error') {
     return (
       <p className={styles.error}>
-        Error loading travellers: {(error as Error).message}{' '}
+        Error loading travellers: {(error as Error).message}
       </p>
     );
   }
@@ -131,7 +136,6 @@ const TravellersList: React.FC = () => {
           {isFetchingNextPage ? <Loader /> : 'Показати ще'}
         </button>
       )}
-      {isFetching && !isFetchingNextPage && <Loader />}
     </section>
   );
 };
