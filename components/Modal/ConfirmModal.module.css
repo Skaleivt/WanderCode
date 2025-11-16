@@ -18,12 +18,12 @@
   border-radius: 24px;
   background: #f7f9ff;
   box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   text-align: center;
+   position: relative;               
 }
 
 .title {
@@ -67,7 +67,7 @@
   cursor: pointer;
 }
 
-/* primary — синя кнопка */
+
 .primary {
   
   border: 1px solid rgba(0, 0, 0, 0.15);
@@ -75,7 +75,7 @@
   color: #000000;
 }
 
-/* ghost — сіра */
+
 .ghost {
     
   border: 1px solid rgba(0, 0, 0, 0.15);
@@ -83,7 +83,6 @@
   color: #000000;
 }
 
-/* HOVER/FOCUS трохи приємні */
 .primary:focus-visible,
 .ghost:focus-visible {
   outline: 2px solid #4169e1;
@@ -101,6 +100,23 @@
     background: #4169e1;
   
 }
+/* .confirm{}
+.error{ outline: 2px solid #F04438; }
+.success{ outline: 2px solid #16A34A; } */
+.close{
+ position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background:none;
+  border-radius: 8px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 
 /* TABLET ≥ 768px */
 @media (min-width: 768px) {

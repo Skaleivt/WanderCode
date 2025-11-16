@@ -75,7 +75,7 @@ async function createStory(values: AddStoryFormValues): Promise<{ id: string }> 
   form.append('title', values.title);
   form.append('category', values.category);
   form.append('body', values.body);
-
+  form.append('shortDesc', values.shortDesc ?? '');
   const res = await fetch('/api/stories', { method: 'POST', body: form });
   if (!res.ok) {
     const msg = await res.text();
@@ -89,13 +89,15 @@ export default function AddStoryForm() {
   const qc = useQueryClient();
   const [preview, setPreview] = useState<string | null>(null);
   const [errorOpen, setErrorOpen] = useState(false);
+  const [publishedOpen, setPublishedOpen] = useState(false);
+  const [createdId, setCreatedId] = useState<string | null>(null);
 
   const mutation = useMutation<{ id: string }, Error, AddStoryFormValues>({
     mutationFn: createStory,
     onSuccess: async (data) => {
-      // інвалідовуємо кеш “Мої історії” у профілі
-      await qc.invalidateQueries({ queryKey: ['profile', 'my-stories'] });
-      router.push(`/stories/${data.id}`);
+        await qc.invalidateQueries({ queryKey: ['profile', 'my-stories'] });
+        setCreatedId(data.id);        // зберігаємо ID нової історії
+        setPublishedOpen(true);       // відкриваємо модалку успіху
     },
     onError: (err) => {
       showErrorToast(err.message || 'Не вдалося зберегти історію');
@@ -126,9 +128,11 @@ export default function AddStoryForm() {
   const onSubmit = async (
     values: AddStoryFormValues,
     helpers: FormikHelpers<AddStoryFormValues>
-  ) => {
+  ) => { try{
     await mutation.mutateAsync(values);
+  }finally{
     helpers.setSubmitting(false);
+  }
   };
 
   // Мемо для розміру зображення в залежності від ширини (за бажанням)
@@ -261,7 +265,42 @@ export default function AddStoryForm() {
   onClose={() => setErrorOpen(false)}                 // бекдроп/ESC — просто закрити
   onCancel={() => { setErrorOpen(false); router.push('/login'); }}   // Ліва кнопка
   onConfirm={() => { setErrorOpen(false); router.push('/register'); }} // Права кнопка
+/>  
+
+{/* Модалка успішної публікації —*/}
+
+<ConfirmModal
+  variant="success"
+  isOpen={publishedOpen}
+  title="Історію опубліковано"
+  description="Все готово! Можете переглянути публікацію або повернутись на головну."
+  cancelText="На головну"
+  confirmText="До історії"
+  onClose={() => setPublishedOpen(false)}
+  onCancel={() => {
+    setPublishedOpen(false);
+    router.push('/');
+  }}
+  onConfirm={() => {
+    setPublishedOpen(false);
+    if (createdId) {
+      router.push(`/stories/${createdId}`);
+    }
+  }}
 />
+{/* Модалка виходу — поки що не використовується */}
+
+{/* <ConfirmModal
+  variant="confirm"
+  isOpen={logoutOpen}
+  title="Ви точно хочете вийти?"
+  description="Ми будемо сумувати за вами!"
+  cancelText="Відмінити"
+  confirmText="Вийти"
+  onClose={() => setLogoutOpen(false)}
+  onCancel={() => setLogoutOpen(false)}
+  onConfirm={() => { setLogoutOpen(false); doLogout(); }}
+/> */}
     </>
-  );
+      );
 }
