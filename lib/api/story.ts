@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { StoriesResponse, Story, NewStory } from "@/types/story";
+import { nextServer } from "@/lib/api/api";
 
 export const storiesKeys = {
   all: ["stories"] as const,
@@ -34,4 +35,16 @@ export async function createStory(payload: NewStory): Promise<Story> {
 export async function getCategories() {
   const { data } = await axios.get("/api/categories");
   return data.data; // припускаю структура: { data: Category[] }
+}
+
+export async function getStoryById(id: string): Promise<Story> {
+  const res = await nextServer.get(`/stories/${id}`);
+  return res.data.data;
+}
+
+export async function updateStory(id: string, form: FormData): Promise<Story> {
+  const res = await nextServer.patch(`/stories/${id}`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data.data;
 }
