@@ -1,6 +1,6 @@
 // app/api/stories/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { api } from '../api';
+import { api } from '../../api/api';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '../_utils/utils';

@@ -3,9 +3,8 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
-// Зменены імпарт: выкарыстоўваем nextServer і logErrorResponse
-import { nextServer, logErrorResponse } from '@/lib/api/api';
-
+import { api } from '../api';
+import { logErrorResponse } from '../../../lib/api/api';
 /**
  * Обробляє GET-запити до маршруту /api/users
  * Цей обробник виступає проксі між кліентом і вашим бекендом.
@@ -16,9 +15,9 @@ export async function GET(request: NextRequest) {
 
     const page = Number(request.nextUrl.searchParams.get('page') ?? 1);
     const perPage = Number(request.nextUrl.searchParams.get('perPage') ?? 12);
-    const filter = request.nextUrl.searchParams.get('filter') ?? undefined; // Зменены выклік: выкарыстоўваем nextServer замест api
+    const filter = request.nextUrl.searchParams.get('filter') ?? undefined; // Зменены выклік: выкарыстоўваем api замест api
 
-    const res = await nextServer.get('/users', {
+    const res = await api.get('/users', {
       params: {
         page,
         perPage,

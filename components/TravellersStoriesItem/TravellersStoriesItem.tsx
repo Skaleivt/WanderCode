@@ -1,3 +1,4 @@
+// components/TravellersStoriesItem/TravellersStoriesItem.tsx
 'use client';
 
 import Link from 'next/link';
@@ -20,7 +21,7 @@ import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import styles from './TravellersStoriesItem.module.css';
 
 interface StoryWithStatus extends Story {
-  isFavorite: boolean; // Обов'язкове поле, додане батьківським компонентом
+  isFavorite: boolean;
 }
 
 type TravellersStoriesItemProps = {

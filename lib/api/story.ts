@@ -1,6 +1,7 @@
-import axios from 'axios';
+// lib/api/story.ts
+
 import type { StoriesResponse } from '@/types/story';
-import { nextServer } from './api';
+import { api } from './api';
 import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
 
 export const storiesKeys = {
@@ -13,7 +14,8 @@ export async function getSavedStories(
   page = 1,
   limit = 9
 ): Promise<StoriesResponse> {
-  const { data } = await nextServer.get('/api/stories/saved', {
+  // ✅ ВЫПРАЎЛЕННЕ: Выдалены пачатковы '/api' з шляху
+  const { data } = await api.get('/stories/saved', {
     params: { page, limit },
   });
   return data;
@@ -23,7 +25,8 @@ export async function getMyStories(
   page = 1,
   limit = 9
 ): Promise<StoriesResponse> {
-  const { data } = await axios.get('/api/stories/owner-stories', {
+  // ✅ ВЫПРАЎЛЕННЕ: Выкарыстаны імпартаваны 'api' і выдалены пачатковы '/api'
+  const { data } = await api.get('/stories/owner-stories', {
     params: { page, limit },
   });
   return data;
@@ -34,13 +37,12 @@ export async function createStory(values: AddStoryFormValues) {
   if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
-  form.append('description', values.description);
-  // form.append('shortDesc', values.shortDesc ?? '');
-
-  const res = await nextServer.post('/stories', form);
+  form.append('description', values.description); // form.append('shortDesc', values.shortDesc ?? '');
+  // Запыт адпраўляецца на Next.js API Route /api/stories
+  const res = await api.post('/stories', form);
   return res.data;
 }
 export async function getCategories() {
-  const res = await nextServer.get('/stories/categories');
+  const res = await api.get('/stories/categories');
   return res.data.data;
 }

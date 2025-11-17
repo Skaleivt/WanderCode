@@ -1,28 +1,8 @@
-/* COMMON */
-/* 
-.container {
-  max-width: 320px;
-  padding: 0 16px;
-  margin: 0 auto;
-}
-
-@media screen and (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-
-@media screen and (min-width: 1158px) {
-  .container {
-    max-width: 1158px;
-    padding: 0 15px;
-  }
-} */
-
 /* MOB */
 
 .section {
   padding: 64px 0;
+  /* 💡 Вертыкальны padding пакінуты для адступаў паміж секцыямі */
 }
 
 .title {
@@ -69,10 +49,17 @@
 @media screen and (min-width: 768px) {
   .section {
     padding: 64px 0;
+    /* 💡 Вертыкальны padding пакінуты */
   }
 
   .title {
     font-size: 44px;
+  }
+
+  .list {
+    flex-direction: row;
+    gap: 24px 24px;
+    justify-content: flex-start;
   }
 
   .list>* {
@@ -94,8 +81,8 @@
     background-color: var(--color-royal-blue);
     cursor: pointer;
     transition: background-color 0.3s ease;
-    /* margin-top: 24px; */
     margin: 0 auto;
+    margin-top: 48px;
   }
 
   .button:hover {
@@ -111,7 +98,7 @@
 
 /* DESK */
 
-@media screen and (min-width: 1158px) {
+@media screen and (min-width: 1440px) {
   .section {
     padding: 72px 0;
   }
@@ -121,13 +108,17 @@
     margin-bottom: 40px;
   }
 
+  .list {
+    gap: 24px 24px;
+  }
+
   .list>* {
     width: calc((100% - 48px) / 3);
   }
 
   .button {
     min-width: 173px;
-    /* margin-top: 48px; */
+    margin-top: 72px;
   }
 }
 

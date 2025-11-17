@@ -19,13 +19,15 @@ export interface Story {
 }
 
 export interface StoriesResponse {
+  // Калі бэкэнд вяртае ўсё ўнутры поля 'data':
   data: {
-    data: Story[];
+    items: Story[];
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
     hasNextPage: boolean;
     page: number;
     perPage: number;
-    totalItems: number;
-    totalPages: number;
     hasPreviousPage: boolean;
   };
 }

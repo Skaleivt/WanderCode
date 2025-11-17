@@ -1,5 +1,5 @@
 // lib/api/travellersApi.ts
-import { nextServer } from './api';
+import { api } from './api';
 
 export type Traveller = {
   id: string;
@@ -105,7 +105,7 @@ export async function fetchTravellers(
   params: FetchTravellersParams
 ): Promise<FetchTravellersResponse> {
   try {
-    const res = await nextServer.get('/users', {
+    const res = await api.get('/users', {
       params: {
         perPage: params.perPage,
         page: params.page,
@@ -183,7 +183,7 @@ export async function fetchTravellers(
 /* Fetch single traveller (user) by id */
 export async function getTravellerById(id: string): Promise<Traveller | null> {
   try {
-    const res = await nextServer.get(`/users/${id}`);
+    const res = await api.get(`/users/${id}`);
     const payload: unknown = res.data; // Swagger shows GET /api/users/{id} returns { status, message, data: { user: {...}, stories: [...] } }
 
     if (isObject(payload) && isObject(payload.data)) {
