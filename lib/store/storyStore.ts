@@ -11,8 +11,7 @@ type StoryDraftStore = {
 const initialDraft: NewStory = {
   img: '',
   title: '',
-  article: '',
-  body: '',
+  description: '',
   category: '',
 };
 
