@@ -1,8 +1,14 @@
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 import { Story } from '@/types/story';
 
 import css from './TravellersStoriesItem.module.css';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toggleStoryBookmark } from "@/lib/api/storyApi";
+import { useState } from "react";
+import { showErrorToast } from "../ShowErrorToast/ShowErrorToast";
+import { useAuthStore } from "@/lib/store/authStore";
 
 type TravelersStoriesItemProps = {
   story: Story;
@@ -11,6 +17,44 @@ type TravelersStoriesItemProps = {
 export default function TravelersStoriesItem({
   story,
 }: TravelersStoriesItemProps) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuthStore();
+
+  const [saved, setSaved] = useState<boolean>(Boolean(story.isFavorite));
+  const [bookmarks, setBookmarks] = useState<number>(story.favoriteCount);
+
+  const { mutate: handleToggleBookmark, isPending } = useMutation({
+    mutationFn: () => toggleStoryBookmark(story._id, saved),
+    onMutate: async () => {
+      setSaved((prev) => !prev);
+      setBookmarks((prev) => (saved ? Math.max(0, prev - 1) : prev + 1));
+    },
+    onError: (error: unknown) => {
+      showErrorToast(
+        error instanceof Error
+          ? error.message
+          : "Сталася помилка. Спробуйте ще раз.",
+      );
+      setSaved((prev) => !prev);
+      setBookmarks((prev) =>
+        saved ? prev + 1 : Math.max(0, prev - 1),
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stories"] });
+      queryClient.invalidateQueries({ queryKey: ["story", story._id] });
+    },
+  });
+
+  const onBookmarkClick = () => {
+    if (!isAuthenticated) {
+      router.push("/sign-up");
+      return;
+    }
+    handleToggleBookmark();
+  };
+
   const getDateString = (date: Date): string => {
       const day = String(date.getDate()).padStart(2, "0");
       const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -19,13 +63,10 @@ export default function TravelersStoriesItem({
       return `${day}.${month}.${year}`;
   }
 
-  const viewStory = (id: string): void => {
-      
+  const goToStoryById = (id: string): void => {
+      router.push(`/stories/${id}`);
   };
 
-  const toogleFavoriteStory = (id: string): void => {
-      
-  };
 
   return (
     <div className={css.story}>
@@ -48,14 +89,26 @@ export default function TravelersStoriesItem({
           
           <div className={css.buttonPanel}>
               <button 
-                  onClick={() => viewStory(story._id)}
+                  onClick={() => goToStoryById(story._id)}
                   className={css.button} 
               >
                   Переглянути статтю
               </button>
               <button 
-                  onClick={() => toogleFavoriteStory(story._id)}
-                  className={[css.button, css.favoriteButton].join(" ")}
+                  onClick={onBookmarkClick}
+                  disabled={isPending}
+                  aria-pressed={saved}
+                  aria-label={
+                    saved
+                      ? "Видалити історію із збережених"
+                      : "Зберегти історію"
+                  }
+                  className={[
+                    css.button, 
+                    css.favoriteButton, 
+                    saved ? css.bookmarkButtonSaved : "",
+                    isPending ? css.bookmarkButtonDisabled : "",
+                  ].filter(Boolean).join(" ")}
               >
                   <Image src="/favorite.svg" width={20} height={20} alt="Favorite" />
               </button>

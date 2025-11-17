@@ -91,3 +91,18 @@
 .button:hover {
   background-color: #00000022;
 }
+
+.bookmarkButtonSaved {
+  background-color: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.bookmarkButtonSaved:hover {
+  background-color: #020617;
+}
+
+.bookmarkButtonDisabled {
+  cursor: wait;
+  opacity: 0.8;
+}
