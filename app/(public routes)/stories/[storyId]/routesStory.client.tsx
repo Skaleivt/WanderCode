@@ -7,6 +7,8 @@ import { DetailedStory } from '@/types/story';
 import Loader from '@/components/Loader/Loader';
 import { toast } from 'react-toastify';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 type Props = {
   storyId: string;
@@ -25,8 +27,14 @@ export function StoryDetailsClient({ storyId }: Props) {
     queryFn: () => fetchStoryById(storyId),
   });
 
-  // Мутація для кнопки "Зберегти"
+  // Локальны стан для src выявы + fallback
+  const [imgSrc, setImgSrc] = useState<string | undefined>(undefined);
 
+  useEffect(() => {
+    setImgSrc(story?.img ?? '/default-avatar.png');
+  }, [story]);
+
+  // Мутація для кнопки "Зберегти"
   const mutation = useMutation({
     mutationFn: () => saveStory(storyId),
     onSuccess: () => {
@@ -75,7 +83,27 @@ export function StoryDetailsClient({ storyId }: Props) {
         </p>
       </div>
 
-      <img src={story.img} alt={story.title} className={css.image} />
+      {/* Image wrapper: for next/image fill the parent must be position:relative and have height */}
+      <div
+        className={css.imageWrapper}
+        // inline style ensures parent has height for fill; you can move this to CSS module
+        style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}
+      >
+        <Image
+          src={imgSrc ?? '/default-avatar.png'}
+          alt={story.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: 'cover' }}
+          // onError is supported in client components; fallback to local default
+          onError={() => {
+            if (imgSrc !== '/default-avatar.png')
+              setImgSrc('/default-avatar.png');
+          }}
+          // временно отключаем оптимизацию если upstream иногда возвращает HTML/404 при SSR
+          unoptimized
+        />
+      </div>
 
       <div className={css.articleBlock}>
         <p className={css.article}>{story.article}</p>

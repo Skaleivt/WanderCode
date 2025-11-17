@@ -141,9 +141,7 @@ export async function removeStoryFromSaved(storyId: string): Promise<void> {
 }
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/stories/${id}`
-    );
+    const response = await nextServer.get(`/stories/${id}`);
 
     const story = response.data.data;
     console.log('story::::', story);
@@ -173,10 +171,6 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
 };
 
 export const saveStory = async (id: string) => {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/stories/save/${id}`,
-    {},
-    { withCredentials: true }
-  );
+  const response = await nextServer.post(`/stories/save/${id}`);
   return response.data;
 };

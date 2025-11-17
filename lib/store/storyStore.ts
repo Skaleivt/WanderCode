@@ -1,5 +1,3 @@
-// lib/store/storyStore.ts (Фінальны выпраўлены код)
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { NewStory } from '@/types/story';
@@ -14,6 +12,7 @@ const initialDraft: NewStory = {
   img: '',
   title: '',
   article: '',
+  body: '',
   category: '',
 };
 

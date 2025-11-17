@@ -1,5 +1,4 @@
 // app/(public routes)/stories/[storyId]/page.tsx
-
 import { fetchStoryById } from '@/lib/api/clientApi';
 import { StoryDetailsClient } from './routesStory.client';
 import {
@@ -8,19 +7,17 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import PopularSection from '@/components/PopularSection/PopularSection';
+import { notFound } from 'next/navigation';
 
-type Props = {
-  params: { storyId: string };
-};
+export default async function StoryPage(props: unknown) {
+  const params = await (props as { params?: { storyId?: string } })?.params;
+  const storyId = params?.storyId;
 
-export default async function StoryPage({ params }: Props) {
-  const resolvedParams = await params;
-  const { storyId } = resolvedParams;
+  if (!storyId) {
+    return notFound();
+  }
 
-  // Створюємо клієнт для prefetching даних
   const queryClient = new QueryClient();
-
-  // Завантажуємо дані про конкретну історію з бекенду на сервері
   await queryClient.prefetchQuery({
     queryKey: ['story', storyId],
     queryFn: () => fetchStoryById(storyId),
@@ -28,10 +25,7 @@ export default async function StoryPage({ params }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {/* Деталі історії */}
       <StoryDetailsClient storyId={storyId} />
-
-      {/* Блок популярних статей */}
       <PopularSection />
     </HydrationBoundary>
   );

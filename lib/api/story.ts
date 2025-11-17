@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { StoriesResponse, Story, NewStory } from '@/types/story';
+import type { StoriesResponse } from '@/types/story';
 import { nextServer } from './api';
 import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
 
