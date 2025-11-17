@@ -21,13 +21,13 @@ export default function MessageNoStories({
   };
 
   return (
-    <div className={css.container}>
-      <div className={css.messageBox}>
-        <p className={css.message}>{text}</p>
-        <button className={css.button} onClick={handleButtonClick}>
-          {buttonText}
-        </button>
-      </div>
+    // <div className={css.container}>
+    <div className={css.messageBox}>
+      <p className={css.message}>{text}</p>
+      <button className={css.button} onClick={handleButtonClick}>
+        {buttonText}
+      </button>
     </div>
+    // </div>
   );
 }

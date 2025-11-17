@@ -1,8 +1,12 @@
-// app/(public routes)/travelers/[travellerId]/page.tsx
 import React from 'react';
-import Image from 'next/image';
 import { getTravellerById } from '@/lib/api/travellersApi';
 import { notFound } from 'next/navigation';
+import css from './page.module.css';
+import Container from '@/components/Container/Container';
+import { TravellersInfo } from '@/components/TravellersInfo/TravellersInfo';
+import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
+// import TravellersStories from '@/components/TravellersStories/TravellersStories';
+import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
 interface TravellerPageProps {
   params: Promise<{ travellerId: string }>;
@@ -17,29 +21,30 @@ export default async function TravellerProfilePage({
     notFound();
   }
 
+  const filter = travellerId;
   const traveller = await getTravellerById(travellerId);
+  const stories = await fetchAllStoriesServer({ filter });
+  const isStories = stories && stories.data && stories.data.totalItems > 0;
+  console.log('stories', stories);
 
   if (!traveller) {
     notFound();
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Профіль Мандрівніка: {traveller.name}</h1>
-
-      {traveller.avatarUrl && (
-        <Image
-          src={traveller.avatarUrl}
-          alt={traveller.name}
-          width={150}
-          height={150}
-          style={{ borderRadius: '50%' }}
-        />
-      )}
-
-      {traveller.description && <p>{traveller.description}</p>}
-
-      {typeof traveller._id !== 'undefined' && <p>ID: {traveller._id}</p>}
-    </div>
+    <Container>
+      <div className={css.profile}>
+        <TravellersInfo traveller={traveller} />
+        <h2 className={css.title}>Історії Мандрівника</h2>
+        {isStories ? (
+          <div>Є історії</div> // замінити на TravellersStories
+        ) : (
+          <MessageNoStories
+            text={'Цей користувач ще не публікував історій'}
+            buttonText={'Назад до історій'}
+          />
+        )}
+      </div>
+    </Container>
   );
 }

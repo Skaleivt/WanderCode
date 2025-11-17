@@ -1,43 +1,55 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bookmark,
   BookmarkCheck,
   Loader2,
   CalendarDays,
   UserRound,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import Image from 'next/image';
 
-import { Story } from "@/types/story";
-import { toggleStoryBookmark } from "@/lib/api/storyApi";
-import { useAuthStore } from "@/lib/store/authStore";
-import { showErrorToast } from "@/components/ShowErrorToast/ShowErrorToast";
-import styles from "./TravellersStoriesItem.module.css";
+import { Story } from '@/types/story';
+import { toggleStoryBookmark } from '@/lib/api/storyApi';
+import { useAuthStore } from '@/lib/store/authStore';
+import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
+import styles from './TravellersStoriesItem.module.css';
+
+interface StoryWithStatus extends Story {
+  isFavorite: boolean; // Обов'язкове поле, додане батьківським компонентом
+}
 
 type TravellersStoriesItemProps = {
-  story: Story;
+  story: StoryWithStatus;
+  onToggleSuccess: (storyId: string, isAdding: boolean) => void;
 };
 
-const TravellersStoriesItem = ({ story }: TravellersStoriesItemProps) => {
+interface MutationContext {
+  currentSaved: boolean;
+}
+
+const TravellersStoriesItem = ({
+  story,
+  onToggleSuccess,
+}: TravellersStoriesItemProps) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuthStore();
 
-const storyId = story._id;
-const imageUrl = story.img;
-const category = story.category;
-const title = story.title;
-const description = story.article;
-const authorName = "Unknown author";
-const authorAvatar = "/default-avatar.png";
-const publishedAt = story.date;
-const initialBookmarksCount = story.favoriteCount ?? 0;
-const initiallySaved = Boolean(story.isFavorite);
+  const storyId = story._id;
+  const imageUrl = story.img;
+  const category = story.category;
+  const title = story.title;
+  const description = story.article;
+  const authorName = 'Unknown author';
+  const authorAvatar = '/file.svg';
+  const publishedAt = story.date;
+  const initialBookmarksCount = story.favoriteCount ?? 0;
+  const initiallySaved = story.isFavorite;
 
   const [saved, setSaved] = useState<boolean>(initiallySaved);
   const [bookmarks, setBookmarks] = useState<number>(initialBookmarksCount);
@@ -45,41 +57,53 @@ const initiallySaved = Boolean(story.isFavorite);
   const dateStr = useMemo(() => {
     const d = new Date(publishedAt);
     return d.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
     });
   }, [publishedAt]);
 
-  const { mutate: handleToggleBookmark, isPending } = useMutation({
-    mutationFn: () => toggleStoryBookmark(storyId, saved),
+  const { mutate: handleToggleBookmark, isPending } = useMutation<
+    unknown,
+    unknown,
+    boolean,
+    MutationContext
+  >({
+    mutationFn: (currentSavedState: boolean) =>
+      toggleStoryBookmark(storyId, currentSavedState),
     onMutate: async () => {
+      const currentSaved = saved;
       setSaved((prev) => !prev);
-      setBookmarks((prev) => (saved ? Math.max(0, prev - 1) : prev + 1));
+      setBookmarks((prev) => (currentSaved ? Math.max(0, prev - 1) : prev + 1));
+      return { currentSaved };
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, variables, context) => {
       showErrorToast(
         error instanceof Error
           ? error.message
-          : "Сталася помилка. Спробуйте ще раз.",
+          : 'Сталася помилка. Спробуйте ще раз.'
       );
+      const operationWasDelete = context?.currentSaved;
+
       setSaved((prev) => !prev);
       setBookmarks((prev) =>
-        saved ? prev + 1 : Math.max(0, prev - 1),
+        operationWasDelete ? prev + 1 : Math.max(0, prev - 1)
       );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["stories"] });
-      queryClient.invalidateQueries({ queryKey: ["story", storyId] });
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: ['stories'] });
+      queryClient.invalidateQueries({ queryKey: ['story', storyId] });
+      const wasSavedBefore = context?.currentSaved;
+      onToggleSuccess(storyId, !wasSavedBefore);
     },
   });
 
   const onBookmarkClick = () => {
     if (!isAuthenticated) {
-      router.push("/sign-up");
+      router.push('/auth/login');
       return;
     }
-    handleToggleBookmark();
+    handleToggleBookmark(saved);
   };
 
   return (
@@ -141,17 +165,15 @@ const initiallySaved = Boolean(story.isFavorite);
             disabled={isPending}
             aria-pressed={saved}
             aria-label={
-              saved
-                ? "Видалити історію із збережених"
-                : "Зберегти історію"
+              saved ? 'Видалити історію із збережених' : 'Зберегти історію'
             }
             className={[
               styles.bookmarkButton,
-              saved ? styles.bookmarkButtonSaved : "",
-              isPending ? styles.bookmarkButtonDisabled : "",
+              saved ? styles.bookmarkButtonSaved : '',
+              isPending ? styles.bookmarkButtonDisabled : '',
             ]
               .filter(Boolean)
-              .join(" ")}
+              .join(' ')}
           >
             {isPending ? (
               <span className="inline-flex items-center gap-2">
@@ -165,13 +187,13 @@ const initiallySaved = Boolean(story.isFavorite);
                 ) : (
                   <Bookmark className="h-4 w-4" />
                 )}
-                {saved ? "Видалити з збережених" : "Зберегти"}
+                {saved ? 'Видалити з збережених' : 'Зберегти'}
               </span>
             )}
           </button>
         </div>
       </div>
-      </article>
+    </article>
   );
 };
 
