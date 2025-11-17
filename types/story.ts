@@ -21,7 +21,8 @@ export interface Story {
 export interface StoriesResponse {
   // Калі бэкэнд вяртае ўсё ўнутры поля 'data':
   data: {
-    items: Story[];
+    // 🛑 ВЫПРАЎЛЕННЕ: Перайменоўваем 'items' у 'data'
+    data: Story[];
     totalItems: number;
     totalPages: number;
     currentPage: number;

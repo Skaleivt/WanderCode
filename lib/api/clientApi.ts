@@ -68,16 +68,19 @@ export const fetchStoriesPage = async ({
   const res = await fetch(`/api/stories?page=${pageParam}&filter=${filter}`);
   if (!res.ok) throw new Error('Не вдалося завантажыць гісторыі');
 
-  const fullResponse: StoriesResponse = await res.json();
-  const data = fullResponse.data;
+  const fullResponse: StoriesResponse = await res.json(); // fullResponse.data - гэта аб'ект, які змяшчае пагінацыйныя дадзеныя
+  const paginationData = fullResponse.data;
 
   return {
-    stories: data.items,
-    totalItems: data.totalItems,
-    totalPages: data.totalPages,
-    currentPage: data.currentPage,
+    // ✅ ВЫПРАЎЛЕННЕ: Цяпер выкарыстоўваем paginationData.data (як мы высветлілі ў логах)
+    stories: paginationData.data,
+    totalItems: paginationData.totalItems,
+    totalPages: paginationData.totalPages,
+    currentPage: paginationData.page, // Пагінацыйны нумар старонкі называецца 'page'
     nextPage:
-      data.currentPage < data.totalPages ? data.currentPage + 1 : undefined,
+      paginationData.page < paginationData.totalPages
+        ? paginationData.page + 1
+        : undefined,
   };
 };
 
