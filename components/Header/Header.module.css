@@ -1,0 +1,141 @@
+.header {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.navDesktop {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navDesktop a {
+  text-decoration: none;
+  color: #333;
+  font-size: 15px;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.navDesktop a:hover,
+.navDesktop a:focus {
+  color: #1a5cff;
+}
+
+.publishBtn {
+  background-color: #1a5cff;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+  transition: background 0.2s;
+}
+
+.publishBtn:hover,
+.publishBtn:focus {
+  background-color: #0046d6;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.loginBtn,
+.registerBtn,
+.logoutBtn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.loginBtn {
+  background-color: #e8e8e8;
+}
+
+.loginBtn:hover,
+.loginBtn:focus {
+  background-color: #d0d0d0;
+}
+
+.registerBtn {
+  background-color: #1a5cff;
+  color: #fff;
+}
+
+.registerBtn:hover,
+.registerBtn:focus {
+  background-color: #0046d6;
+}
+
+.logoutBtn {
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logoutBtn:hover,
+.logoutBtn:focus {
+  color: #1a5cff;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .navDesktop {
+    display: none;
+  }
+
+  .menuToggle {
+    display: block;
+  }
+}

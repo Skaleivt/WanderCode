@@ -1,0 +1,148 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 80px;
+  z-index: 50;
+}
+
+.menu {
+  background-color: #fff;
+  width: 90%;
+  max-width: 380px;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.closeBtn:hover,
+.closeBtn:focus {
+  color: #1a5cff;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav a:hover,
+.nav a:focus {
+  color: #1a5cff;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.publishBtn,
+.loginBtn,
+.registerBtn,
+.logoutBtn {
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.publishBtn {
+  background-color: #1a5cff;
+  color: white;
+}
+
+.publishBtn:hover,
+.publishBtn:focus {
+  background-color: #0046d6;
+}
+
+.loginBtn {
+  background-color: #e8e8e8;
+}
+
+.loginBtn:hover,
+.loginBtn:focus {
+  background-color: #d0d0d0;
+}
+
+.registerBtn {
+  background-color: #1a5cff;
+  color: white;
+}
+
+.registerBtn:hover,
+.registerBtn:focus {
+  background-color: #0046d6;
+}
+
+.logoutBtn {
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
