@@ -48,9 +48,9 @@ export default function LoginForm() {
 
   return (
     <main className={css.mainContent}>
+      <h1 className={css.formTitle}>Вхід</h1>
+      <p className={css.formText}>Вітаємо знову у спільноту мандрівників!</p>
       <form onSubmit={handleSubmit} className={css.form}>
-        <h1 className={css.formTitle}>Вхід</h1>
-        <p className={css.formText}>Вітаємо знову у спільноту мандрівників!</p>
         <div className={css.formGroup}>
           <label htmlFor="email">Пошта*</label>
           <input

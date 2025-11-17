@@ -47,6 +47,7 @@ export default function RegistrationForm() {
   return (
     <main className={css.mainContent}>
       <h1 className={css.formTitle}>Реєстрація</h1>
+      <p className={css.formText}>Раді вас бачити у спільноті мандрівників!</p>
       <form onSubmit={handleSubmit} className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="name">Імʼя та Прізвище*</label>

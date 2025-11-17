@@ -32,20 +32,23 @@ export default async function AuthPage({ params }: AuthPageProps) {
         </header>
         <div className={css.authContainer}>
           <ul className={css.authNavList}>
-            <li className={authType === 'register' ? css.active : ''}>
-              <Link
-                aria-disabled={authType === 'register'}
-                href="/auth/register"
-              >
-                Реєстрація
-              </Link>
+            <li
+              className={`${css.authNavItem} ${
+                authType === 'register' ? css.active : ''
+              }`}
+            >
+              <Link href="/auth/register">Реєстрація</Link>
             </li>
-            <li className={authType === 'login' ? css.active : ''}>
-              <Link aria-disabled={authType === 'login'} href="/auth/login">
-                Вхід
-              </Link>
+
+            <li
+              className={`${css.authNavItem} ${
+                authType === 'login' ? css.active : ''
+              }`}
+            >
+              <Link href="/auth/login">Вхід</Link>
             </li>
           </ul>
+
           {authType === 'register' ? <RegistrationForm /> : <LoginForm />}
         </div>
         <footer className={css.footer}>&copy; 2025 Подорожники</footer>
