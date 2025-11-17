@@ -178,5 +178,11 @@ export const getTravellerById = async (travellerId: string) => {
   const res = await nextServer.get<ApiTravellerResponse>(
     `/users/${travellerId}`
   );
-  return res.data.data.user;
+
+  const user = res.data.data.user;
+
+  return {
+    ...user,
+    avatarUrl: user.avatarUrl || '/default-avatar.png',
+  };
 };
