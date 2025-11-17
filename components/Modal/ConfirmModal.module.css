@@ -147,7 +147,7 @@
 }
 
 /* DESKTOP ≥ 1200px (близько до Figma 768x400) */
-@media (min-width: 1200px) {
+@media (min-width: 1440px) {
   .backdrop {
     padding: 64px 0;
   }
