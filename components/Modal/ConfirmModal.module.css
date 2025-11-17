@@ -1,0 +1,180 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+}
+
+/* MOBILE (база) */
+.card {
+  width: 100%;
+  max-width: 335px;
+  padding: 24px 20px;
+  border-radius: 24px;
+  background: var(--color-scheme-2-background);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* gap: 16px; */
+  text-align: center;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.closeIcon {
+  fill: var(--color-white);
+  stroke-width: 1px;
+  stroke: var(--color-scheme-1-text);
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--color-scheme-1-text);
+  max-width: 295px;
+  padding-top: 36px;
+  margin-bottom: 16px;
+}
+
+.desc {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-scheme-1-text);
+  max-width: 295px;
+  margin-bottom: 32px;
+}
+
+.actionsBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.confirmBtn,
+.cancelBtn {
+  width: 100%;
+  height: 48px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--color-scheme-2-border);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-neutral-darkest);
+  background: var(--opacity-neutral-darkest-5);
+  cursor: pointer;
+}
+
+.confirmBtn {
+  color: var(--color-white);
+  background: var(--color-royal-blue);
+  border: 1px solid var(--color-royal-blue);
+}
+
+.confirmBtn:focus-visible,
+.cancelBtn:focus-visible {
+  outline: 2px solid var(--color-royal-blue);
+  outline-offset: 2px;
+}
+
+.confirmBtn:hover,
+.cancelBtn:hover {
+  color: var(--color-white);
+  background: var(--color-royal-blue);
+  border-color: var(--color-royal-blue);
+}
+
+/* .confirm{}
+.error{ outline: 2px solid #F04438; }
+.success{ outline: 2px solid #16A34A; } */
+
+/* TABLET ≥ 768px */
+@media (min-width: 768px) {
+  .backdrop {
+    padding: 32px 24px;
+  }
+
+  .card {
+    max-width: 704px;
+    padding: 16px 32px 64px;
+  }
+
+  .close {
+    right: 16px;
+    top: 16px;
+  }
+
+  .title {
+    font-size: 32px;
+    max-width: 640px;
+  }
+
+  .desc {
+    font-size: 18px;
+    max-width: 640px;
+  }
+
+  .actionsBtn {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .confirmBtn,
+  .cancelBtn {
+    width: 203px;
+  }
+}
+
+/* DESKTOP ≥ 1200px (близько до Figma 768x400) */
+@media (min-width: 1440px) {
+  .backdrop {
+    padding: 64px 0;
+  }
+
+  .close {
+    right: 24px;
+    top: 24px;
+  }
+
+  .title {
+    font-size: 48px;
+    margin: 0 auto;
+    padding-top: 36px;
+  }
+
+  .desc {
+    font-size: 20px;
+    margin: 16px auto 32px;
+  }
+
+  .actionsBtn {
+    max-width: 430px; /* як у Figma */
+    margin-top: 8px;
+  }
+
+  .confirmBtn,
+  .cancelBtn {
+    height: 48px;
+  }
+}

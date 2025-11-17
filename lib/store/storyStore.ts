@@ -1,18 +1,20 @@
+// lib/store/storyStore.ts (Фінальны выпраўлены код)
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { NewStory } from '@/types/story';
 
 type StoryDraftStore = {
   draft: NewStory;
-  setDraft: (note: NewStory) => void;
+  setDraft: (story: NewStory) => void;
   clearDraft: () => void;
 };
 
 const initialDraft: NewStory = {
+  img: '',
   title: '',
-  content: '',
-  tag: 'Todo',
-  // поля для історії перевизначити
+  article: '',
+  category: '',
 };
 
 export const useStoryDraftStore = create<StoryDraftStore>()(

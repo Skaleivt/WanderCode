@@ -1,0 +1,97 @@
+/* app/(public routes)/stories/StoriesPage.module.css */
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Section background */
+.section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #f7f9ff;
+  padding: 32px 20px 64px;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 704px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* Header (Heading + Filters) */
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* H1 Heading */
+.heading {
+  width: 100%;
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: #000000;
+  text-align: center;
+}
+
+/* ==== RESPONSIVE ==== */
+
+/* Tablet / small desktop */
+@media (min-width: 768px) {
+  .section {
+    padding: 32px 32px 64px;
+  }
+
+  .container {
+    max-width: 704px;
+  }
+
+  .heading {
+    font-size: 48px;
+    max-width: 704px;
+  }
+}
+
+/* Mobile up to 767px */
+@media (max-width: 767px) {
+  .section {
+    padding: 32px 20px 64px;
+  }
+
+  .container {
+    max-width: 335px;
+  }
+
+  .heading {
+    font-size: 32px;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+}
+
+/* Desktop (1280px and up) */
+@media (min-width: 1280px) {
+  .section {
+    padding: 48px 64px 72px;
+  }
+
+  .container {
+    max-width: 1312px;
+  }
+
+  .heading {
+    font-size: 56px;
+    max-width: 1312px;
+  }
+}

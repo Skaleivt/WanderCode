@@ -2,53 +2,54 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { api } from '../../api';
 import { parse } from 'cookie';
-import { isAxiosError } from 'axios';
-import { logErrorResponse } from '../../_utils/utils';
 
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get('refreshToken')?.value;
-    const next = request.nextUrl.searchParams.get('next') || '/';
+    const sessionId = cookieStore.get('sessionId')?.value;
+    const nextUrl = request.nextUrl.searchParams.get('next') || '/';
 
-    if (refreshToken) {
-      const apiRes = await api.get('auth/refresh', {
-        headers: {
-          Cookie: cookieStore.toString(),
-        },
-      });
-      const setCookie = apiRes.headers['set-cookie'];
-      if (setCookie) {
-        const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
-        let accessToken = '';
-        let refreshToken = '';
-
-        for (const cookieStr of cookieArray) {
-          const parsed = parse(cookieStr);
-          if (parsed.accessToken) accessToken = parsed.accessToken;
-          if (parsed.refreshToken) refreshToken = parsed.refreshToken;
-        }
-
-        if (accessToken) cookieStore.set('accessToken', accessToken);
-        if (refreshToken) cookieStore.set('refreshToken', refreshToken);
-
-        return NextResponse.redirect(new URL(next, request.url), {
-          headers: {
-            'set-cookie': cookieStore.toString(),
-          },
-        });
-      }
-    }
-    return NextResponse.redirect(new URL('/sign-in', request.url));
-  } catch (error) {
-    if (isAxiosError(error)) {
-      logErrorResponse(error.response?.data);
+    if (!refreshToken || !sessionId) {
       return NextResponse.redirect(new URL('/sign-in', request.url));
     }
-    logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+
+    const apiRes = await api.post('/auth/refresh', null, {
+      headers: {
+        Cookie: `refreshToken=${refreshToken}; sessionId=${sessionId}`,
+      },
+      withCredentials: true,
+    });
+
+    const setCookie = apiRes.headers['set-cookie'];
+    if (setCookie) {
+      const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+      const res = NextResponse.redirect(new URL(nextUrl, request.url));
+
+      for (const cookieStr of cookieArray) {
+        const parsed = parse(cookieStr);
+        if (parsed.accessToken)
+          res.cookies.set('accessToken', parsed.accessToken, {
+            httpOnly: true,
+            path: '/',
+          });
+        if (parsed.refreshToken)
+          res.cookies.set('refreshToken', parsed.refreshToken, {
+            httpOnly: true,
+            path: '/',
+          });
+        if (parsed.sessionId)
+          res.cookies.set('sessionId', parsed.sessionId, {
+            httpOnly: true,
+            path: '/',
+          });
+      }
+
+      return res;
+    }
+
+    return NextResponse.redirect(new URL(nextUrl, request.url));
+  } catch {
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 }

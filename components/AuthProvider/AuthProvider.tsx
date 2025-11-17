@@ -1,28 +1,34 @@
+// components/AuthProvider/AuthProvider.tsx
 'use client';
 
-import { checkSession } from '@/lib/api/clientApi';
-import { getMe } from '@/lib/api/clientApi';
+import { getMe, checkSession } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-type Props = {
-  children: React.ReactNode;
-};
+type Props = { children: React.ReactNode };
 
 export default function AuthProvider({ children }: Props) {
   const setUser = useAuthStore((state) => state.setUser);
   const clearIsAuthenticated = useAuthStore(
     (state) => state.clearIsAuthenticated
   );
+  const initialized = useRef(false); // ⚡ блокування повторних викликів
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const sessionIsValid = await checkSession();
+    if (initialized.current) return; // запобігаємо повторним запитам
+    initialized.current = true;
 
-      if (sessionIsValid) {
-        const user = await getMe();
+    const fetchUser = async () => {
+      try {
+        let user = await getMe();
+        if (!user) {
+          const refreshed = await checkSession();
+          if (refreshed) user = await getMe();
+        }
+
         if (user) setUser(user);
-      } else {
+        else clearIsAuthenticated();
+      } catch {
         clearIsAuthenticated();
       }
     };
