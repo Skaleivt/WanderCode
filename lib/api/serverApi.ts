@@ -2,8 +2,8 @@
 import { cookies } from 'next/headers';
 import { nextServer } from './api';
 import { Category, StoriesResponse } from '@/types/story';
-import { AxiosResponse } from 'axios';
 import { User } from '@/types/user';
+import { AxiosError, AxiosResponse } from 'axios';
 
 async function getServerCookies(): Promise<string> {
   const cookieStore = await cookies();
@@ -63,8 +63,16 @@ export const getMeServer = async (): Promise<User | null> => {
       },
     });
     return res.data;
-  } catch (error) {
-    console.error('Failed to fetch user on server:', error);
+  } catch (err: unknown) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 401) {
+        return null;
+      }
+      console.error('Failed to fetch user on server:', err.message);
+      return null;
+    }
+    // Якщо помилка не AxiosError
+    console.error('Unexpected error on server:', err);
     return null;
   }
 };
