@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import css from './PopularSection.module.css';
 import { StoriesResponse } from '@/types/story';
-import TravelersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
+import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
 import { useRouter } from 'next/navigation';
 
 type PopularClientProps = {
@@ -25,9 +25,7 @@ export default function PopularSectionClient({
       <h2 className={css.title}>Популярні історії</h2> 
       <ul className={css.list}>
         {stories.map((story) => (
-          <li className={css.listItem} key={story._id}>
-            <TravelersStoriesItem story={story} />
-          </li>
+          <TravellersStoriesItem key={story._id} story={story} />
         ))}
       </ul>
       <button 

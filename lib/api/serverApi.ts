@@ -1,7 +1,7 @@
 // lib/api/serverApi.ts
 import { cookies } from 'next/headers';
 import { nextServer } from './api';
-import { StoriesResponse } from '@/types/story';
+import { Category, StoriesResponse } from '@/types/story';
 import { AxiosResponse } from 'axios';
 import { User } from '@/types/user';
 
@@ -68,3 +68,17 @@ export const getMeServer = async (): Promise<User | null> => {
     return null;
   }
 };
+
+export interface CategoryResponse {
+  status: number;
+  message: string;
+  data: Category[];
+}
+export async function fetchCategoriesServer(): Promise<CategoryResponse> {
+  const response =
+    await nextServer.get<CategoryResponse>(`/stories/categories`);
+
+  return {
+    ...response.data,
+  };
+}

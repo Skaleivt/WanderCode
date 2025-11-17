@@ -8,9 +8,9 @@ export interface Story {
   ownerId: string;
   date: string;
   favoriteCount: number;
-///виправи якщо треба
+  ///виправи якщо треба
   shortDesc?: string;
-  body: string; 
+  body: string;
   coverUrl?: string;
   authorId: string;
   createdAt: string;
@@ -33,21 +33,17 @@ export interface StoriesResponse {
 export interface NewStory {
   img: string;
   title: string;
-  article: string;
   category: string;
   date?: string;
-
-///виправи якщо треба
-  shortDesc?: string;
-  body: string;
-  cover?: File;        // при створенні
+  description: string;
+  cover?: File;
 }
 
 export interface Category {
   _id: string;
-  value: string;
-  title: string;
+  name: string;
 }
+
 export interface DetailedStory {
   _id: string;
   img: string;

@@ -131,7 +131,7 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
     );
 
     const story = response.data.data;
-
+    console.log('story::::', story);
     return {
       _id: story._id,
       img: story.img,
@@ -139,7 +139,7 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
       article: story.article,
       date: story.date,
       favoriteCount: story.favoriteCount,
-      owner: story.owner,
+      owner: story.ownerId,
       category: story.category,
     };
   } catch (error: unknown) {
