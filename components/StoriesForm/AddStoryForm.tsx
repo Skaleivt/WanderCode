@@ -10,37 +10,28 @@ import ConfirmModal from '@/components/Modal/ConfirmModal';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import Loader from '@/components/Loader/Loader';
 import styles from './AddStoryForm.module.css';
-import { useField } from 'formik';
+// import { useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
-import { getCategories } from '@/lib/api/story';
+import { createStory, getCategories } from '@/lib/api/story';
 import { Category } from '@/types/story';
 
-// ---- Лічильник символів для короткого опису
-const ShortDescLiveCounter = () => {
-  const [field] = useField<string>('shortDesc');
-  const left = 61 - (field.value?.length ?? 0);
-  return (
-    <div className={styles.helper}>Лишилось символів: {Math.max(0, left)}</div>
-  );
-};
+// // ---- Лічильник символів для короткого опису
+// const ShortDescLiveCounter = () => {
+//   const [field] = useField<string>('shortDesc');
+//   const left = 61 - (field.value?.length ?? 0);
+//   return (
+//     <div className={styles.helper}>Лишилось символів: {Math.max(0, left)}</div>
+//   );
+// };
 
 // ---- Типи форми
 export interface AddStoryFormValues {
   cover: File | null;
   title: string;
   category: string;
-  shortDesc?: string;
-  body: string;
+  // shortDesc?: string;
+  description: string;
 }
-
-// ---- Категорії (підстав свої, якщо є у constants)
-// const CATEGORIES = [
-//   { value: 'Поради', label: 'Поради' },
-//   { value: 'Маршрути', label: 'Маршрути' },
-//   { value: 'Лайфхаки', label: 'Лайфхаки' },
-//   { value: 'Інше', label: 'Інше' },
-// ];
-
 // ---- Валідація
 const schema = Yup.object({
   cover: Yup.mixed<File>()
@@ -54,7 +45,10 @@ const schema = Yup.object({
     .max(100, 'макс. 100')
     .required('Обовʼязково'),
   category: Yup.string().required('оберіть категорію'),
-  body: Yup.string().trim().min(30, 'мін. 30 символів').required('Обовʼязково'),
+  description: Yup.string()
+    .trim()
+    .min(30, 'мін. 30 символів')
+    .required('Обовʼязково'),
 });
 
 // ---- Початкові значення
@@ -62,27 +56,17 @@ const initialValues: AddStoryFormValues = {
   cover: null,
   title: '',
   category: '',
-  shortDesc: '',
-  body: '',
+  // shortDesc: '',
+  description: '',
 };
 
-// ---- API-клієнт
-async function createStory(
-  values: AddStoryFormValues
-): Promise<{ id: string }> {
-  const form = new FormData();
-  if (values.cover) form.append('cover', values.cover);
-  form.append('title', values.title);
-  form.append('category', values.category);
-  form.append('body', values.body);
-  form.append('shortDesc', values.shortDesc ?? '');
-  const res = await fetch('/api/stories', { method: 'POST', body: form });
-  if (!res.ok) {
-    const msg = await res.text();
-    throw new Error(msg || 'Помилка створення історії');
-  }
-  return res.json();
-}
+type ApiError = Error & {
+  status?: number;
+  response?: {
+    status: number;
+    data: unknown;
+  };
+};
 
 export default function AddStoryForm() {
   const router = useRouter();
@@ -105,9 +89,14 @@ export default function AddStoryForm() {
       setCreatedId(data.id); // зберігаємо ID нової історії
       setPublishedOpen(true); // відкриваємо модалку успіху
     },
-    onError: (err) => {
-      showErrorToast(err.message || 'Не вдалося зберегти історію');
-      setErrorOpen(true);
+    onError: (err: ApiError) => {
+      const status = err?.response?.status || err?.status;
+
+      if (status === 401 || status === 403) {
+        setErrorOpen(true);
+      } else {
+        showErrorToast(err.message || 'Не вдалося зберегти історію');
+      }
     },
   });
 
@@ -227,7 +216,7 @@ export default function AddStoryForm() {
                       </option>
                       {categories?.map((c: Category) => (
                         <option key={c._id} value={c._id}>
-                          {c.title}
+                          {c.name}
                         </option>
                       ))}
                     </Field>
@@ -237,37 +226,17 @@ export default function AddStoryForm() {
                       className={styles.err}
                     />
                   </label>
-                  {/* Короткий опис — показуємо ТІЛЬКИ на моб/планшеті */}
-                  <div className={`${styles.field} ${styles.shortOnly}`}>
-                    <label className={styles.label}>Короткий опис</label>
-                    <Field
-                      as="textarea"
-                      id="shortDesc"
-                      name="shortDesc"
-                      rows={3}
-                      maxLength={61}
-                      placeholder="Введіть короткий опис історії"
-                      className={styles.summaryArea}
-                    />
-                    <ErrorMessage
-                      name="shortDesc"
-                      component="p"
-                      className={styles.err}
-                    />
 
-                    <ShortDescLiveCounter />
-                  </div>
-                  {/* Текст */}
                   <label className={styles.field}>
                     <span className={styles.label}>Текст історії</span>
                     <Field
                       as="textarea"
-                      name="body"
+                      name="description"
                       rows={8}
                       placeholder="Ваша  історія тут"
                     />
                     <ErrorMessage
-                      name="body"
+                      name="description"
                       component="p"
                       className={styles.err}
                     />
@@ -344,19 +313,6 @@ export default function AddStoryForm() {
           }
         }}
       />
-      {/* Модалка виходу — поки що не використовується */}
-
-      {/* <ConfirmModal
-  variant="confirm"
-  isOpen={logoutOpen}
-  title="Ви точно хочете вийти?"
-  description="Ми будемо сумувати за вами!"
-  cancelText="Відмінити"
-  confirmText="Вийти"
-  onClose={() => setLogoutOpen(false)}
-  onCancel={() => setLogoutOpen(false)}
-  onConfirm={() => { setLogoutOpen(false); doLogout(); }}
-/> */}
     </>
   );
 }

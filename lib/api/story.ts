@@ -34,8 +34,8 @@ export async function createStory(values: AddStoryFormValues) {
   if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
-  form.append('body', values.body);
-  form.append('shortDesc', values.shortDesc ?? '');
+  form.append('description', values.description);
+  // form.append('shortDesc', values.shortDesc ?? '');
 
   const res = await nextServer.post('/stories', form);
   return res.data;
