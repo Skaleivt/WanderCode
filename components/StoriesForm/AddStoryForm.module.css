@@ -250,8 +250,19 @@
     max-width: 768px;
     margin: 0 auto;
     padding: 0 32px;
-  }
+  
 
+  }
+.inner {
+
+
+
+padding: 0px;
+gap: 24px;
+
+width: 640px;
+
+}
   .title {
     gap: 24px;
     height: 53px;
@@ -262,6 +273,7 @@
 
   .form {
     max-width: 704px;
+
   }
 
   .coverImage {
@@ -278,6 +290,10 @@
     padding-bottom: 64px;
   }
 }
+ 
+
+
+
 
 /* ========= Desktop ≥1280 (layout 1440, container 1312) ========= */
 @media (min-width: 1280px) {
@@ -285,7 +301,7 @@
     width: 1440px;
     padding: 0 64px 72px 160px;
     gap: 24px;
-    width: 1440;
+   
   }
 
   .inner {
