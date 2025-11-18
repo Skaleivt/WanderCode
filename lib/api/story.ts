@@ -1,9 +1,9 @@
 // lib/api/story.ts
 
-import type { StoriesResponse,Story } from '@/types/story';
+import type { StoriesResponse} from '@/types/story';
 import { api } from './api';
 import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
-
+import type { Story } from '@/types/story';
 export const storiesKeys = {
   all: ['stories'] as const,
   saved: () => ['stories', 'saved'] as const,
@@ -33,7 +33,7 @@ export async function getMyStories(
   });
   return data;
 }
-// 🔹 Створення історії
+
 export async function createStory(values: AddStoryFormValues) {
   const form = new FormData();
   if (values.cover) form.append('cover', values.cover);
