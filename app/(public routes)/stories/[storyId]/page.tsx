@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { fetchStoryByIdServer } from '@/lib/api/serverApi';
+
 import {
   dehydrate,
   HydrationBoundary,
@@ -24,7 +25,6 @@ export default async function StoryPage({ params }: StoryPageProps) {
   }
 
   const queryClient = new QueryClient();
-
   try {
     // Prefetch story для SSR
     await queryClient.prefetchQuery({

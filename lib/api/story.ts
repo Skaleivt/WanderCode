@@ -35,8 +35,7 @@ export async function createStory(values: AddStoryFormValues) {
   if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
-  form.append('description', values.description); // form.append('shortDesc', values.shortDesc ?? '');
-  // Запыт адпраўляецца на Next.js API Route /api/stories
+  form.append('description', values.description);
   const res = await api.post('/stories', form);
   return res.data;
 }

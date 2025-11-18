@@ -35,6 +35,11 @@ export function StoryDetailsClient({ storyId }: Props) {
     if (story?.img) setImgSrc(story.img);
   }, [story]);
 
+  useEffect(() => {
+    setImgSrc(story?.img ?? '/default-avatar.png');
+  }, [story]);
+
+  // Мутація для кнопки "Зберегти"
   const mutation = useMutation({
     mutationFn: () => saveStory(storyId),
     onSuccess: () => {

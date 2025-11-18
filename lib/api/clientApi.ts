@@ -3,7 +3,10 @@
 import { User } from '@/types/user';
 import { api } from './api';
 import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
+
 import { AxiosError } from 'axios';
+
+export type { StoriesResponse, Story, DetailedStory, Category };
 
 export type { StoriesResponse, Story, DetailedStory, Category };
 
@@ -187,7 +190,6 @@ export const fetchUserById = async (id: string): Promise<User> => {
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
   try {
     const response = await api.get(`/stories/${id}`);
-
     return response.data.data;
   } catch (error) {
     console.error('Помилка fetchStoryByIdServer:', error);

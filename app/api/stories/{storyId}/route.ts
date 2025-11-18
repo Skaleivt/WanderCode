@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { AxiosError, isAxiosError } from 'axios';
+
 import { api } from '../../api';
 
+// ✅ Выпраўлены тып: params - гэта аб'ект, а не Promise
 interface RouteParams {
   params: { storyId: string };
 }
@@ -27,6 +29,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
+    if (!isAxiosError(error)) {
+      console.error('Non-Axios Error:', error);
+      return NextResponse.json(
+        { message: 'Internal Server Error' },
+        { status: 500 }
+      );
+    }
     const axiosError = error as AxiosError;
     logErrorResponse(axiosError);
 

@@ -5,6 +5,7 @@ import css from './page.module.css';
 import Container from '@/components/Container/Container';
 import { TravellersInfo } from '@/components/TravellersInfo/TravellersInfo';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
+
 import TravellersStories from '@/components/TravellersStories/TravellersStories';
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
@@ -25,6 +26,7 @@ export default async function TravellerProfilePage(props: unknown) {
       : {
           data: {
             data: [],
+
             totalItems: 0,
             totalPages: 1,
             currentPage: 1,
