@@ -8,8 +8,6 @@ import { AxiosError } from 'axios';
 
 export type { StoriesResponse, Story, DetailedStory, Category };
 
-export type { StoriesResponse, Story, DetailedStory, Category };
-
 export type StoriesPage = {
   stories: Story[];
   totalItems: number;
