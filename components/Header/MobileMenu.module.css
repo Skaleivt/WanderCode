@@ -1,25 +1,28 @@
+/* ================== Основні стилі для MobileMenu ================== */
 .overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 80px;
-  z-index: 50;
+  padding-top: 0; /* fullscreen */
+  z-index: 9999;
 }
 
 .menu {
   background-color: #fff;
-  width: 90%;
-  max-width: 380px;
-  border-radius: 12px;
+  width: 100%;
+  height: 100vh; /* fullscreen на мобілці та планшеті */
+  border-radius: 0;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   animation: slideDown 0.3s ease;
+  overflow-y: auto;
 }
 
 @keyframes slideDown {
@@ -95,7 +98,9 @@
   border-radius: 6px;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .publishBtn {
@@ -145,4 +150,34 @@
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* ================== Планшет (768px - 1024px) ================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .overlay {
+    align-items: flex-start;
+    padding-top: 0; /* fullscreen */
+  }
+
+  .menu {
+    width: 100%;
+    height: 100vh; /* fullscreen */
+    max-width: none;
+    border-radius: 0;
+  }
+}
+
+/* ================== Десктоп (>1024px) ================== */
+@media (min-width: 1025px) {
+  .overlay {
+    align-items: flex-start;
+    padding-top: 80px; /* зсунемо вниз, щоб не перекривати header */
+  }
+
+  .menu {
+    height: auto;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 12px;
+  }
 }

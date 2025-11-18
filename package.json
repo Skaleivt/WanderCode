@@ -17,6 +17,7 @@
     "axios": "^1.11.0",
     "cookie": "^1.0.2",
     "formik": "^2.4.6",
+    "framer-motion": "^12.23.24",
     "hydrate": "^1.0.0",
     "lucide-react": "^0.553.0",
     "mongoose": "^8.20.0",

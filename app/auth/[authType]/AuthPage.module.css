@@ -29,8 +29,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  font-family: "Inter", sans-serif;
-  box-sizing: border-box;
 }
 
 .formTitle {
@@ -54,14 +52,12 @@
   margin-bottom: 32px;
 }
 
-.input {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.formGroup {
+  display: flex;
+  flex-direction: column;
   font-size: 14px;
-  transition: border 0.2s, box-shadow 0.2s;
-  width: 100%;
-  box-sizing: border-box;
+  font-weight: 500;
+  color: #212529;
 }
 
 .formGroup label {
@@ -88,10 +84,10 @@
   margin-bottom: 24px;
 }
 
-.error {
-  color: #ff4d4f;
-  font-size: 12px;
-  margin-top: -8px;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .submitButton {
@@ -116,75 +112,12 @@
   background: var(--color-royal-blue-lighter);
 }
 
-.toggleLink {
-  text-align: center;
-  font-size: 14px;
-  color: #1a5cff;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: all 0.2s;
-}
-
-.toggleLink:hover {
-  text-decoration: underline;
-  transform: scale(1.02);
-}
-
-.toggleContainer {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
-}
-
-/* Адаптивність */
-@media (max-width: 768px) {
-  .form {
-    margin: 40px 16px;
-    padding: 24px;
-  }
-
-  .form h2 {
-    font-size: 20px;
-  }
-
-  .input {
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-
-  .submitBtn {
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-
-  .toggleLink {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .form {
-    margin: 20px 12px;
-    padding: 20px;
-  }
-
-  .form h2 {
-    font-size: 18px;
-  }
-
-  .input {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-
-  .submitBtn {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-
-  .toggleLink {
-    font-size: 12px;
-  }
+.error {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 150%;
+  color: var(--color-red);
 }
 
 .topRow {

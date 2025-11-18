@@ -9,8 +9,10 @@ interface MobileMenuProps {
   isAuthenticated: boolean;
   userName?: string;
   userAvatar?: string;
-  openLoginModal: () => void;
-  openRegisterModal: () => void;
+
+  goToLogin: () => void;
+  goToRegister: () => void;
+  onLogout: () => void;
 }
 
 export const MobileMenu = ({
@@ -18,8 +20,9 @@ export const MobileMenu = ({
   isAuthenticated,
   userName,
   userAvatar,
-  openLoginModal,
-  openRegisterModal,
+  goToLogin,
+  goToRegister,
+  onLogout,
 }: MobileMenuProps) => {
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -71,16 +74,17 @@ export const MobileMenu = ({
                 className={styles.loginBtn}
                 onClick={() => {
                   onClose();
-                  openLoginModal();
+                  goToLogin();
                 }}
               >
                 Вхід
               </button>
+
               <button
                 className={styles.registerBtn}
                 onClick={() => {
                   onClose();
-                  openRegisterModal();
+                  goToRegister();
                 }}
               >
                 Реєстрація
@@ -92,7 +96,14 @@ export const MobileMenu = ({
                 <img src={userAvatar} alt="avatar" className={styles.avatar} />
               )}
               <span>{userName}</span>
-              <button className={styles.logoutBtn} onClick={onClose}>
+
+              <button
+                className={styles.logoutBtn}
+                onClick={() => {
+                  onClose();
+                  onLogout();
+                }}
+              >
                 Вихід
               </button>
             </div>
