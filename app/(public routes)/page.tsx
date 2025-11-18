@@ -6,6 +6,7 @@ import css from './page.module.css';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import Container from '@/components/Container/Container';
+import TravellersPage from './travellers/page';
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -91,6 +92,7 @@ export default async function HomePage() {
           </div>
         </section>
         <PopularSection />
+        <TravellersPage />
         <section id="Join" className={css.containerSec}>
           <div className={css.joinUs}>
             <h2 className={css.title}>Приєднуйтесь до нашої спільноти</h2>

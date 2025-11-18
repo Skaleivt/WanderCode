@@ -93,7 +93,7 @@ export default function AuthNavigation() {
         </>
       ) : (
         <>
-          <ul>
+          <ul className={css.container}>
             <li className={css.navigationItem}>
               <Link
                 href="/auth/login"

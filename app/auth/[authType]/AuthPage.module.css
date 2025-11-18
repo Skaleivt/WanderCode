@@ -1,9 +1,11 @@
 .auth {
   padding: 28px 0;
 }
+
 .authContainer {
   max-width: 644px;
 }
+
 .authNavList {
   display: flex;
   justify-content: space-between;
@@ -13,9 +15,11 @@
   border-bottom: 1px solid var(--color-scheme-1-border);
   width: 167px;
   height: 1px;
-  pointer-events: none; /* Не клікається */
+  pointer-events: none;
+  /* Не клікається */
   cursor: default;
 }
+
 /* form */
 .mainContent {
   flex: 1;
@@ -39,6 +43,7 @@
   color: var(--color-scheme-1-text);
   margin-bottom: 24px;
 }
+
 .formText {
   font-family: var(--font-family);
   font-weight: 400;
@@ -58,6 +63,7 @@
   width: 100%;
   box-sizing: border-box;
 }
+
 .formGroup label {
   font-family: var(--font-family);
   font-weight: 400;
@@ -190,6 +196,7 @@
   align-items: center;
   gap: 10px;
 }
+
 .logo {
   display: flex;
   align-items: center;
@@ -205,10 +212,11 @@
   line-height: 110%;
   letter-spacing: -0.01em;
 }
+
 /*layout  */
 .header {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   margin-bottom: 82px;
 }
 

@@ -1,22 +1,53 @@
 // components/TravellersStories/TravellersStories.tsx
-
 'use client';
 
 import { useMemo, useEffect } from 'react';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
-import { fetchStoriesPage, StoriesPage } from '@/lib/api/clientApi';
+import {
+  fetchStoriesPage,
+  StoriesPage,
+  StoriesResponse,
+} from '@/lib/api/clientApi';
 import Loader from '@/components/Loader/Loader';
 import StoriesList from '@/components/StoriesList/StoriesList';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import { Story } from '@/types/story';
 
-const TravellersStories = () => {
-  const searchParams = useSearchParams();
-  const filter = searchParams.get('filter') || 'all';
+// ✅ ІМПАРТУЕМ СТЫЛІ
+import styles from './TravellersStories.module.css';
+
+interface StoryWithStatus extends Story {
+  isFavorite: boolean;
+}
+
+export interface TravellersStoriesProps {
+  initialStories: StoriesResponse;
+  filter: string;
+}
+
+const TravellersStories = ({
+  initialStories,
+  filter,
+}: TravellersStoriesProps) => {
+  const data = initialStories?.data; // Канвертацыя серверных дадзеных у фармат, які чакае React Query
+
+  const initialPage: StoriesPage = {
+    stories: data?.data || [],
+    totalItems: data?.totalItems || 0,
+    totalPages: data?.totalPages || 1,
+    currentPage: data?.currentPage || 1,
+    nextPage:
+      (data?.currentPage || 1) < (data?.totalPages || 1)
+        ? (data?.currentPage || 1) + 1
+        : undefined,
+  };
+  const initialDataQuery: InfiniteData<StoriesPage, number> = {
+    pages: [initialPage],
+    pageParams: [1],
+  };
 
   const {
-    data,
+    data: queryData,
     isLoading,
     isError,
     error,
@@ -27,23 +58,30 @@ const TravellersStories = () => {
     StoriesPage,
     Error,
     InfiniteData<StoriesPage, number>,
-    ['stories', { filter: string }],
+    ['travellerStories', { filter: string }],
     number
   >({
-    queryKey: ['stories', { filter }],
+    queryKey: ['travellerStories', { filter }],
 
-    queryFn: ({ pageParam = 1, queryKey }) => {
-      const [, { filter }] = queryKey as ['stories', { filter: string }];
-      return fetchStoriesPage({ pageParam, filter });
+    queryFn: ({ pageParam = 1 }) => {
+      return fetchStoriesPage({ pageParam: pageParam as number, filter });
     },
 
-    initialPageParam: 1,
+    initialPageParam: initialPage.nextPage || 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialData: initialDataQuery,
   });
 
-  const allStories: Story[] = useMemo(() => {
-    return data?.pages.flatMap((page) => page.stories) ?? [];
-  }, [data]);
+  const allStories: StoryWithStatus[] = useMemo(() => {
+    const stories = queryData?.pages.flatMap((page) => page.stories) ?? [];
+
+    return stories
+      .filter((story): story is Story => !!story)
+      .map((story) => ({
+        ...story,
+        isFavorite: (story as StoryWithStatus).isFavorite ?? false,
+      })) as StoryWithStatus[];
+  }, [queryData]);
 
   useEffect(() => {
     if (isError) {
@@ -54,26 +92,22 @@ const TravellersStories = () => {
       showErrorToast(message);
     }
   }, [isError, error]);
-
   if (isLoading) {
     return (
-      <div className="stories-loader">
+      <div className={styles.storiesLoader}>
         <Loader />
       </div>
     );
   }
 
-  const noStoriesMessage =
-    filter === 'all'
-      ? 'Наразі немає жодної історії'
-      : `Наразі немає історій у категорії "${filter}"`;
+  const noStoriesMessage = 'Цей користувач ще не публікував історій';
 
-  if (!allStories.length) {
+  if (!allStories.length && !hasNextPage) {
     return (
-      <div className="stories-empty">
-        <h2 className="stories-empty__title">{noStoriesMessage}</h2>
-        <p className="stories-empty__text">
-          Станьте першим, хто поділиться власною подорожжю та надихне інших!
+      <div className={styles.storiesEmpty}>
+        <h2 className={styles.storiesEmpty__title}>{noStoriesMessage}</h2>
+        <p className={styles.storiesEmpty__text}>
+          Станьце першим, хто поділиться власною подорожжю та надихне іншых!
         </p>
       </div>
     );
@@ -82,16 +116,20 @@ const TravellersStories = () => {
   const handleLoadMore = () => {
     fetchNextPage();
   };
+  const handleToggleSuccess = (storyId: string, isAdding: boolean) => {
+    console.log(
+      `Закладка для ${storyId}: ${isAdding ? 'дададзена' : 'выдалена'}`
+    );
+  };
 
   return (
-    <section className="stories">
-      <StoriesList stories={allStories} />
-
+    <section className={styles.stories}>
+      <StoriesList stories={allStories} onToggleSuccess={handleToggleSuccess} />
       {hasNextPage && (
-        <div className="stories__load-more-wrap">
+        <div className={styles.loadMoreWrap}>
           <button
             type="button"
-            className="stories__load-more-btn"
+            className={styles.loadMoreBtn}
             onClick={handleLoadMore}
             disabled={isFetchingNextPage}
           >

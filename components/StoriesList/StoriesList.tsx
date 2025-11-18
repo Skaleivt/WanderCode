@@ -1,18 +1,29 @@
-// components/StoriesList/StoriesList.tsx (ВЫПРАЎЛЕНЫ)
+// components/StoriesList/StoriesList.tsx
+'use client';
+
 import React from 'react';
 import { Story } from '@/types/story';
-
-interface StoriesListProps {
-  stories: (Story | null | undefined)[];
+import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
+import styles from './StoriesList.module.css';
+export interface StoryWithStatus extends Story {
+  isFavorite: boolean;
 }
 
-const StoriesList: React.FC<StoriesListProps> = ({ stories }) => {
+interface StoriesListProps {
+  stories: (StoryWithStatus | null | undefined)[];
+  onToggleSuccess: (storyId: string, isAdding: boolean) => void;
+}
+
+const StoriesList: React.FC<StoriesListProps> = ({
+  stories,
+  onToggleSuccess,
+}) => {
   if (!stories || stories.length === 0) {
     return null;
   }
 
   return (
-    <div className="stories-list-grid">
+    <div className={styles['stories-list-grid']}>
       {stories.map((story, index) => {
         if (!story) {
           return null;
@@ -22,7 +33,10 @@ const StoriesList: React.FC<StoriesListProps> = ({ stories }) => {
 
         return (
           <div key={key}>
-            <h3>{story.title}</h3>
+            <TravellersStoriesItem
+              story={story} // Тут TypeScript вже не сваритиметься
+              onToggleSuccess={onToggleSuccess}
+            />
           </div>
         );
       })}

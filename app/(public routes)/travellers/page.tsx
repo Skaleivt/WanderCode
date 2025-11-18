@@ -1,17 +1,16 @@
-// app/(public routes)/travelers/page.tsx
+// app/(public routes)/travellers/page.tsx
 
 import React, { Suspense } from 'react';
 import TravellersList from '@/components/Travellers/TravellersList/TravellersList';
 import Loader from '@/components/Loader/Loader';
+import Container from '@/components/Container/Container';
 
 export default function TravellersPage() {
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Мандрівники</h1>
-
+    <Container>
       <Suspense fallback={<Loader />}>
         <TravellersList />
       </Suspense>
-    </main>
+    </Container>
   );
 }

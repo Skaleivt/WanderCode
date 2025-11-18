@@ -1,6 +1,8 @@
 export interface User {
+  _id: string;
   name: string;
-  email: string;
+  email?: string;
   avatarUrl?: string;
-  selectedStories: [];
+  selectedStories?: [];
 }
+//types/user.ts
