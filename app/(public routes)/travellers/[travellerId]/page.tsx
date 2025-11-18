@@ -8,9 +8,73 @@ import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
 
 import TravellersStories from '@/components/TravellersStories/TravellersStories';
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
+import { Metadata } from 'next';
 
 interface PageProps {
   params: Promise<{ storyId: string }>;
+}
+
+interface TravellerProfileData {
+  _id: string;
+  name: string;
+  avatarUrl?: string;
+  description?: string;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const travellerId = resolvedParams.storyId?.trim();
+
+  if (!travellerId) {
+    return {};
+  }
+
+  try {
+    const traveller: TravellerProfileData | null =
+      await getTravellerById(travellerId);
+
+    if (!traveller) {
+      return { title: 'Профіль не знайдено | Wander Code' };
+    }
+
+    const title = `${traveller.name} — Історії та Профіль Мандрівника | Wander Code`;
+    const description =
+      traveller.description ||
+      `Перегляньте профіль мандрівника ${traveller.name} та його унікальні історії подорожей на Wander Code.`;
+
+    return {
+      title: title,
+      description: description,
+      keywords: [
+        'профіль мандрівника',
+        traveller.name,
+        'історії подорожей',
+        'автор блогу',
+        'Wander Code',
+      ],
+      openGraph: {
+        title: title,
+        description: description,
+        url: `https://wander-code.vercel.app/travellers/${travellerId}`,
+        siteName: 'Wander Code',
+        images: traveller.avatarUrl
+          ? [
+              {
+                url: traveller.avatarUrl,
+                width: 400,
+                height: 400,
+                alt: traveller.name,
+              },
+            ]
+          : [],
+        type: 'article',
+      },
+    };
+  } catch {
+    return { title: 'Профіль | WanderCode' };
+  }
 }
 
 export default async function TravellerProfilePage({ params }: PageProps) {

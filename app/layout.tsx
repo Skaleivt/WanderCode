@@ -24,18 +24,18 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: 'Подорожники - WanderCode | Вашыя гісторыі падарожжаў',
+  title: 'Подорожники - WanderCode | Ваші історії про подорожі',
   description:
-    'Чытайце натхняльныя нататкі падарожнікаў пра дзіўныя месцы і стварайце ўласныя гісторыі падарожжаў.',
+    'Читайте надихаючі нотатки мандрівників про дивовижні місця та створюйте власні історії подорожей.',
   openGraph: {
     title: 'Подорожники - WanderCode',
     description:
-      'Прачытаць заметкі падарожнікаў аб месцах, дзе яны былі, і напісаць нататку пра свае падарожжы.',
-    url: 'localhost:3000',
+      'Прочитайте нотатки мандрівників про місця, які вони відвідали, та напишіть нотатку про їхні подорожі.',
+    url: 'https://wander-code.vercel.app',
     siteName: 'Подорожники - WanderCode',
     images: [
       {
-        url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
+        url: '/wandercode.jpg',
         width: 1200,
         height: 630,
         alt: 'Подорожники - WanderCode preview',
