@@ -33,7 +33,7 @@ export async function createStory(payload: NewStory): Promise<Story> {
   return data; // очікується { id, ... }
 }
 export async function getCategories() {
-  const { data } = await axios.get("/api/categories");
+  const { data } = await axios.get('/stories/categories');
   return data.data; // припускаю структура: { data: Category[] }
 }
 
