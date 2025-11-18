@@ -1,28 +1,44 @@
-// components/StoriesList/StoriesList.tsx (ВЫПРАЎЛЕНЫ)
+// components/StoriesList/StoriesList.tsx
+'use client';
+
 import React from 'react';
 import { Story } from '@/types/story';
+import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem'; // Мяркуецца, што ён існуе
+import styles from './StoriesList.module.css'; // Тут павінны быць стылі stories-list-grid
 
-interface StoriesListProps {
-  stories: (Story | null | undefined)[];
+// Тып для перадачы ў TravellersStoriesItem
+interface StoryWithStatus extends Story {
+  isFavorite: boolean;
 }
 
-const StoriesList: React.FC<StoriesListProps> = ({ stories }) => {
+interface StoriesListProps {
+  stories: (StoryWithStatus | null | undefined)[];
+  onToggleSuccess: (storyId: string, isAdding: boolean) => void;
+}
+
+const StoriesList: React.FC<StoriesListProps> = ({
+  stories,
+  onToggleSuccess,
+}) => {
   if (!stories || stories.length === 0) {
     return null;
   }
 
   return (
-    <div className="stories-list-grid">
+    <div className={styles['stories-list-grid']}>
       {stories.map((story, index) => {
         if (!story) {
           return null;
-        }
+        } // Выкарыстоўваем _id ці індэкс у якасці ключа
 
         const key = story._id || index;
 
         return (
           <div key={key}>
-            <h3>{story.title}</h3>
+            <TravellersStoriesItem // Пераканаўшыся, што тып правільны
+              story={story as StoryWithStatus}
+              onToggleSuccess={onToggleSuccess}
+            />
           </div>
         );
       })}

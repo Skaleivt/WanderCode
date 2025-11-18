@@ -1,0 +1,80 @@
+/* components/Travellers/TravellerInfo/TravellerInfo.module.css */
+
+.infoWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.avatarSection {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.description {
+    max-width: 700px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.idText {
+    font-size: 12px;
+    color: var(--color-gray-dark);
+}
+
+@media screen and (min-width: 1440px) {
+    .infoWrapper {
+        width: 590px;
+        height: 199px;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 0;
+        gap: 24px;
+        border-bottom: none;
+    }
+
+    .avatarSection {
+        width: 199px;
+        height: 199px;
+        border-radius: 100%;
+    }
+
+    .textInfo {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 24.5px 0;
+        height: 199px;
+        width: 387px;
+        box-sizing: border-box;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .description {
+        text-align: left;
+    }
+}

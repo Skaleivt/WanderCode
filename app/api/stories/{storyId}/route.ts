@@ -2,20 +2,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { AxiosError } from 'axios';
-import { nextServer } from '@/lib/api/api';
+import { AxiosError, isAxiosError } from 'axios';
+// ✅ Выкарыстоўваем кліент 'api' для бэкэнда
+import { api } from '../../api';
 
+// ✅ Выпраўлены тып: params - гэта аб'ект, а не Promise
 interface RouteParams {
-  params: Promise<{ storyId: string }>;
-}
-
-// Helper to compile all cookies into a single string for the external API call
-async function getServerCookiesString(): Promise<string> {
-  const cookieStore = await cookies();
-  return cookieStore
-    .getAll()
-    .map(({ name, value }) => `${name}=${value}`)
-    .join('; ');
+  params: { storyId: string };
 }
 
 // Generic error logging
@@ -26,17 +19,27 @@ function logErrorResponse(error: AxiosError) {
 
 // GET /api/stories/[storyId]
 export async function GET(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
+  // ✅ Атрымліваем storyId без 'await'
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   try {
-    const res = await nextServer.get(`/stories/${storyId}`, {
+    // ✅ Званок праз 'api'
+    const res = await api.get(`/stories/${storyId}`, {
       headers: {
-        Cookie: await getServerCookiesString(),
+        Cookie: cookieStore.toString(),
       },
     });
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
+    if (!isAxiosError(error)) {
+      console.error('Non-Axios Error:', error);
+      return NextResponse.json(
+        { message: 'Internal Server Error' },
+        { status: 500 }
+      );
+    }
     const axiosError = error as AxiosError;
     logErrorResponse(axiosError);
 
@@ -49,19 +52,27 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
 // PATCH /api/stories/[storyId]
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   try {
     const formData = await req.formData();
 
-    const res = await nextServer.patch(`/stories/${storyId}`, formData, {
+    const res = await api.patch(`/stories/${storyId}`, formData, {
       headers: {
-        Cookie: await getServerCookiesString(),
+        Cookie: cookieStore.toString(),
       },
     });
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
+    if (!isAxiosError(error)) {
+      console.error('Non-Axios Error:', error);
+      return NextResponse.json(
+        { message: 'Internal Server Error' },
+        { status: 500 }
+      );
+    }
     const axiosError = error as AxiosError;
     logErrorResponse(axiosError);
 
@@ -74,17 +85,25 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
 // DELETE /api/stories/[storyId]
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   try {
-    const res = await nextServer.delete(`/stories/${storyId}`, {
+    const res = await api.delete(`/stories/${storyId}`, {
       headers: {
-        Cookie: await getServerCookiesString(),
+        Cookie: cookieStore.toString(),
       },
     });
 
     return new NextResponse(null, { status: res.status || 204 });
   } catch (error) {
+    if (!isAxiosError(error)) {
+      console.error('Non-Axios Error:', error);
+      return NextResponse.json(
+        { message: 'Internal Server Error' },
+        { status: 500 }
+      );
+    }
     const axiosError = error as AxiosError;
     logErrorResponse(axiosError);
 

@@ -1,4 +1,4 @@
-import { nextServer } from "@/lib/api/api";
+import { api } from '@/lib/api/api';
 
 export interface Category {
   _id: string;
@@ -7,6 +7,6 @@ export interface Category {
 }
 
 export async function getCategories(): Promise<Category[]> {
-  const res = await nextServer.get("/categories");
-  return res.data.data;  // бекенд повертає data: { data: [] }
+  const res = await api.get('/categories');
+  return res.data.data; // бекенд повертає data: { data: [] }
 }
