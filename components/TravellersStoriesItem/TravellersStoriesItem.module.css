@@ -4,7 +4,7 @@
   width: 100%;
   border-radius: 16px;
   background-color: #e8eeff;
-  border: 1px solid rgba(0, 0, 0, 0.15); 
+  border: 1px solid rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
@@ -35,6 +35,7 @@
   font-weight: 400;
   color: #4b5563;
   margin-bottom: 4px;
+  /* Падсунуць катэгорыю да загалоўка */
 }
 
 .title {
@@ -45,6 +46,7 @@
   margin: 0 0 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  /* 🛑 Загаловак: 2 радкі */
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
@@ -57,34 +59,57 @@
   margin: 0 0 12px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  /* 🛑 Апісанне: 3 радкі */
   -webkit-box-orient: vertical;
   line-clamp: 3;
   overflow: hidden;
 }
 
-.meta {
+/* 🛑 ВЫДАЛІЦЕ СТАРЫЯ СТЫЛІ .meta І .metaInfo (бо яны заменены) */
+
+/* ✅ НОВЫЯ СТЫЛІ ДЛЯ БЛОКА АЎТАРА */
+
+.authorMetaBlock {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 13px;
-  color: #4b5563;
 }
 
 .authorAvatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.metaInfo {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.authorInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: #4b5563;
+  flex-grow: 1;
 }
 
+.authorName {
+  font-weight: 600;
+  color: #111827;
+}
+
+.dateAndBookmarks {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Дата злева, закладкі справа */
+  width: 100%;
+}
+
+.publishedDate {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* 🛑 ЗМЕНА: Закладкі цяпер унутры dateAndBookmarks, але мы перавызначаем, каб захаваць знешні выгляд */
 .bookmarks {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 6px;

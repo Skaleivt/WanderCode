@@ -1,8 +1,9 @@
+// lib/api/storyApi.ts
 import { addStoryToSaved, removeStoryFromSaved } from './clientApi';
 
 export const toggleStoryBookmark = async (
   storyId: string,
-  currentlySaved: boolean,
+  currentlySaved: boolean
 ) => {
   if (currentlySaved) {
     await removeStoryFromSaved(storyId);

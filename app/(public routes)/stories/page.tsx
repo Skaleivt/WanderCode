@@ -1,43 +1,23 @@
 // app/(public routes)/stories/page.tsx
 
-import type { Metadata } from 'next';
-import TravellersStories from '@/components/TravellersStories/TravellersStories';
-import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
+import Container from '@/components/Container/Container';
 import Loader from '@/components/Loader/Loader';
+import StoriesPageWrapper from '@/components/Stories/StoriesPageWrapper';
 
-// 💡 Import the new filter component
-import StoriesFilterControls from '@/components/Stories/StoriesFilterControls';
+// 🛑 Выдалены ўсе імпарты, звязаныя з катэгорыямі:
+// StoriesFilterControls, fetchCategories, CategoryResponse, Category
 
-import styles from './StoriesPage.module.css';
-
-export const metadata: Metadata = {
-  title: 'Історії Мандрівників | Подорожники',
-  description:
-    'Надихаючі історії мандрівників з усього світу: Європа, Азія, гори, пустелі та океани. Читайте досвід інших та плануйте власні пригоди.',
-};
-
-const StoriesPage = () => {
+export default async function StoriesPage() {
+  // 🛑 Выдалена ўся логіка загрузкі катэгорый
   return (
-    <main className={styles.page}>
-      <section className={styles.section}>
-        <div className={styles.container}>
-          <header className={styles.header}>
-            <h1 className={styles.heading}>Історії Мандрівників</h1>
-
-            {/* 💡 Replaced old filter markup with the new Client Component */}
-            <StoriesFilterControls />
-          </header>
-
-          <TanStackProvider>
-            <Suspense fallback={<Loader />}>
-              <TravellersStories />
-            </Suspense>
-          </TanStackProvider>
-        </div>
-      </section>
-    </main>
+    <Container>
+            <h1 className="main-title">Всі Історії</h1>           {' '}
+      {/* 🛑 Выдалены выклік StoriesFilterControls */}           {' '}
+      <Suspense fallback={<Loader />}>
+                <StoriesPageWrapper />     {' '}
+      </Suspense>
+         {' '}
+    </Container>
   );
-};
-
-export default StoriesPage;
+}

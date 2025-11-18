@@ -2,11 +2,10 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   fetchTravellers,
   FetchTravellersResponse as PaginationResult,
-  Traveller,
 } from '@/lib/api/travellersApi';
 import {
   TRAVELLERS_INITIAL_PER_PAGE_DESKTOP,
@@ -18,9 +17,7 @@ import TravellerCard from '../TravellerCard/TravellerCard';
 import Loader from '@/components/Loader/Loader';
 import styles from './TravellersList.module.css';
 
-// Helper to determine initial card count based on screen size
 const useInitialPerPage = (isMobileView: boolean) => {
-  // Mobile/Tablet: 8, Desktop: 12
   return isMobileView
     ? TRAVELLERS_INITIAL_PER_PAGE_MOBILE_TABLET
     : TRAVELLERS_INITIAL_PER_PAGE_DESKTOP;
@@ -32,21 +29,18 @@ const TravellersList: React.FC = () => {
   );
 
   const [isClient, setIsClient] = useState(false);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     setIsClient(true);
 
-    queryClient.removeQueries({ queryKey: ['travellers'] });
-
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     handleResize();
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [queryClient]);
+  }, []);
 
   const isMobileView = windowWidth < 1440;
   const initialPerPage = useInitialPerPage(isMobileView);
@@ -56,11 +50,10 @@ const TravellersList: React.FC = () => {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetching,
     isFetchingNextPage,
     status,
   } = useInfiniteQuery<PaginationResult>({
-    queryKey: ['travellers'],
+    queryKey: ['travellers', initialPerPage],
 
     queryFn: ({ pageParam = 1 }) => {
       const page = typeof pageParam === 'number' ? pageParam : 1;
@@ -74,16 +67,25 @@ const TravellersList: React.FC = () => {
       });
     },
 
-    getNextPageParam: (lastPage) => {
-      if (lastPage.hasNextPage) {
-        return lastPage.page + 1;
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage) return undefined;
+      if (typeof lastPage.page === 'number') {
+        const loadedCount = allPages.reduce((sum, p) => {
+          const len = Array.isArray(p.data) ? p.data.length : 0;
+          return sum + len;
+        }, 0);
+        const nextPerPage = TRAVELLERS_LOAD_MORE_AMOUNT;
+        const nextPage = Math.floor(loadedCount / nextPerPage) + 1;
+        return lastPage.hasNextPage ? nextPage : undefined;
       }
+      if (lastPage.hasNextPage) {
+        return allPages.length + 1;
+      }
+
       return undefined;
     },
-
     initialPageParam: 1,
     enabled: isClient,
-
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: true,
@@ -93,17 +95,13 @@ const TravellersList: React.FC = () => {
   const allTravellers = useMemo(() => {
     const flatList = data?.pages.flatMap((page) => page.data) ?? [];
 
-    const uniqueTravellers = flatList.reduce((acc, current) => {
-      if (!acc.some((item) => item._id === current._id)) {
-        acc.push(current);
-      }
-      return acc;
-    }, [] as Traveller[]);
+    const uniqueMap = flatList.reduce((map, traveller) => {
+      map.set(traveller._id, traveller);
+      return map;
+    }, new Map<string, (typeof flatList)[number]>());
 
-    return uniqueTravellers;
+    return Array.from(uniqueMap.values());
   }, [data]);
-
-  // --- UI STATUS HANDLING ---
 
   if (status === 'pending' || !isClient) {
     return <Loader />;
@@ -121,17 +119,14 @@ const TravellersList: React.FC = () => {
     return <p className={styles.empty}>No travellers found.</p>;
   }
 
-  // --- MAIN RENDER ---
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Мандрівнікі</h2>
-
+      <h2 className={styles.title}>Мандрівники</h2>
       <ul className={styles.list}>
         {allTravellers.map((traveller) => (
           <TravellerCard key={traveller._id} traveller={traveller} />
         ))}
       </ul>
-
       {hasNextPage && (
         <button
           onClick={() => fetchNextPage()}
@@ -141,8 +136,6 @@ const TravellersList: React.FC = () => {
           {isFetchingNextPage ? <Loader /> : 'Показати ще'}
         </button>
       )}
-
-      {isFetching && !isFetchingNextPage && <Loader />}
     </section>
   );
 };

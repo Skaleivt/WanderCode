@@ -1,0 +1,20 @@
+/* stories-list-grid styles (ДАДАЦЬ) */
+
+.stories-list-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .stories-list-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .stories-list-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 слупкі па 3 карткі */
+    }
+}

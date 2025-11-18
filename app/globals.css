@@ -51,6 +51,18 @@
   --color-red: #b00101;
 }
 
+:root {
+
+  --bg-muted: #E8EEFF;
+  --text-60: rgba(0, 0, 0, .6);
+  --border: rgba(0, 0, 0, .15);
+  --danger: #D92D20;
+  --primary: #4169E1;
+  --text: #000;
+  --radius-8: 8px;
+  --radius-16: 16px;
+}
+
 body {
   font-family: var(--font-family);
   display: flex;
@@ -65,6 +77,7 @@ ul {
   margin: 0;
   padding: 0;
 }
+
 h1,
 h2,
 h3,
