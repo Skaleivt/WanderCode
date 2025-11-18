@@ -9,3 +9,4 @@ export default async function EditStoryPage({ params }: EditStoryPageProps) {
 
   return <EditStoryForm storyId={storyId} />;
 }
+

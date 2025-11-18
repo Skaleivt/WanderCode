@@ -48,3 +48,4 @@ export async function updateStory(id: string, form: FormData): Promise<Story> {
   });
   return res.data.data;
 }
+
