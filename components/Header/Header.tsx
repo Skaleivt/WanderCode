@@ -1,78 +1,106 @@
-// components/Header/Header.tsx
-import React from 'react';
-import Link from 'next/link';
-import Container from '../Container/Container';
-import AuthNavigation from '../AuthNavigation/AuthNavigation';
+'use client';
 
-export const Header: React.FC = () => {
-  // Navigation links for non-authorized users (MVP)
-  const publicNavItems = [
-    { href: '/', label: 'Головна' },
-    { href: '/stories', label: 'Історії' },
-    { href: '/travellers', label: 'Мандрівники' },
-  ];
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import Link from 'next/link';
+import styles from './Header.module.css';
+import { MobileMenu } from './MobileMenu';
+
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
+import Container from '../Container/Container';
+import { useAuthStore } from '@/lib/store/authStore';
+
+export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const handleToggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const handleCloseMenu = () => setIsMenuOpen(false);
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false);
+        setIsLoginOpen(false);
+        setIsRegisterOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
+  useEffect(() => {
+    if (isMenuOpen || isLoginOpen || isRegisterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isMenuOpen, isLoginOpen, isRegisterOpen]);
 
   return (
-    <header
-      style={{
-        backgroundColor: 'var(--color-scheme-1-background)',
-        borderBottom: '1px solid var(--color-scheme-1-border)',
-        padding: '16px 0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      <Container className="header-container">
-        {' '}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          {/* Logo Placeholder */}
-          <Link
-            href="/"
-            style={{
-              fontSize: '24px',
-              fontWeight: 'bold',
-              color: 'var(--color-royal-blue)',
-              textDecoration: 'none',
-            }}
-          >
-            WanderCode LOGO
+    <Container>
+      <header className={styles.header}>
+        <div className={styles.container}>
+          <Link href="/" className={styles.logo}>
+            <svg
+              className={styles.logo}
+              width="22"
+              height="22"
+              aria-hidden="true"
+            >
+              <use href="/symbol-defs.svg#icon-logo" />
+            </svg>
+            Подорожники
           </Link>
 
-          {/* Primary Navigation (Desktop view) */}
-          <nav className="desktop-nav" style={{ display: 'flex', gap: '20px' }}>
-            {publicNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  color: 'var(--color-neutral-dark)',
-                  textDecoration: 'none',
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className={styles.navDesktop}>
+            <Link href="/">Головна</Link>
+            <Link href="/stories">Історії</Link>
+            <Link href="/travellers">Мандрівники</Link>
+
+            {isAuthenticated && (
+              <ul className={styles.navigationItem}>
+                <li>
+                  <Link href="/profile/" prefetch={false}>
+                    Мій профіль
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    href="/stories/create"
+                    prefetch={false}
+                    className={styles.createStory}
+                  >
+                    Опублікувати історію
+                  </Link>
+                </li>
+              </ul>
+            )}
+
+            <div className={styles.authButtons}>
+              <AuthNavigation />
+            </div>
           </nav>
 
-          {/* Auth Buttons for Non-Logged-in User */}
-          <div
-            className="auth-buttons"
-            style={{ display: 'flex', gap: '10px' }}
-          >
-            <AuthNavigation />
-          </div>
+          <button className={styles.menuToggle} onClick={handleToggleMenu}>
+            <svg width={24} height={24}>
+              <use href="/symbol-defs.svg#icon-menu"></use>
+            </svg>
+          </button>
         </div>
-      </Container>
-    </header>
-  );
-};
 
-export default Header;
+        {isMenuOpen &&
+          createPortal(
+            <MobileMenu
+              onClose={handleCloseMenu}
+              openLoginModal={() => setIsLoginOpen(true)}
+              openRegisterModal={() => setIsRegisterOpen(true)}
+            />,
+            document.body
+          )}
+      </header>
+    </Container>
+  );
+}

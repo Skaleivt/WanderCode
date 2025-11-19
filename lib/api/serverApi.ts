@@ -1,9 +1,10 @@
-// lib/api/serverApi.ts (Вяртаем да чыстага стану)
+// lib/api/serverApi.ts
 
 import { cookies } from 'next/headers';
 import { api } from './api';
 import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
 import { UserResponse } from '@/types/user';
+import { User } from '@/types/user';
 import { AxiosError, AxiosResponse } from 'axios';
 import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
@@ -18,12 +19,6 @@ async function getServerCookies(): Promise<string> {
     )
     .join('; ');
 
-  if (cookieString) {
-    console.log('SERVER DEBUG: Cookies being sent to Backend:', cookieString);
-  } else {
-    console.log('SERVER DEBUG: No cookies found in request.');
-  }
-
   return cookieString;
 }
 
@@ -37,7 +32,7 @@ export const checkServerSession = async (): Promise<AxiosResponse> => {
   return res;
 };
 
-export async function fetchAllStoriesServer({
+async function executeStoriesRequest({
   page,
   perPage,
   filter,
@@ -63,9 +58,84 @@ export async function fetchAllStoriesServer({
     },
   });
 
-  return {
-    ...response.data,
-  };
+  return response.data;
+}
+
+export async function fetchAllStoriesServer({
+  page,
+  perPage,
+  filter,
+  sortField,
+  sortOrder,
+}: {
+  page?: number;
+  perPage?: number;
+  filter?: string;
+  sortField?: string;
+  sortOrder?: string;
+}): Promise<StoriesResponse> {
+  const requestedPerPage = perPage || 4;
+  const backendPerPage = 3;
+
+  try {
+    // 1. Query 1st page
+    const response1 = await executeStoriesRequest({
+      page: 1,
+      perPage: backendPerPage,
+      filter,
+      sortField,
+      sortOrder,
+    }); // 2. Query 2nd page
+
+    const response2 = await executeStoriesRequest({
+      page: 2,
+      perPage: backendPerPage,
+      filter,
+      sortField,
+      sortOrder,
+    });
+
+    let storiesData: Story[] = [];
+
+    const data1 = response1?.data?.data || [];
+    const data2 = response2?.data?.data || []; // Concatenate and slice to the requested amount (4)
+
+    storiesData = [...data1, ...data2];
+    storiesData = storiesData.slice(0, requestedPerPage);
+
+    const totalReturned = storiesData.length;
+
+    const correctedResponse: StoriesResponse = {
+      data: {
+        totalItems: response1.data.totalItems || totalReturned,
+        totalPages: response1.data.totalPages || 1,
+        hasNextPage: response1.data.hasNextPage || false,
+        hasPreviousPage: response1.data.hasPreviousPage || false,
+
+        currentPage: page || 1, // Corrected values for the frontend
+
+        data: storiesData as Story[],
+        page: page || 1,
+        perPage: requestedPerPage,
+      },
+    };
+
+    return correctedResponse;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_: unknown) {
+    return {
+      data: {
+        data: [],
+        totalItems: 0,
+        totalPages: 0,
+        currentPage: page || 1,
+        page: page || 1,
+        perPage: requestedPerPage,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+    };
+  }
 }
 
 export const getMeServer = async (): Promise<UserResponse> => {
@@ -75,8 +145,6 @@ export const getMeServer = async (): Promise<UserResponse> => {
         Cookie: await getServerCookies(),
       },
     });
-
-    console.log('SERVER DEBUG: User fetched successfully (200 OK).');
 
     return res.data;
   } catch (error) {
@@ -90,7 +158,6 @@ export const getMeServer = async (): Promise<UserResponse> => {
   }
 };
 
-// 🛑 Пакідаем функцыю тут, але яна не выклікаецца нідзе пасля адкату.
 export interface CategoryResponse {
   status: number;
   message: string;
@@ -113,17 +180,12 @@ export async function fetchStoryByIdServer(
     }
 
     const res = await api.get(`/stories/${storyId}`);
-    // Логування для дебагу
-    console.log('server fetchStoryByIdServer response:', res.data);
-
     const storyData = res.data?.data;
 
-    // Перевірка, чи є story
     if (!storyData) {
       throw new Error('Story Not Found (дані пусті)');
     }
 
-    // Додаткова перевірка полів, щоб TypeScript був задоволений
     const story: DetailedStory = {
       _id: storyData._id,
       img: storyData.img || '/file.svg',
@@ -150,7 +212,7 @@ export async function fetchStoryByIdServer(
       throw new Error('Story Not Found (404)');
     }
 
-    throw new Error('Не вдалося завантажити історію (SSR)');
+    throw new Error('Не вдалося завантажыць історыю (SSR)');
   }
 }
 

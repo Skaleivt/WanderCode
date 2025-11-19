@@ -1,0 +1,60 @@
+/* TravellersSectionHome.module.css */
+
+.section {
+    padding: 0;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.loadMoreButton {
+    display: block;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-white);
+    border: 1px solid var(--color-royal-blue);
+    border-radius: 8px;
+    min-width: 147px;
+    max-width: fit-content;
+    height: 48px;
+    background-color: var(--color-royal-blue);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 auto;
+    margin-top: 48px;
+    text-align: center;
+    padding: 12px 8px;
+    box-sizing: border-box;
+}
+
+/* Tablet: 2x2 */
+@media screen and (min-width: 768px) {
+    .list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .list>* {
+        width: calc((100% - 24px) / 2);
+    }
+}
+
+/* Desktop: 4 у радок */
+@media screen and (min-width: 1440px) {
+    .list {
+        gap: 24px;
+    }
+
+    .list>* {
+        width: calc((100% - 72px) / 4);
+    }
+}

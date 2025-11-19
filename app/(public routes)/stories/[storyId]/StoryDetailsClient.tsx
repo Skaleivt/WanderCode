@@ -113,6 +113,7 @@ export function StoryDetailsClient({ storyId }: PageParams) {
           </button>
         </div>
       </div>
+      <p className={css.stories}>Популярні історії</p>
     </div>
   );
 }

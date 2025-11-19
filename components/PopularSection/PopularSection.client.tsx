@@ -1,7 +1,9 @@
+// components/PopularSection/PopularSection.client.tsx
 'use client';
 
 import { useCallback, useState } from 'react';
 import { fetchAllStoriesClient, getMe } from '@/lib/api/clientApi';
+import Link from 'next/link';
 
 import css from './PopularSection.module.css';
 import { StoriesResponse, Story } from '@/types/story';
@@ -11,7 +13,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 type PopularClientProps = {
   initialData: StoriesResponse;
   initialUser: string[] | undefined;
-  perPage: number;
   sortField: string;
   sortOrder: string;
 };
@@ -24,21 +25,19 @@ interface UserDataResponse {
   selectedStories: string[];
 }
 
+// Канстанта для запыту
+const INITIAL_REQUEST_COUNT = 4;
+
 export default function PopularSectionClient({
   initialData,
   initialUser,
-  perPage,
   sortField,
   sortOrder,
 }: PopularClientProps) {
   const queryClient = useQueryClient();
 
-  const [stories, setStories] = useState<Story[]>(initialData.data.data ?? []);
-  const [page, setPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(
-    initialData.data.hasNextPage ?? false
-  );
-  const [loading, setLoading] = useState(false);
+  const [stories] = useState<Story[]>(initialData.data.data ?? []);
+  const [hasNextPage] = useState(initialData.data.hasNextPage ?? false);
 
   const { data: userData } = useQuery<UserDataResponse>({
     queryKey: ['user'],
@@ -48,9 +47,14 @@ export default function PopularSectionClient({
   });
 
   useQuery({
-    queryKey: ['stories', page, perPage, sortField, sortOrder],
+    queryKey: ['stories', 1, INITIAL_REQUEST_COUNT, sortField, sortOrder],
     queryFn: () =>
-      fetchAllStoriesClient({ page, perPage, sortField, sortOrder }),
+      fetchAllStoriesClient({
+        page: 1,
+        perPage: INITIAL_REQUEST_COUNT,
+        sortField,
+        sortOrder,
+      }),
     initialData: initialData,
     enabled: false,
   });
@@ -81,32 +85,6 @@ export default function PopularSectionClient({
     [queryClient]
   );
 
-  const loadMore = async () => {
-    if (loading) return;
-    setLoading(true);
-
-    const nextPage = page + 1;
-
-    try {
-      const storiesData = await fetchAllStoriesClient({
-        page: nextPage,
-        perPage,
-        sortField,
-        sortOrder,
-      });
-
-      setStories((prev) => [...prev, ...storiesData.data.data]);
-      setPage(nextPage);
-      setHasNextPage(storiesData.data.hasNextPage);
-
-      // Не трэба выклікаць getMe(), бо стан карыстальніка падтрымліваецца useQuery
-    } catch (err) {
-      console.error('Помилка завантаження наступної сторінки:', err);
-    }
-
-    setLoading(false);
-  };
-
   return (
     <div className={css.section}>
       <ul className={css.list}>
@@ -118,7 +96,7 @@ export default function PopularSectionClient({
           };
 
           return (
-            <li key={story._id}>
+            <li key={story._id} className={css.listItem}>
               <TravellersStoriesItem
                 story={storyWithStatus}
                 onToggleSuccess={updateSelectedStories}
@@ -127,13 +105,11 @@ export default function PopularSectionClient({
           );
         })}
       </ul>
-
       {hasNextPage && (
-        <button className={css.button} onClick={loadMore} disabled={loading}>
-          {loading ? 'Завантаження...' : 'Завантажити ще'}
-        </button>
+        <Link href="/stories" className={css.button}>
+          Переглянути всі
+        </Link>
       )}
     </div>
   );
 }
-// components/PopularSection/PopularSection.client.tsx

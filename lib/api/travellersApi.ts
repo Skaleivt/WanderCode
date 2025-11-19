@@ -1,4 +1,6 @@
 // lib/api/travellersApi.ts
+
+import { ApiTravellerResponse } from '../store/travellerStore';
 import { api } from './api';
 
 export type Traveller = {
@@ -100,7 +102,7 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
   };
 }
 
-/* Fetch travellers from backend using page+perPage pagination */
+/* Fetch travellers from backend using page+perPage pagination (Client-side) */
 export async function fetchTravellersClient(
   params: FetchTravellersParams
 ): Promise<FetchTravellersResponse> {
@@ -138,21 +140,18 @@ export async function fetchTravellersClient(
           ? paginationResult.hasPreviousPage
           : false;
 
-      // --- ВЫПРАЎЛЕННЕ ПАГІНАЦЫІ ---
       const currentPage =
         typeof paginationResult.page === 'number'
           ? paginationResult.page
           : typeof paginationResult.page === 'string'
-            ? Number(paginationResult.page) // Пераўтварэнне радка ў лік
+            ? Number(paginationResult.page)
             : params.page;
       const currentPerPage =
         typeof paginationResult.perPage === 'number'
           ? paginationResult.perPage
           : typeof paginationResult.perPage === 'string'
-            ? Number(paginationResult.perPage) // Пераўтварэнне радка ў лік
+            ? Number(paginationResult.perPage)
             : params.perPage;
-      // --- КАНЕЦ ВЫПРАЎЛЕННЯ ---
-
       const normalized = items.map((it, idx) => normalizeRaw(it, idx));
 
       return {
@@ -184,13 +183,13 @@ export async function fetchTravellersClient(
 export async function getTravellerById(id: string): Promise<Traveller | null> {
   try {
     const res = await api.get(`/users/${id}`);
-    const payload: unknown = res.data; // Swagger shows GET /api/users/{id} returns { status, message, data: { user: {...}, stories: [...] } }
+    const payload: unknown = res.data;
 
     if (isObject(payload) && isObject(payload.data)) {
-      const inner = payload.data as Record<string, unknown>; // Prefer inner.user; if not present, try inner directly
-      const userRaw = inner['user'] ?? inner; // normalizeRaw expects a record-like object
+      const inner = payload.data as Record<string, unknown>;
+      const userRaw = inner['user'] ?? inner;
       return normalizeRaw(userRaw, 0);
-    } // fallback: if payload itself is a user object
+    }
 
     if (isObject(payload)) {
       return normalizeRaw(payload, 0);
@@ -198,7 +197,89 @@ export async function getTravellerById(id: string): Promise<Traveller | null> {
 
     return null;
   } catch (err) {
-    // rethrow so caller can distinguish network errors vs 404 handling
     throw err;
   }
 }
+
+export async function fetchTravellersServer(
+  params: FetchTravellersParams
+): Promise<FetchTravellersResponse> {
+  try {
+    const res = await api.get('/users', {
+      params: {
+        perPage: params.perPage,
+        page: params.page,
+      },
+    });
+
+    const payload: unknown = res.data;
+
+    const paginationResult = isObject(payload) ? payload.data : null;
+
+    let items: unknown[] = [];
+
+    if (isObject(paginationResult) && Array.isArray(paginationResult.data)) {
+      items = paginationResult.data;
+
+      const totalItems =
+        typeof paginationResult.totalItems === 'number'
+          ? paginationResult.totalItems
+          : 0;
+      const totalPages =
+        typeof paginationResult.totalPages === 'number'
+          ? paginationResult.totalPages
+          : 1;
+      const hasNextPage =
+        typeof paginationResult.hasNextPage === 'boolean'
+          ? paginationResult.hasNextPage
+          : false;
+      const hasPreviousPage =
+        typeof paginationResult.hasPreviousPage === 'boolean'
+          ? paginationResult.hasPreviousPage
+          : false;
+
+      const currentPage =
+        typeof paginationResult.page === 'number'
+          ? paginationResult.page
+          : params.page;
+      const currentPerPage =
+        typeof paginationResult.perPage === 'number'
+          ? paginationResult.perPage
+          : params.perPage;
+      const normalized = items.map((it, idx) => normalizeRaw(it, idx));
+
+      return {
+        data: normalized,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        hasNextPage: hasNextPage,
+        hasPreviousPage: hasPreviousPage,
+        page: currentPage,
+        perPage: currentPerPage,
+      };
+    }
+
+    return {
+      data: [],
+      totalItems: 0,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPreviousPage: false,
+      page: params.page,
+      perPage: params.perPage,
+    };
+  } catch (error) {
+    console.error('Error fetching travellers on server:', error);
+    throw error;
+  }
+}
+export const getTravellerInfoById = async (travellerId: string) => {
+  const res = await api.get<ApiTravellerResponse>(`/users/${travellerId}`);
+
+  const user = res.data.data.user;
+
+  return {
+    ...user,
+    avatarUrl: user.avatarUrl || '/default-avatar.png',
+  };
+};

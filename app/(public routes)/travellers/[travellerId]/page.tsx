@@ -1,85 +1,47 @@
 import React from 'react';
-import { getTravellerById } from '@/lib/api/travellersApi';
+import { Metadata } from 'next';
+import {
+  getTravellerById,
+  getTravellerInfoById,
+} from '@/lib/api/travellersApi';
 import { notFound } from 'next/navigation';
 import css from './page.module.css';
 import Container from '@/components/Container/Container';
 import { TravellersInfo } from '@/components/TravellersInfo/TravellersInfo';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
-
 import TravellersStories from '@/components/TravellersStories/TravellersStories';
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
-import { Metadata } from 'next';
 
-interface PageProps {
-  params: Promise<{ storyId: string }>;
-}
+type Props = {
+  params: { travellerId: string };
+};
 
-interface TravellerProfileData {
-  _id: string;
-  name: string;
-  avatarUrl?: string;
-  description?: string;
-}
-
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const travellerId = resolvedParams.storyId?.trim();
-
-  if (!travellerId) {
-    return {};
-  }
-
-  try {
-    const traveller: TravellerProfileData | null =
-      await getTravellerById(travellerId);
-
-    if (!traveller) {
-      return { title: 'Профіль не знайдено | Wander Code' };
-    }
-
-    const title = `${traveller.name} — Історії та Профіль Мандрівника | Wander Code`;
-    const description =
-      traveller.description ||
-      `Перегляньте профіль мандрівника ${traveller.name} та його унікальні історії подорожей на Wander Code.`;
-
-    return {
-      title: title,
-      description: description,
-      keywords: [
-        'профіль мандрівника',
-        traveller.name,
-        'історії подорожей',
-        'автор блогу',
-        'Wander Code',
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { travellerId } = params;
+  const traveller = await getTravellerInfoById(travellerId);
+  return {
+    title: `Профіль Мандрівника: ${traveller.name}`,
+    description: `Історії подорожей, фото та пригоди з усього світу.`,
+    openGraph: {
+      title: `Профіль Мандрівника: ${traveller.name}`,
+      description: '',
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/travelers/${travellerId}`,
+      siteName: 'Подорожники',
+      images: [
+        {
+          url: traveller.avatarUrl,
+          width: 1200,
+          height: 630,
+          alt: `Профіль мандрівника ${traveller.name}`,
+        },
       ],
-      openGraph: {
-        title: title,
-        description: description,
-        url: `https://wander-code.vercel.app/travellers/${travellerId}`,
-        siteName: 'Wander Code',
-        images: traveller.avatarUrl
-          ? [
-              {
-                url: traveller.avatarUrl,
-                width: 400,
-                height: 400,
-                alt: traveller.name,
-              },
-            ]
-          : [],
-        type: 'article',
-      },
-    };
-  } catch {
-    return { title: 'Профіль | WanderCode' };
-  }
+    },
+  };
 }
 
-export default async function TravellerProfilePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const travellerId = resolvedParams.storyId?.trim();
+export default async function TravellerProfilePage({ params }: Props) {
+  const resolvedParams = params;
+  const travellerId = resolvedParams.travellerId?.trim();
 
   if (!travellerId) {
     return notFound();

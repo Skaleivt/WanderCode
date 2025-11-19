@@ -1,8 +1,7 @@
-/* MOB */
+/* components/PopularSection/PopularSection.module.css */
 
 .section {
-  padding: 64px 0;
-  /* 💡 Вертыкальны padding пакінуты для адступаў паміж секцыямі */
+  padding: 0;
 }
 
 .title {
@@ -18,7 +17,7 @@
 
 .list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -26,8 +25,32 @@
   width: 100%;
 }
 
+.listItem {
+  display: block;
+  width: 100%;
+}
+
+
 .button {
-  display: none;
+  display: block;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-white);
+  border: 1px solid var(--color-royal-blue);
+  border-radius: 8px;
+  min-width: 147px;
+  max-width: fit-content;
+  height: 48px;
+  background-color: var(--color-royal-blue);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0 auto;
+  margin-top: 48px;
+  text-align: center;
+  padding: 12px 8px;
+  box-sizing: border-box;
 }
 
 .empty {
@@ -44,46 +67,25 @@
   text-align: center;
 }
 
-/* TAB */
-
 @media screen and (min-width: 768px) {
-  .section {
-    padding: 64px 0;
-    /* 💡 Вертыкальны padding пакінуты */
-  }
 
   .title {
     font-size: 44px;
   }
 
   .list {
-    flex-direction: row;
-    gap: 24px 24px;
     justify-content: flex-start;
   }
 
-  .list>* {
+  .listItem {
     width: calc((100% - 24px) / 2);
-  }
-
-  .button {
     display: block;
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--color-white);
-
-    border: 1px solid var(--color-royal-blue);
-    border-radius: 8px;
-    min-width: 147px;
-    min-height: 48px;
-    background-color: var(--color-royal-blue);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin: 0 auto;
-    margin-top: 48px;
   }
+
+  .listItem:nth-child(4) {
+    display: block;
+  }
+
 
   .button:hover {
     background-color: var(--color-royal-blue-lighter);
@@ -96,13 +98,7 @@
   }
 }
 
-/* DESK */
-
 @media screen and (min-width: 1440px) {
-  .section {
-    padding: 72px 0;
-  }
-
   .title {
     font-size: 52px;
     margin-bottom: 40px;
@@ -112,14 +108,17 @@
     gap: 24px 24px;
   }
 
-  .list>* {
+  .listItem {
     width: calc((100% - 48px) / 3);
   }
+
+  .listItem:nth-child(4) {
+    display: none;
+  }
+
 
   .button {
     min-width: 173px;
     margin-top: 72px;
   }
 }
-
-/* components/PopularSection/PopularSection.module.css */

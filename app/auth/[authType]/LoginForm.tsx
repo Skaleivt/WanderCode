@@ -1,4 +1,3 @@
-// app/(auth routes)/sign-in/page.tsx
 'use client';
 
 import css from './AuthPage.module.css';
@@ -8,9 +7,10 @@ import { useEffect, useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export default function LoginForm() {
-  const [error, setError] = useState('');
+  const [error] = useState('');
   const setUser = useAuthStore((state) => state.setUser);
   const router = useRouter();
 
@@ -22,28 +22,33 @@ export default function LoginForm() {
       password: String(formData.get('password')),
     };
     try {
+      toast.info('Перевіряємо ваші дані...');
       const res = await loginUser(formValues);
 
       if (res) {
         const me = await getMe();
-        if (me) setUser(me);
-        router.push('/');
+        if (me) {
+          setUser(me);
+          toast.success(`Ласкаво просимо, ${me.name || 'користувач'}!`);
+          router.push('/');
+        } else {
+          toast.warning('Не вдалося отримати дані користувача.');
+        }
       } else {
-        setError('Invalid email or password');
+        toast.error('Невірна пошта або пароль.');
       }
     } catch (error) {
-      setError((error as ApiError).message ?? 'Oops... some error');
+      toast.error(
+        (error as ApiError).message ?? 'Сталася помилка. Спробуйте ще раз.'
+      );
     }
   };
-  // замінити метадані
+
   useEffect(() => {
-    document.title = `Sign-in | NoteHub`;
+    document.title = `Вхід | WanderCode`;
     document
       .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        `Sign in to your NoteHub account. Enter your email and password to log in.`
-      );
+      ?.setAttribute('content', `Ввійдіть у свій WanderCode акаунт`);
   });
 
   return (

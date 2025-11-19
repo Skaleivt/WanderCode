@@ -56,30 +56,21 @@ export default function AuthNavigation() {
             </li>
 
             <li>
-              <Link
-                href="/stories/create"
-                prefetch={false}
-                className={css.createStory}
-              >
-                Опублікувати історію
-              </Link>
+              <Image
+                src={user?.avatarUrl || '/default-avatar.png'}
+                alt="User Avatar"
+                width={32}
+                height={32}
+                className={css.avatar}
+              />
             </li>
-
-            <li className={css.avatar}>
-              {user?.avatarUrl ? (
-                <Image
-                  src={user.avatarUrl}
-                  alt="User Avatar"
-                  width={32}
-                  height={32}
-                  className={css.avatar}
-                />
-              ) : (
-                <div className={css.placeholderAvatar}>👤</div>
-              )}
-
+            <li>
               <p className={css.userEmail}>{user?.name}</p>
-
+            </li>
+            <li>
+              <span>|</span>
+            </li>
+            <li>
               <button
                 className={css.logoutButton}
                 onClick={() => setIsOpen(true)}
@@ -94,7 +85,7 @@ export default function AuthNavigation() {
       ) : (
         <>
           <ul className={css.container}>
-            <li className={css.navigationItem}>
+            <li className={css.loginBtn}>
               <Link
                 href="/auth/login"
                 prefetch={false}
@@ -104,7 +95,7 @@ export default function AuthNavigation() {
               </Link>
             </li>
 
-            <li className={css.navigationItem}>
+            <li className={css.registerBtn}>
               <Link
                 href="/auth/register"
                 prefetch={false}

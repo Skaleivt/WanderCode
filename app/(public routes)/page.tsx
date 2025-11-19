@@ -6,7 +6,7 @@ import css from './page.module.css';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import Container from '@/components/Container/Container';
-import TravellersPage from './travellers/page';
+import TravellersSectionHome from '@/components/Travellers/TravellersSectionHome/TravellersSectionHome';
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -23,20 +23,21 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className={css.heroContainer}>
-        <div className={css.hero}>
-          <h1 className={css.heroTitle}>Відкрийте світ подорожей з нами!</h1>
-          <p className={css.heroText}>
-            Приєднуйтесь до нашої спільноти мандрівників, де ви зможете ділитися
-            своїми історіями та отримувати натхнення для нових пригод. Відкрийте
-            для себе нові місця та знайдіть однодумців!
-          </p>
-          <button className={css.heroBtn}>
-            <Link href="#Join">Доєднатись</Link>
-          </button>
-        </div>
-      </section>
       <Container>
+        <section className={css.heroContainer}>
+          <div className={css.hero}>
+            <h1 className={css.heroTitle}>Відкрийте світ подорожей з нами!</h1>
+            <p className={css.heroText}>
+              Приєднуйтесь до нашої спільноти мандрівників, де ви зможете
+              ділитися своїми історіями та отримувати натхнення для нових
+              пригод. Відкрийте для себе нові місця та знайдіть однодумців!
+            </p>
+            <button className={css.heroBtn}>
+              <Link href="#Join">Доєднатись</Link>
+            </button>
+          </div>
+        </section>
+
         <section className={css.about}>
           <div>
             <div className={css.aboutContainer}>
@@ -91,8 +92,15 @@ export default async function HomePage() {
             </ul>
           </div>
         </section>
-        <PopularSection />
-        <TravellersPage />
+        <section className={css.popularStoriesSection}>
+          <h2 className={css.popularStoriesTitle}>Популярні історії</h2>
+          <PopularSection />
+        </section>
+        <section className={css.travellersHomeSection}>
+          <h2 className={css.travellersHomeTitle}>Наші Мандрівники</h2>
+          <TravellersSectionHome />
+        </section>
+        {/* <TravellersPage /> */}
         <section id="Join" className={css.containerSec}>
           <div className={css.joinUs}>
             <h2 className={css.title}>Приєднуйтесь до нашої спільноти</h2>

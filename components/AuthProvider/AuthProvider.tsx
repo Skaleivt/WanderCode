@@ -4,6 +4,7 @@
 import { getMe, checkSession } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 
 type Props = { children: React.ReactNode };
 
@@ -12,10 +13,10 @@ export default function AuthProvider({ children }: Props) {
   const clearIsAuthenticated = useAuthStore(
     (state) => state.clearIsAuthenticated
   );
-  const initialized = useRef(false); // ⚡ блокування повторних викликів
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return; // запобігаємо повторним запитам
+    if (initialized.current) return;
     initialized.current = true;
 
     const fetchUser = async () => {
@@ -30,6 +31,7 @@ export default function AuthProvider({ children }: Props) {
         else clearIsAuthenticated();
       } catch {
         clearIsAuthenticated();
+        toast.error('Помилка при завантаженні даних користувача.');
       }
     };
 

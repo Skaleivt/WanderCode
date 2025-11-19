@@ -8,7 +8,7 @@ type Props = {
 export default function PublicLayout({ children }: Props) {
   return (
     <>
-      <Header />
+      <Header isAuthenticated={false} />
       <main>{children}</main>
       <Footer />
     </>

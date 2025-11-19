@@ -55,7 +55,6 @@ export async function fetchAllStoriesClient({
   return response.data;
 }
 
-// ✅ ВЫПРАЎЛЕННЕ ПАМЫЛКІ 2353: Дададзеныя perPage, sortField і sortOrder у тыпізацыю аргументаў
 export const fetchStoriesPage = async ({
   pageParam,
   filter,
@@ -71,8 +70,6 @@ export const fetchStoriesPage = async ({
   sortField?: string; // ✅ ДАДАДЗЕНА
   sortOrder?: string; // ✅ ДАДАДЗЕНА
 }): Promise<StoriesPage> => {
-  // Выкарыстоўваем адносны шлях да Next.js API Proxy Route Handler
-  // 💡 ВЫПРАЎЛЕННЕ: Дадаем perPage і sortField/sortOrder у URL для перадачы ў Route Handler
   const params = new URLSearchParams({
     page: String(pageParam),
     ...(filter && { filter }),

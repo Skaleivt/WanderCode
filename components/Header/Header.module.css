@@ -1,0 +1,160 @@
+.header {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.createStory {
+  border: 1px solid var(--color-royal-blue);
+  border-radius: 8px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  width: 202px;
+  height: 35px;
+  background: var(--color-royal-blue);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 150%;
+  color: var(--color-white);
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.navDesktop {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navDesktop a:hover,
+.navDesktop a:focus {
+  color: #1a5cff;
+}
+
+.publishBtn {
+  background-color: #1a5cff;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+  transition: background 0.2s;
+}
+
+.publishBtn:hover,
+.publishBtn:focus {
+  background-color: #0046d6;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.loginBtn,
+.registerBtn,
+.logoutBtn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.loginBtn {
+  background-color: #e8e8e8;
+}
+
+.loginBtn:hover,
+.loginBtn:focus {
+  background-color: #d0d0d0;
+}
+
+.registerBtn {
+  background-color: #1a5cff;
+  color: #fff;
+}
+
+.registerBtn:hover,
+.registerBtn:focus {
+  background-color: #0046d6;
+}
+
+.logoutBtn {
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logoutBtn:hover,
+.logoutBtn:focus {
+  color: #1a5cff;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.menuToggle {
+  border: 1px solid var(--color-scheme-2-border);
+  border-radius: 8px;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  background: var(--opacity-neutral-darkest-5);
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .navDesktop {
+    display: none;
+  }
+
+  .menuToggle {
+    display: block;
+  }
+}
+@media (min-width: 769px) {
+  .menuToggle {
+    display: none;
+  }
+}
+.navigationItem {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
