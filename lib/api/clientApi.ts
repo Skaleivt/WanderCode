@@ -55,29 +55,26 @@ export async function fetchAllStoriesClient({
   return response.data;
 }
 
-// ✅ ВЫПРАЎЛЕННЕ ПАМЫЛКІ 2353: Дададзеныя perPage, sortField і sortOrder у тыпізацыю аргументаў
 export const fetchStoriesPage = async ({
   pageParam,
   filter,
   travellerId,
-  perPage, // ✅ ДАДАДЗЕНА
-  sortField, // ✅ ДАДАДЗЕНА
-  sortOrder, // ✅ ДАДАДЗЕНА
+  perPage,
+  sortField,
+  sortOrder,
 }: {
   pageParam: number;
   filter?: string;
   travellerId?: string;
-  perPage?: number; // ✅ ДАДАДЗЕНА
-  sortField?: string; // ✅ ДАДАДЗЕНА
-  sortOrder?: string; // ✅ ДАДАДЗЕНА
+  perPage?: number;
+  sortField?: string;
+  sortOrder?: string;
 }): Promise<StoriesPage> => {
-  // Выкарыстоўваем адносны шлях да Next.js API Proxy Route Handler
-  // 💡 ВЫПРАЎЛЕННЕ: Дадаем perPage і sortField/sortOrder у URL для перадачы ў Route Handler
   const params = new URLSearchParams({
     page: String(pageParam),
     ...(filter && { filter }),
     ...(travellerId && { travellerId }),
-    ...(perPage && { perPage: String(perPage) }), // ПАВІНЕН БЫЦЬ ЛІК
+    ...(perPage && { perPage: String(perPage) }),
     ...(sortField && { sortField }),
     ...(sortOrder && { sortOrder }),
   }).toString();
@@ -190,11 +187,15 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
     const response = await api.get(`/stories/${id}`);
     return response.data.data;
   } catch (error) {
-    console.error('Помилка fetchStoryByIdServer:', error);
+    // ✅ ВЫПРАЎЛЕННЕ: Кансольнае паведамленне
+    console.error('Помилка fetchStoryByIdClient:', error);
+
     if (error instanceof AxiosError && error.response?.status === 404) {
+      // Кідзем памылку 404 для апрацоўкі ў useQuery (StoryDetailsClient)
       throw new Error('Story Not Found (404)');
     }
-    throw new Error('Не вдалося завантажити історію (SSR)');
+    // ✅ ВЫПРАЎЛЕННЕ: Агульнае паведамленне пра памылку для кліента
+    throw new Error('Не вдалося завантажити історію (Client)');
   }
 };
 

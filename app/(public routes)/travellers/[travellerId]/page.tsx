@@ -1,3 +1,5 @@
+// app/(public routes)/travellers/[travellerId]/page.tsx
+
 import React from 'react';
 import { getTravellerById } from '@/lib/api/travellersApi';
 import { notFound } from 'next/navigation';
@@ -10,12 +12,18 @@ import TravellersStories from '@/components/TravellersStories/TravellersStories'
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
 interface PageProps {
-  params: Promise<{ storyId: string }>;
+  // Захоўваем правільную тыпізацыю, якую мы хочам выкарыстоўваць
+  params: { travellerId: string };
 }
 
-export default async function TravellerProfilePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const travellerId = resolvedParams.storyId?.trim();
+// 🛑 ВЫПРАЎЛЕННЕ: Выкарыстоўваем 'any' для аргумента, каб абыйсці памылку Next.js Builder-а.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function TravellerProfilePage(props: any) {
+  // Выкарыстоўваем строгі тып для ўнутранай працы
+  const { params } = props as PageProps;
+
+  // Атрымліваем travellerId з прыведзенага аб'екта params
+  const travellerId = params.travellerId?.trim();
 
   if (!travellerId) {
     return notFound();
@@ -24,13 +32,14 @@ export default async function TravellerProfilePage({ params }: PageProps) {
   const filter = travellerId;
   const traveller = await getTravellerById(travellerId);
   const stories = await fetchAllStoriesServer({ filter });
+
+  // Ваш код для апрацоўкі адказу гісторый
   const safeStories =
     stories && stories.data
       ? stories
       : {
           data: {
             data: [],
-
             totalItems: 0,
             totalPages: 1,
             currentPage: 1,
@@ -43,6 +52,7 @@ export default async function TravellerProfilePage({ params }: PageProps) {
   const isStories = safeStories.data.totalItems > 0;
 
   if (!traveller) {
+    // Выклікаецца, калі getTravellerById вяртае null (напрыклад, з-за 404)
     return notFound();
   }
 

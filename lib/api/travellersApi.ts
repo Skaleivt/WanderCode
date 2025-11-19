@@ -1,5 +1,6 @@
 // lib/api/travellersApi.ts
 import { api } from './api';
+import { AxiosError } from 'axios';
 
 export type Traveller = {
   id: string;
@@ -195,6 +196,11 @@ export async function getTravellerById(id: string): Promise<Traveller | null> {
 
     return null;
   } catch (err) {
+    // ✅ ВЫПРАЎЛЕННЕ: Апрацоўка 404. Вяртаем null, каб старонка магла выклікаць notFound().
+    if (err instanceof AxiosError && err.response?.status === 404) {
+      console.warn(`Traveller with ID ${id} not found (404)`);
+      return null;
+    }
     throw err;
   }
 }

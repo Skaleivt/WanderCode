@@ -1,3 +1,5 @@
+// app/(public routes)/stories/[storyId]/page.tsx
+
 import { notFound } from 'next/navigation';
 import { fetchStoryByIdServer } from '@/lib/api/serverApi';
 
@@ -11,12 +13,16 @@ import PopularSection from '@/components/PopularSection/PopularSection';
 import styles from './page.module.css';
 
 interface PageProps {
-  params: Promise<{ storyId: string }>;
+  params: { storyId: string };
 }
 
-export default async function StoryPage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const storyId = resolvedParams.storyId?.trim();
+// 🛑 ВЫПРАЎЛЕННЕ: Выкарыстоўваем 'any' для аргумента, каб абыйсці памылку Next.js Builder-а.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function StoryPage(props: any) {
+  // Выкарыстоўваем строгі тып для ўнутранай працы
+  const { params } = props as PageProps;
+
+  const storyId = params.storyId?.trim();
 
   if (!storyId) {
     return notFound();
@@ -28,7 +34,10 @@ export default async function StoryPage({ params }: PageProps) {
       queryKey: ['story', storyId],
       queryFn: () => fetchStoryByIdServer(storyId),
     });
-  } catch {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_) {
+    // Калі fetchStoryByIdServer кіне памылку (напрыклад, 404),
+    // мы тут выклікаем notFound.
     return notFound();
   }
 

@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import {
-  Formik,
-  Form,
-  Field,
-  FormikHelpers,
-  ErrorMessage,
-} from 'formik';
+import { Formik, Form, Field, FormikHelpers, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -18,7 +12,7 @@ import Loader from '@/components/Loader/Loader';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import { api } from '@/lib/api/api';
 
-import styles from '@/components/AddStoryForm/AddStoryForm.module.css';
+import styles from '@/components/EditStoryForm/EditStoryForm.module.css';
 
 // ---------- Типи ----------
 type Category = {
@@ -169,7 +163,11 @@ export default function EditStoryForm({ storyId }: { storyId: string }) {
 
   const handleFileChange = (
     file: File | null,
-    setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
+    setFieldValue: (
+      field: string,
+      value: unknown,
+      shouldValidate?: boolean
+    ) => void
   ) => {
     setFieldValue('cover', file, true);
 
@@ -278,7 +276,9 @@ export default function EditStoryForm({ storyId }: { storyId: string }) {
                       disabled={loadingCategories}
                     >
                       <option value="" disabled>
-                        {loadingCategories ? 'Завантаження…' : 'Оберіть категорію'}
+                        {loadingCategories
+                          ? 'Завантаження…'
+                          : 'Оберіть категорію'}
                       </option>
 
                       {categories?.map((c: Category) => (
@@ -318,8 +318,7 @@ export default function EditStoryForm({ storyId }: { storyId: string }) {
                   >
                     {mutation.isPending ? (
                       <>
-                        <Loader />{' '}
-                        <span className="sr-only">Оновлення…</span>
+                        <Loader /> <span className="sr-only">Оновлення…</span>
                       </>
                     ) : (
                       'Оновити'
