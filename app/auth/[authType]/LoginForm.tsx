@@ -4,7 +4,7 @@
 import css from './AuthPage.module.css';
 import { AuthorizationRequest, getMe, loginUser } from '@/lib/api/clientApi';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
@@ -35,22 +35,12 @@ export default function LoginForm() {
       setError((error as ApiError).message ?? 'Oops... some error');
     }
   };
-  // замінити метадані
-  useEffect(() => {
-    document.title = `Sign-in | NoteHub`;
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        `Sign in to your NoteHub account. Enter your email and password to log in.`
-      );
-  });
 
   return (
     <main className={css.mainContent}>
+      <h1 className={css.formTitle}>Вхід</h1>
+      <p className={css.formText}>Вітаємо знову у спільноту мандрівників!</p>
       <form onSubmit={handleSubmit} className={css.form}>
-        <h1 className={css.formTitle}>Вхід</h1>
-        <p className={css.formText}>Вітаємо знову у спільноту мандрівників!</p>
         <div className={css.formGroup}>
           <label htmlFor="email">Пошта*</label>
           <input

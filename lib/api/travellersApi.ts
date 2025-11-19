@@ -1,6 +1,7 @@
 // lib/api/travellersApi.ts
 import { nextServer } from './api';
 import { ApiTravellerResponse } from '../store/travellerStore';
+import { api } from './api';
 
 export type Traveller = {
   id: string;
@@ -102,11 +103,11 @@ function normalizeRaw(raw: unknown, fallbackIndex: number): Traveller {
 }
 
 /* Fetch travellers from backend using page+perPage pagination */
-export async function fetchTravellers(
+export async function fetchTravellersClient(
   params: FetchTravellersParams
 ): Promise<FetchTravellersResponse> {
   try {
-    const res = await nextServer.get('/users', {
+    const res = await api.get('/users', {
       params: {
         perPage: params.perPage,
         page: params.page,
@@ -138,14 +139,21 @@ export async function fetchTravellers(
         typeof paginationResult.hasPreviousPage === 'boolean'
           ? paginationResult.hasPreviousPage
           : false;
+
+      // --- ВЫПРАЎЛЕННЕ ПАГІНАЦЫІ ---
       const currentPage =
         typeof paginationResult.page === 'number'
           ? paginationResult.page
-          : params.page;
+          : typeof paginationResult.page === 'string'
+            ? Number(paginationResult.page) // Пераўтварэнне радка ў лік
+            : params.page;
       const currentPerPage =
         typeof paginationResult.perPage === 'number'
           ? paginationResult.perPage
-          : params.perPage;
+          : typeof paginationResult.perPage === 'string'
+            ? Number(paginationResult.perPage) // Пераўтварэнне радка ў лік
+            : params.perPage;
+      // --- КАНЕЦ ВЫПРАЎЛЕННЯ ---
 
       const normalized = items.map((it, idx) => normalizeRaw(it, idx));
 
@@ -177,19 +185,15 @@ export async function fetchTravellers(
 /* Fetch single traveller (user) by id */
 export async function getTravellerById(id: string): Promise<Traveller | null> {
   try {
-    const res = await nextServer.get(`/users/${id}`);
-    const payload: unknown = res.data;
+    const res = await api.get(`/users/${id}`);
+    const payload: unknown = res.data; // Swagger shows GET /api/users/{id} returns { status, message, data: { user: {...}, stories: [...] } }
 
-    // Swagger shows GET /api/users/{id} returns { status, message, data: { user: {...}, stories: [...] } }
     if (isObject(payload) && isObject(payload.data)) {
-      const inner = payload.data as Record<string, unknown>;
-      // Prefer inner.user; if not present, try inner directly
-      const userRaw = inner['user'] ?? inner;
-      // normalizeRaw expects a record-like object
+      const inner = payload.data as Record<string, unknown>; // Prefer inner.user; if not present, try inner directly
+      const userRaw = inner['user'] ?? inner; // normalizeRaw expects a record-like object
       return normalizeRaw(userRaw, 0);
-    }
+    } // fallback: if payload itself is a user object
 
-    // fallback: if payload itself is a user object
     if (isObject(payload)) {
       return normalizeRaw(payload, 0);
     }

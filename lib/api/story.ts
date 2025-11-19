@@ -1,19 +1,22 @@
-import axios from 'axios';
-import type { StoriesResponse } from '@/types/story';
-import { nextServer } from './api';
-import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
+// lib/api/story.ts
 
+import type { StoriesResponse } from '@/types/story';
+import { api } from './api';
+import { AddStoryFormValues } from '@/components/StoriesForm/AddStoryForm';
+import type { Story } from '@/types/story';
 export const storiesKeys = {
   all: ['stories'] as const,
   saved: () => ['stories', 'saved'] as const,
   mine: () => ['stories', 'mine'] as const,
+    // 🔹 для сторінки деталей / редагування
+  detail: (id: string) => ['stories', 'detail', id] as const,
 };
 
 export async function getSavedStories(
   page = 1,
   limit = 9
 ): Promise<StoriesResponse> {
-  const { data } = await nextServer.get('/api/stories/saved', {
+  const { data } = await api.get('/stories/saved', {
     params: { page, limit },
   });
   return data;
@@ -23,7 +26,7 @@ export async function getMyStories(
   page = 1,
   limit = 9
 ): Promise<StoriesResponse> {
-  const { data } = await axios.get('/api/stories/owner-stories', {
+  const { data } = await api.get('/stories/owner-stories', {
     params: { page, limit },
   });
   return data;
@@ -35,12 +38,36 @@ export async function createStory(values: AddStoryFormValues) {
   form.append('title', values.title);
   form.append('category', values.category);
   form.append('description', values.description);
-  // form.append('shortDesc', values.shortDesc ?? '');
-
-  const res = await nextServer.post('/stories', form);
+  const res = await api.post('/stories', form);
   return res.data;
 }
+// 🔹 Отримати одну історію для префілу форми (Edit)
+export async function getStoryById(storyId: string): Promise<Story> {
+  const { data } = await api.get(`/stories/${storyId}`);
+  // якщо бек повертає { data: {...} } → поміняй на return data.data;
+  return data;
+}
+
+// 🔹 Оновити існуючу історію (PATCH)
+export async function updateStory(
+  storyId: string,
+  values: AddStoryFormValues
+): Promise<Story> {
+  const form = new FormData();
+
+  // ⚠️ Надсилаємо файл тільки якщо це новий File
+  if (values.cover instanceof File) {
+    form.append('cover', values.cover);
+  }
+
+  form.append('title', values.title);
+  form.append('category', values.category);
+  form.append('description', values.description);
+
+  const { data } = await api.patch(`/stories/${storyId}`, form);
+  return data;
+}
 export async function getCategories() {
-  const res = await nextServer.get('/stories/categories');
+  const res = await api.get('/stories/categories');
   return res.data.data;
 }

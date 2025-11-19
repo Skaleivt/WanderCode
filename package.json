@@ -1,5 +1,5 @@
 {
-  "name": "06-notehub-nextjs",
+  "name": "wander-code",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,6 +19,7 @@
     "formik": "^2.4.6",
     "hydrate": "^1.0.0",
     "lucide-react": "^0.553.0",
+    "mongoose": "^8.20.0",
     "next": "^15.4.4",
     "normalize.css": "^8.0.1",
     "postcss": "^8.5.6",

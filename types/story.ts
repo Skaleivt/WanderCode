@@ -8,7 +8,7 @@ export interface Story {
   ownerId: string;
   date: string;
   favoriteCount: number;
-  ///виправи якщо треба
+
   shortDesc?: string;
   body: string;
   coverUrl?: string;
@@ -19,13 +19,16 @@ export interface Story {
 }
 
 export interface StoriesResponse {
+  // Калі бэкэнд вяртае ўсё ўнутры поля 'data':
   data: {
+    // 🛑 ВЫПРАЎЛЕННЕ: Перайменоўваем 'items' у 'data'
     data: Story[];
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
     hasNextPage: boolean;
     page: number;
     perPage: number;
-    totalItems: number;
-    totalPages: number;
     hasPreviousPage: boolean;
   };
 }

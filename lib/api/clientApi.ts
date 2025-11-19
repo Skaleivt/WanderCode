@@ -1,12 +1,18 @@
 // lib/api/clientApi.ts
 'use client';
 import { User } from '@/types/user';
-import { nextServer } from './api';
-import { StoriesResponse, Story, DetailedStory } from '@/types/story';
-import axios from 'axios';
+import { api } from './api';
+import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
+
+import { AxiosError } from 'axios';
+
+export type { StoriesResponse, Story, DetailedStory, Category };
 
 export type StoriesPage = {
   stories: Story[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
   nextPage: number | undefined;
 };
 
@@ -36,7 +42,7 @@ export async function fetchAllStoriesClient({
   sortField?: string;
   sortOrder?: string;
 }): Promise<StoriesResponse> {
-  const response = await nextServer.get<StoriesResponse>('/stories', {
+  const response = await api.get<StoriesResponse>('/stories', {
     params: {
       page,
       perPage,
@@ -49,20 +55,53 @@ export async function fetchAllStoriesClient({
   return response.data;
 }
 
+// ✅ ВЫПРАЎЛЕННЕ ПАМЫЛКІ 2353: Дададзеныя perPage, sortField і sortOrder у тыпізацыю аргументаў
 export const fetchStoriesPage = async ({
   pageParam,
   filter,
+  travellerId,
+  perPage, // ✅ ДАДАДЗЕНА
+  sortField, // ✅ ДАДАДЗЕНА
+  sortOrder, // ✅ ДАДАДЗЕНА
 }: {
   pageParam: number;
-  filter: string;
+  filter?: string;
+  travellerId?: string;
+  perPage?: number; // ✅ ДАДАДЗЕНА
+  sortField?: string; // ✅ ДАДАДЗЕНА
+  sortOrder?: string; // ✅ ДАДАДЗЕНА
 }): Promise<StoriesPage> => {
-  const res = await fetch(`/api/stories?page=${pageParam}&filter=${filter}`);
-  if (!res.ok) throw new Error('Не ўдалося загрузіць гісторыі');
-  return res.json();
+  // Выкарыстоўваем адносны шлях да Next.js API Proxy Route Handler
+  // 💡 ВЫПРАЎЛЕННЕ: Дадаем perPage і sortField/sortOrder у URL для перадачы ў Route Handler
+  const params = new URLSearchParams({
+    page: String(pageParam),
+    ...(filter && { filter }),
+    ...(travellerId && { travellerId }),
+    ...(perPage && { perPage: String(perPage) }), // ПАВІНЕН БЫЦЬ ЛІК
+    ...(sortField && { sortField }),
+    ...(sortOrder && { sortOrder }),
+  }).toString();
+
+  const res = await fetch(`/api/stories?${params}`);
+  if (!res.ok) throw new Error('Не вдалося завантажыць гісторыі');
+
+  const fullResponse: StoriesResponse = await res.json();
+  const paginationData = fullResponse.data;
+
+  return {
+    stories: paginationData.data,
+    totalItems: paginationData.totalItems,
+    totalPages: paginationData.totalPages,
+    currentPage: paginationData.page,
+    nextPage:
+      paginationData.page < paginationData.totalPages
+        ? paginationData.page + 1
+        : undefined,
+  };
 };
 
 export async function registerUser(data: RegisterRequest): Promise<User> {
-  const response = await nextServer.post(`/auth/register`, data, {
+  const response = await api.post(`/auth/register`, data, {
     withCredentials: true,
   });
   return {
@@ -71,7 +110,7 @@ export async function registerUser(data: RegisterRequest): Promise<User> {
 }
 
 export async function loginUser(data: AuthorizationRequest): Promise<User> {
-  const response = await nextServer.post(`/auth/login`, data, {
+  const response = await api.post(`/auth/login`, data, {
     withCredentials: true,
   });
   return {
@@ -80,7 +119,7 @@ export async function loginUser(data: AuthorizationRequest): Promise<User> {
 }
 
 export const getMe = async () => {
-  const res = await nextServer.get('/users/current', {
+  const res = await api.get('/users/current', {
     withCredentials: true,
   });
   return res.data.data;
@@ -88,7 +127,7 @@ export const getMe = async () => {
 
 export const checkSession = async (): Promise<boolean> => {
   try {
-    const res = await nextServer.post('/auth/refresh', {
+    const res = await api.post('/auth/refresh', {
       withCredentials: true,
     });
     return res.status === 200;
@@ -98,12 +137,12 @@ export const checkSession = async (): Promise<boolean> => {
 };
 
 export const logout = async (): Promise<void> => {
-  await nextServer.post('/auth/logout');
+  await api.post('/auth/logout');
 };
 
 export async function addStoryToSaved(storyId: string): Promise<void> {
   try {
-    await nextServer.post('/saved', { storyId });
+    await api.post('/users/saved', { storyId });
   } catch (error: unknown) {
     let message = 'Не вдалося додати в збережені';
     if (error instanceof Error) {
@@ -115,53 +154,59 @@ export async function addStoryToSaved(storyId: string): Promise<void> {
 
 export async function removeStoryFromSaved(storyId: string): Promise<void> {
   try {
-    await nextServer.delete('/saved', { data: { storyId } });
+    await api.delete('/users/saved', { data: { storyId } });
   } catch (error: unknown) {
-    let message = 'Не вдалося видалити із збережених';
+    let message = 'Не вдалося выдаліць із збережаных';
     if (error instanceof Error) {
       message = error.message || message;
     }
     throw new Error(message);
   }
 }
+
+export async function toggleStoryBookmark(
+  storyId: string,
+  isCurrentlySaved: boolean
+): Promise<void> {
+  if (isCurrentlySaved) {
+    await removeStoryFromSaved(storyId);
+  } else {
+    await addStoryToSaved(storyId);
+  }
+}
+
+export const fetchUserById = async (id: string): Promise<User> => {
+  try {
+    const response = await api.get(`/users/${id}`);
+    return response.data.data;
+  } catch (error: unknown) {
+    console.error('Помилка fetchUserById:', error);
+    throw new Error('Не вдалося завантажыць дадзеныя карыстальніка');
+  }
+};
+
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/stories/${id}`
-    );
-
-    const story = response.data.data;
-    console.log('story::::', story);
-    return {
-      _id: story._id,
-      img: story.img,
-      title: story.title,
-      article: story.article,
-      date: story.date,
-      favoriteCount: story.favoriteCount,
-      owner: story.ownerId,
-      category: story.category,
-    };
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error(
-        'Помилка fetchStoryById:',
-        error.response?.data || error.message
-      );
-    } else if (error instanceof Error) {
-      console.error('Помилка fetchStoryById:', error.message);
-    } else {
-      console.error('Невідома помилка fetchStoryById');
+    const response = await api.get(`/stories/${id}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Помилка fetchStoryByIdServer:', error);
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      throw new Error('Story Not Found (404)');
     }
-    throw new Error('Не вдалося завантажити історію');
+    throw new Error('Не вдалося завантажити історію (SSR)');
   }
 };
 
 export const saveStory = async (id: string) => {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/stories/save/${id}`,
-    {},
-    { withCredentials: true }
-  );
-  return response.data;
+  try {
+    const response = await api.post(`/stories/save/${id}`, {});
+    return response.data;
+  } catch (error: unknown) {
+    let message = 'Не вдалося зберагчы гісторыю';
+    if (error instanceof Error) {
+      message = error.message || message;
+    }
+    throw new Error(message);
+  }
 };

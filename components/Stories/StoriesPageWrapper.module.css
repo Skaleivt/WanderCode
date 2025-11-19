@@ -1,0 +1,92 @@
+/* components/Stories/StoriesPageWrapper.module.css */
+
+/* Секцыя-абгортка, якая змяшчае спіс і кнопку "Переглянути ще" */
+.storiesSection {
+    /* Аналагічна .section з PopularSection */
+    padding: 64px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Для цэнтравання кнопкі "Переглянути ще" */
+}
+
+/* Абгортка для кнопкі загрузкі (забяспечвае цэнтраванне і адступ) */
+.loadMoreWrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+    /* Адступ з TAB-версіі */
+}
+
+/* Стылі для кнопкі "Переглянути ще" */
+.loadMoreBtn {
+    /* Стылі, узятыя з .button у вашым прыкладзе */
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-white);
+
+    border: 1px solid var(--color-royal-blue);
+    border-radius: 8px;
+    min-width: 147px;
+    min-height: 48px;
+    background-color: var(--color-royal-blue);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+    background-color: var(--color-royal-blue-lighter);
+}
+
+.loadMoreBtn:disabled {
+    background-color: var(--color-royal-blue);
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Стылі для паведамлення аб пустых гісторыях */
+.storiesEmpty {
+    /* Аналагічна .empty */
+    margin-top: 40px;
+    color: var(--color-scheme-1-text);
+    font-size: 16px;
+    text-align: center;
+}
+
+.storiesEmpty__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* Стылі для Loader */
+.storiesLoader {
+    margin-top: 20px;
+    text-align: center;
+}
+
+
+/* TAB Стылі */
+@media screen and (min-width: 768px) {
+    .storiesSection {
+        padding: 64px 0;
+    }
+}
+
+/* DESK Стылі */
+@media screen and (min-width: 1440px) {
+    .storiesSection {
+        padding: 72px 0;
+    }
+
+    .loadMoreWrap {
+        margin-top: 72px;
+        /* Адступ з DESK-версіі */
+    }
+
+    .loadMoreBtn {
+        min-width: 173px;
+    }
+}

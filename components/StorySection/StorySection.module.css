@@ -1,0 +1,73 @@
+/* components/StorySection/StorySection.module.css */
+
+.storySection {
+    margin-bottom: 40px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.sectionHeader h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    /* Dark text */
+}
+
+.viewAllButton {
+    /* Стылі для кнопкі "Показати всі" */
+    text-decoration: none;
+    color: #4f46e5;
+    /* Tailwind indigo-600 */
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    /* Gray-200 */
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.viewAllButton:hover {
+    background-color: #f3f4f6;
+    /* Gray-50 */
+}
+
+.storiesGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px 24px;
+    /* Вертыкальны і гарызантальны інтэрвал */
+}
+
+/* 768px+ (Tablet) */
+@media (min-width: 768px) {
+    .storiesGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 1024px+ (Desktop) */
+@media (min-width: 1024px) {
+    .storiesGrid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 карткі ў радку */
+    }
+}
+
+.loadingContainer,
+.noStories {
+    text-align: center;
+    padding: 30px 0;
+    color: #6b7280;
+    /* Gray-500 */
+}
+
+.loadMoreContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}

@@ -7,15 +7,17 @@ import { DetailedStory } from '@/types/story';
 import Loader from '@/components/Loader/Loader';
 import { toast } from 'react-toastify';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
-type Props = {
+interface PageParams {
   storyId: string;
-};
+}
 
-export function StoryDetailsClient({ storyId }: Props) {
+export function StoryDetailsClient({ storyId }: PageParams) {
   const queryClient = useQueryClient();
+  const [imgSrc, setImgSrc] = useState<string>('/file.svg');
 
-  // Запит детальної історії
   const {
     data: story,
     isLoading,
@@ -23,17 +25,25 @@ export function StoryDetailsClient({ storyId }: Props) {
   } = useQuery<DetailedStory, Error>({
     queryKey: ['story', storyId],
     queryFn: () => fetchStoryById(storyId),
+    // Використовуємо SSR data, щоб не робити повторний запит
+    initialData: () =>
+      queryClient.getQueryData<DetailedStory>(['story', storyId]),
+    enabled: !!storyId, // запит тільки якщо storyId існує
   });
 
-  // Мутація для кнопки "Зберегти"
+  useEffect(() => {
+    if (story?.img) setImgSrc(story.img);
+  }, [story]);
 
+  useEffect(() => {
+    setImgSrc(story?.img ?? '/default-avatar.png');
+  }, [story]);
+
+  // Мутація для кнопки "Зберегти"
   const mutation = useMutation({
     mutationFn: () => saveStory(storyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        // після успіху перезапитуємо деталі історії
-        queryKey: ['story', storyId],
-      });
+      queryClient.invalidateQueries({ queryKey: ['story', storyId] });
       toast.success('Історія збережена!');
     },
     onError: () => {
@@ -41,9 +51,7 @@ export function StoryDetailsClient({ storyId }: Props) {
     },
   });
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return <Loader />;
 
   if (isError || !story) {
     return (
@@ -53,8 +61,6 @@ export function StoryDetailsClient({ storyId }: Props) {
       />
     );
   }
-
-  console.log('story.img:', story?.img);
 
   return (
     <div className={css.container}>
@@ -67,15 +73,28 @@ export function StoryDetailsClient({ storyId }: Props) {
         <p className={css.date}>
           <span className={css.label}>Опубліковано:</span>
           <span className={css.value}>
-            {new Date(story.date).toLocaleDateString()}
+            {story.date ? new Date(story.date).toLocaleDateString() : '–'}
           </span>
         </p>
         <p className={css.country}>
-          <span className={css.value}>{story.category?.title || '–'}</span>
+          <span className={css.value}>{story.category?.title ?? '–'}</span>
         </p>
       </div>
 
-      <img src={story.img} alt={story.title} className={css.image} />
+      <div
+        className={css.imageWrapper}
+        style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}
+      >
+        <Image
+          src={imgSrc}
+          alt={story.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: 'cover' }}
+          onError={() => setImgSrc('/file.svg')}
+          unoptimized
+        />
+      </div>
 
       <div className={css.articleBlock}>
         <p className={css.article}>{story.article}</p>
@@ -94,6 +113,7 @@ export function StoryDetailsClient({ storyId }: Props) {
           </button>
         </div>
       </div>
+      <p className={css.stories}>Популярні історії</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // app/api/stories/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { api } from '../api';
+import { api } from '../../api/api';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '../_utils/utils';
@@ -10,7 +10,15 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
 
     const page = Number(request.nextUrl.searchParams.get('page') ?? 1);
-    const filter = request.nextUrl.searchParams.get('filter') ?? undefined;
+    // Атрымліваем значэнне фільтра
+    const rawFilter = request.nextUrl.searchParams.get('filter');
+
+    // ✅ ВЫПРАЎЛЕННЕ: Калі rawFilter - гэта радок "undefined" ці пусты радок, устанаўліваем яго як сапраўдны undefined.
+    const filter =
+      rawFilter === 'undefined' || rawFilter === null || rawFilter === ''
+        ? undefined
+        : rawFilter;
+
     const sortField =
       request.nextUrl.searchParams.get('sortField') ?? undefined;
     const sortOrder =
@@ -20,7 +28,7 @@ export async function GET(request: NextRequest) {
       params: {
         page,
         perPage: 3,
-        filter,
+        filter, // <- Тут цяпер будзе або сапраўдны ID, або undefined
         sortField,
         sortOrder,
       },
@@ -28,17 +36,20 @@ export async function GET(request: NextRequest) {
         Cookie: cookieStore.toString(),
       },
     });
-
+    // ✅ Дыягностычны лог:
+    console.log('Бэкэнд адказ пасля фільтрацыі:', res.data);
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
+
       return NextResponse.json(
         { error: error.message, response: error.response?.data },
-        { status: error.status }
+        { status: error.response?.status || 500 }
       );
     }
     logErrorResponse({ message: (error as Error).message });
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
