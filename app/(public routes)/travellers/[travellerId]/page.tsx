@@ -13,11 +13,11 @@ import TravellersStories from '@/components/TravellersStories/TravellersStories'
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
 type Props = {
-  params: { travellerId: string };
+  params: Promise<{ travellerId: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { travellerId } = params;
+  const { travellerId } = await params;
   const traveller = await getTravellerInfoById(travellerId);
   return {
     title: `Профіль Мандрівника: ${traveller.name}`,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TravellerProfilePage({ params }: Props) {
-  const resolvedParams = params;
+  const resolvedParams = await params;
   const travellerId = resolvedParams.travellerId?.trim();
 
   if (!travellerId) {

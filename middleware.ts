@@ -74,7 +74,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/profile/:path*',
+    '/profile/saved',
+    '/profile/own',
     '/stories/create',
     '/stories/edit',
     '/api/:path*',

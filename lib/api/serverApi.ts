@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 import { api } from './api';
 import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
 import { UserResponse } from '@/types/user';
-import { User } from '@/types/user';
 import { AxiosError, AxiosResponse } from 'axios';
 import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
@@ -108,7 +107,7 @@ export async function fetchAllStoriesServer({
         hasNextPage: response1.data.hasNextPage || false,
         hasPreviousPage: response1.data.hasPreviousPage || false,
 
-        currentPage: page || 1, // Corrected values for the frontend
+        currentPage: page || 1,
 
         data: storiesData as Story[],
         page: page || 1,
@@ -117,8 +116,7 @@ export async function fetchAllStoriesServer({
     };
 
     return correctedResponse;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_: unknown) {
+  } catch {
     return {
       data: {
         data: [],
@@ -139,9 +137,12 @@ const PUBLIC_ROUTES = ['/', '/stories', '/travellers'];
 export const getMeServer = async (
   pathname: string
 ): Promise<UserResponse | null> => {
+  if (!pathname) {
+    return null;
+  }
   if (
     PUBLIC_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(route)
+      (route) => pathname === route || pathname?.startsWith(route)
     )
   ) {
     return null;
@@ -230,12 +231,14 @@ interface OwnStoriesResponse {
 }
 
 export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
-  const res = await api.get('stories/saved', {
+  const res = await api.get('/stories/saved', {
     headers: { Cookie: await getServerCookies() },
   });
 
-  const storiesArray: Story[] = Array.isArray(res.data?.data)
-    ? res.data.data.data
+  const payload = res.data?.data;
+
+  const storiesArray: Story[] = Array.isArray(payload?.data)
+    ? payload.data
     : [];
 
   const normalizedStories: StoryWithStatus[] = storiesArray.map((story) => ({

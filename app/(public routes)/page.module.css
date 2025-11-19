@@ -12,6 +12,7 @@
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  position: relative;
 }
 
 .heroTitle {
@@ -211,7 +212,6 @@
 }
 
 @media screen and (min-width: 768px) {
-
   /* hero */
   .hero {
     padding: 244px 32px 117px;
@@ -259,7 +259,6 @@
     font-size: 44px;
   }
 
-
   /* join */
   .containerSec {
     padding: 32px 0;
@@ -295,7 +294,6 @@
 }
 
 @media screen and (min-width: 1440px) {
-
   /* hero */
   .hero {
     background-image: url('/home/back-main-desk-1x.webp');

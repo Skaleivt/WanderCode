@@ -3,7 +3,7 @@
   border-bottom: 1px solid #ddd;
   padding: 12px 0;
   position: sticky;
-  top: 0;
+  bottom: 72px;
   z-index: 20;
 }
 .createStory {
@@ -181,5 +181,9 @@
   }
   .authButtons {
     display: block;
+  }
+  .header {
+    background-color: transparent;
+    border-bottom: none;
   }
 }

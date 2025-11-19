@@ -62,7 +62,7 @@ export default function Header() {
             {isAuthenticated && (
               <ul className={styles.navigationItem}>
                 <li>
-                  <Link href="/profile/" prefetch={false}>
+                  <Link href="/profile/saved" prefetch={false}>
                     Мій профіль
                   </Link>
                 </li>
