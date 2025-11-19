@@ -1,5 +1,5 @@
 // lib/api/travellersApi.ts
-import { nextServer } from './api';
+
 import { ApiTravellerResponse } from '../store/travellerStore';
 import { api } from './api';
 
@@ -274,9 +274,7 @@ export async function fetchTravellersServer(
   }
 }
 export const getTravellerInfoById = async (travellerId: string) => {
-  const res = await nextServer.get<ApiTravellerResponse>(
-    `/users/${travellerId}`
-  );
+  const res = await api.get<ApiTravellerResponse>(`/users/${travellerId}`);
 
   const user = res.data.data.user;
 

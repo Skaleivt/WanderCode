@@ -4,20 +4,20 @@ import {
   getTravellerById,
   getTravellerInfoById,
 } from '@/lib/api/travellersApi';
-import TravellerInfo from '@/components/TravellerInfo/TravellerInfo';
-import { getTravellerById } from '@/lib/api/travellersApi';
 import { notFound } from 'next/navigation';
 import css from './page.module.css';
 import Container from '@/components/Container/Container';
 import { TravellersInfo } from '@/components/TravellersInfo/TravellersInfo';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
+import TravellersStories from '@/components/TravellersStories/TravellersStories';
+import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
 type Props = {
-  params: Promise<{ travellerId: string }>;
+  params: { travellerId: string };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { travellerId } = await params;
+  const { travellerId } = params;
   const traveller = await getTravellerInfoById(travellerId);
   return {
     title: `Профіль Мандрівника: ${traveller.name}`,
@@ -39,24 +39,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-interface TravellerPageProps {
-  params: Promise<{ travellerId: string }>;
-import TravellersStories from '@/components/TravellersStories/TravellersStories';
-import { fetchAllStoriesServer } from '@/lib/api/serverApi';
-
-interface PageProps {
-  params: Promise<{ storyId: string }>;
-}
-
-export default async function TravellerProfilePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const travellerId = resolvedParams.storyId?.trim();
+export default async function TravellerProfilePage({ params }: Props) {
+  const resolvedParams = params;
+  const travellerId = resolvedParams.travellerId?.trim();
 
   if (!travellerId) {
     return notFound();
   }
-  
-  const travellerInfo = await getTravellerInfoById(travellerId);
 
   const filter = travellerId;
   const traveller = await getTravellerById(travellerId);
@@ -84,7 +73,6 @@ export default async function TravellerProfilePage({ params }: PageProps) {
   }
 
   return (
-    <>
     <Container>
       <div className={css.profile}>
         <TravellersInfo traveller={traveller} />

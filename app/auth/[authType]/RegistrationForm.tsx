@@ -1,93 +1,62 @@
-"use client";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { motion } from "framer-motion";
-import styles from "./AuthForm.module.css";
+'use client';
 import css from './AuthPage.module.css';
 import { getMe, RegisterRequest, registerUser } from '@/lib/api/clientApi';
-import { useState } from 'react';
-import { ApiError } from 'next/dist/server/api-utils';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
-interface RegistrationFormProps {
-  onToggle?: () => void; // 🔥 додано для Header
-}
+export default function RegistrationForm() {
+  const [error] = useState('');
+  const setUser = useAuthStore((state) => state.setUser);
+  const router = useRouter();
 
-const RegistrationSchema = Yup.object().shape({
-  name: Yup.string().required("Ім’я обов’язкове"),
-  email: Yup.string().email("Невірний email").required("Email обов’язковий"),
-  password: Yup.string()
-    .min(6, "Мінімум 6 символів")
-    .required("Пароль обов’язковий"),
-});
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const formValues: RegisterRequest = {
+      name: String(formData.get('name')),
+      email: String(formData.get('email')),
+      password: String(formData.get('password')),
+    };
+    try {
+      toast.info('Реєструємо вас...');
+      const res = await registerUser(formValues);
+
       if (res) {
         const me = await getMe();
-        if (me) setUser(me);
-        router.push('/');
+        if (me) {
+          setUser(me);
+          toast.success(
+            `Реєстрація пройшла успішно! Ласкаво просимо, ${me.name || 'користувач'}!`
+          );
+          router.push('/');
+        } else {
+          toast.warning(
+            'Реєстрація пройшла, але не вдалося отримати дані користувача.'
+          );
+        }
       } else {
-        setError('Invalid email or password');
+        toast.error('Невірна пошта або пароль.');
       }
-    } catch (error) {
-      setError((error as ApiError).message ?? 'Oops... some error');
+    } catch {
+      toast.error('Сталася помилка. Спробуйте ще раз.');
     }
   };
 
-export default function RegistrationForm({ onToggle }: RegistrationFormProps) {
+  useEffect(() => {
+    document.title = `Реєстрація| WanderCode`;
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        `Створіть новий акаунт. ВВедіть і'я, пошту та пароль`
+      );
+  });
+
   return (
-    <Formik
-      initialValues={{ name: "", email: "", password: "" }}
-      validationSchema={RegistrationSchema}
-      onSubmit={async (values, { setSubmitting }) => {
-        try {
-          await axios.post("/auth/register", values);
-          window.location.href = "/";
-        } catch (error: any) {
-          toast.error(error.response?.data?.message || "Щось пішло не так");
-        } finally {
-          setSubmitting(false);
-        }
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form className={styles.form}>
-          <h2>Реєстрація</h2>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-          >
-            <Field className={styles.input} name="name" placeholder="Ім’я" />
-            <ErrorMessage
-              name="name"
-              component="div"
-              className={styles.error}
-            />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Field
-              className={styles.input}
-              name="email"
-              placeholder="Email"
-              type="email"
-            />
-            <ErrorMessage
-              name="email"
-              component="div"
-              className={styles.error}
-            />
-          </motion.div>
     <main className={css.mainContent}>
       <h1 className={css.formTitle}>Реєстрація</h1>
-      <p className={css.formText}>Раді вас бачити у спільноті мандрівників!</p>
       <form onSubmit={handleSubmit} className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="name">Імʼя та Прізвище*</label>
@@ -101,52 +70,37 @@ export default function RegistrationForm({ onToggle }: RegistrationFormProps) {
           />
         </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            <Field
-              className={styles.input}
-              name="password"
-              placeholder="Пароль"
-              type="password"
-            />
-            <ErrorMessage
-              name="password"
-              component="div"
-              className={styles.error}
-            />
-          </motion.div>
+        <div className={css.formGroup}>
+          <label htmlFor="email">Пошта*</label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            className={css.input}
+            required
+            placeholder="hello@podorozhnyky.ua"
+          />
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <button
-              type="submit"
-              className={styles.submitBtn}
-              disabled={isSubmitting}
-            >
-              Зареєструватися
-            </button>
-          </motion.div>
+        <div className={css.formGroup}>
+          <label htmlFor="password">Пароль*</label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            className={css.input}
+            required
+            placeholder="********"
+          />
+        </div>
 
-          {/* 🔥 Це toggle-посилання */}
-          {onToggle && (
-            <motion.div
-              className={styles.toggleLink}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              onClick={onToggle}
-            >
-              Вже є акаунт? Увійти
-            </motion.div>
-          )}
-        </Form>
-      )}
-    </Formik>
+        <div className={css.actions}>
+          <button type="submit" className={css.submitButton}>
+            Зареєструватись
+          </button>
+        </div>
+        {error && <p className={css.error}>{error}</p>}
+      </form>
+    </main>
   );
 }

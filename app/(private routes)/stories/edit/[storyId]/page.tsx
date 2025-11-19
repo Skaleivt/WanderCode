@@ -5,5 +5,7 @@ export default function EditStoryPage({
 }: {
   params: { storyId: string };
 }) {
-  return <EditStoryForm storyId={params.storyId} />;
+  const resolvedParams = params;
+  const storyId = resolvedParams.storyId?.trim();
+  return <EditStoryForm storyId={storyId} />;
 }

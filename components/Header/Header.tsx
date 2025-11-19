@@ -2,32 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FiMenu, FiLogOut } from 'react-icons/fi';
 import Link from 'next/link';
 import styles from './Header.module.css';
 import { MobileMenu } from './MobileMenu';
-// import LoginForm from '../forms/LoginForm';
-// import RegistrationForm from '../forms/RegistrationForm';
-// import { Modal } from "../modal/Modal";
-// import { ConfirmModal } from "./ConfirmModal";
 
-interface HeaderProps {
-  isAuthenticated: boolean;
-  userName?: string;
-  userAvatar?: string;
-}
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
+import Container from '../Container/Container';
+import { useAuthStore } from '@/lib/store/authStore';
 
-export const Header = ({
-  isAuthenticated,
-  userName,
-  userAvatar,
-}: HeaderProps) => {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const handleToggleMenu = () => setIsMenuOpen((prev) => !prev);
   const handleCloseMenu = () => setIsMenuOpen(false);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -48,137 +37,70 @@ export const Header = ({
       document.body.style.overflow = '';
     }
   }, [isMenuOpen, isLoginOpen, isRegisterOpen]);
-  const handleLogout = () => {
-    const confirmed = window.confirm('Ви впевнені, що хочете вийти?');
-    if (confirmed) {
-      console.log('Вихід');
-    }
-  };
+
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          <svg
-            className={styles.logo}
-            width="22"
-            height="22"
-            aria-hidden="true"
-          >
-            <use href="/symbol-defs.svg#icon-logo" />
-          </svg>
-          Подорожники
-        </Link>
+    <Container>
+      <header className={styles.header}>
+        <div className={styles.container}>
+          <Link href="/" className={styles.logo}>
+            <svg
+              className={styles.logo}
+              width="22"
+              height="22"
+              aria-hidden="true"
+            >
+              <use href="/symbol-defs.svg#icon-logo" />
+            </svg>
+            Подорожники
+          </Link>
 
-        <nav className={styles.navDesktop}>
-          <Link href="/">Головна</Link>
-          <Link href="/stories">Історії</Link>
-          <Link href="/travelers">Мандрівники</Link>
+          <nav className={styles.navDesktop}>
+            <Link href="/">Головна</Link>
+            <Link href="/stories">Історії</Link>
+            <Link href="/travellers">Мандрівники</Link>
 
-          {isAuthenticated && (
-            <>
-              <Link href="/profile">Мій Профіль</Link>
-              <button className={styles.publishBtn}>
-                Опублікувати історію
-              </button>
-            </>
-          )}
+            {isAuthenticated && (
+              <ul className={styles.navigationItem}>
+                <li>
+                  <Link href="/profile/" prefetch={false}>
+                    Мій профіль
+                  </Link>
+                </li>
 
-          <div className={styles.authButtons}>
-            {!isAuthenticated ? (
-              <>
-                <button
-                  className={styles.loginBtn}
-                  onClick={() => setIsLoginOpen(true)}
-                >
-                  Вхід
-                </button>
-                <button
-                  className={styles.registerBtn}
-                  onClick={() => setIsRegisterOpen(true)}
-                >
-                  Реєстрація
-                </button>
-              </>
-            ) : (
-              <>
-                <div className={styles.userInfo}>
-                  {userAvatar && (
-                    <img
-                      src={userAvatar}
-                      alt="avatar"
-                      className={styles.avatar}
-                    />
-                  )}
-                  <span>{userName}</span>
-                </div>
-                <button
-                  className={styles.logoutBtn}
-                  onClick={handleLogout}
-                  title="Вихід"
-                >
-                  <FiLogOut size={20} />
-                </button>
-              </>
+                <li>
+                  <Link
+                    href="/stories/create"
+                    prefetch={false}
+                    className={styles.createStory}
+                  >
+                    Опублікувати історію
+                  </Link>
+                </li>
+              </ul>
             )}
-          </div>
-        </nav>
 
-        <button className={styles.menuToggle} onClick={handleToggleMenu}>
-          <FiMenu size={24} />
-        </button>
-      </div>
+            <div className={styles.authButtons}>
+              <AuthNavigation />
+            </div>
+          </nav>
 
-      {isMenuOpen &&
-        createPortal(
-          <MobileMenu
-            onClose={handleCloseMenu}
-            isAuthenticated={isAuthenticated}
-            userName={userName}
-            userAvatar={userAvatar}
-            openLoginModal={() => setIsLoginOpen(true)}
-            openRegisterModal={() => setIsRegisterOpen(true)}
-          />,
-          document.body
-        )}
+          <button className={styles.menuToggle} onClick={handleToggleMenu}>
+            <svg width={24} height={24}>
+              <use href="/symbol-defs.svg#icon-menu"></use>
+            </svg>
+          </button>
+        </div>
 
-      {}
-      {/* {isConfirmOpen &&
-        createPortal(
-          <ConfirmModal
-            message="Ви впевнені, що хочете вийти?"
-            onConfirm={() => {
-              setIsConfirmOpen(false);
-              console.log("Вихід"); // тут треба викликати функцію logout
-            }}
-            onCancel={() => setIsConfirmOpen(false)}
-          />,
-          document.body
-        )} */}
-      {/* {isLoginOpen &&
-        createPortal(
-          <Modal onClose={() => setIsLoginOpen(false)}>
-            <LoginForm
-              onToggle={() => {
-                setIsLoginOpen(false);
-                setIsRegisterOpen(true);
-              }}
-            />
-          </Modal>,
-          document.body
-        )}
-
-      {isRegisterOpen &&
-        createPortal(
-          <Modal onClose={() => setIsRegisterOpen(false)}>
-            <RegistrationForm
-              onToggle={() => {
-                setIsRegisterOpen(false);
-                setIsLoginOpen(true);
-              }}
-            />
-          </Modal>,
-          document.body
-        )} */}
-    </header>
+        {isMenuOpen &&
+          createPortal(
+            <MobileMenu
+              onClose={handleCloseMenu}
+              openLoginModal={() => setIsLoginOpen(true)}
+              openRegisterModal={() => setIsRegisterOpen(true)}
+            />,
+            document.body
+          )}
+      </header>
+    </Container>
   );
-};
+}

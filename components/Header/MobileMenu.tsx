@@ -1,26 +1,20 @@
 'use client';
-
-import { FiX } from 'react-icons/fi';
 import Link from 'next/link';
 import styles from './MobileMenu.module.css';
+import { useAuthStore } from '@/lib/store/authStore';
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
 
 interface MobileMenuProps {
   onClose: () => void;
-  isAuthenticated: boolean;
   userName?: string;
   userAvatar?: string;
   openLoginModal: () => void;
   openRegisterModal: () => void;
 }
 
-export const MobileMenu = ({
-  onClose,
-  isAuthenticated,
-  userName,
-  userAvatar,
-  openLoginModal,
-  openRegisterModal,
-}: MobileMenuProps) => {
+export const MobileMenu = ({ onClose }: MobileMenuProps) => {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.menu} onClick={(e) => e.stopPropagation()}>
@@ -37,7 +31,9 @@ export const MobileMenu = ({
             Подорожники
           </div>
           <button className={styles.closeBtn} onClick={onClose}>
-            <FiX size={22} />
+            <svg width={24} height={24}>
+              <use href="/symbol-defs.svg#icon-close"></use>
+            </svg>
           </button>
         </div>
 
@@ -48,7 +44,7 @@ export const MobileMenu = ({
           <Link href="/stories" onClick={onClose}>
             Історії
           </Link>
-          <Link href="/travelers" onClick={onClose}>
+          <Link href="/travellers" onClick={onClose}>
             Мандрівники
           </Link>
 
@@ -63,41 +59,7 @@ export const MobileMenu = ({
             </>
           )}
         </nav>
-
-        <div className={styles.actions}>
-          {!isAuthenticated ? (
-            <>
-              <button
-                className={styles.loginBtn}
-                onClick={() => {
-                  onClose();
-                  openLoginModal();
-                }}
-              >
-                Вхід
-              </button>
-              <button
-                className={styles.registerBtn}
-                onClick={() => {
-                  onClose();
-                  openRegisterModal();
-                }}
-              >
-                Реєстрація
-              </button>
-            </>
-          ) : (
-            <div className={styles.userInfo}>
-              {userAvatar && (
-                <img src={userAvatar} alt="avatar" className={styles.avatar} />
-              )}
-              <span>{userName}</span>
-              <button className={styles.logoutBtn} onClick={onClose}>
-                Вихід
-              </button>
-            </div>
-          )}
-        </div>
+        <AuthNavigation />
       </div>
     </div>
   );

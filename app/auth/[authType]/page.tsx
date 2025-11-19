@@ -1,13 +1,12 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import RegistrationForm from './RegistrationForm';
-import LoginForm from './LoginForm';
 import Link from 'next/link';
 import css from './AuthPage.module.css';
 import Container from '@/components/Container/Container';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import RegistrationForm from './RegistrationForm';
+import LoginForm from './LoginForm';
+
 type Props = {
   params: Promise<{ authType: string }>;
 };
@@ -45,31 +44,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-type AuthPageProps = {
-  params: Promise<{ authType: string }>;
-};
+export default async function AuthPage({ params }: Props) {
+  const { authType } = await params;
 
-import LoginForm from "../../components/forms/LoginForm";
-import RegistrationForm from "../../components/forms/RegistrationForm";
-import AuthFormWrapper from "../../components/forms/AuthFormWrapper";
-
-interface AuthPageProps {
-  params: { authType: "login" | "register" };
-}
-
-export default function AuthPage({ params }: AuthPageProps) {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user"); // наприклад, user токен
-    if (storedUser) {
-      setIsAuthenticated(true);
-      router.replace("/");
-    }
-  }, [router]);
-
-  if (isAuthenticated) return null;
+  if (!authType) {
+    notFound();
+  }
 
   return (
     <Container>
@@ -87,23 +67,20 @@ export default function AuthPage({ params }: AuthPageProps) {
         </header>
         <div className={css.authContainer}>
           <ul className={css.authNavList}>
-            <li
-              className={`${css.authNavItem} ${
-                authType === 'register' ? css.active : ''
-              }`}
-            >
-              <Link href="/auth/register">Реєстрація</Link>
+            <li className={authType === 'register' ? css.active : ''}>
+              <Link
+                aria-disabled={authType === 'register'}
+                href="/auth/register"
+              >
+                Реєстрація
+              </Link>
             </li>
-
-            <li
-              className={`${css.authNavItem} ${
-                authType === 'login' ? css.active : ''
-              }`}
-            >
-              <Link href="/auth/login">Вхід</Link>
+            <li className={authType === 'login' ? css.active : ''}>
+              <Link aria-disabled={authType === 'login'} href="/auth/login">
+                Вхід
+              </Link>
             </li>
           </ul>
-
           {authType === 'register' ? <RegistrationForm /> : <LoginForm />}
         </div>
         <footer className={css.footer}>&copy; 2025 Подорожники</footer>

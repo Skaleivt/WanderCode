@@ -11,11 +11,11 @@ import PopularSection from '@/components/PopularSection/PopularSection';
 import styles from './page.module.css';
 
 interface PageProps {
-  params: Promise<{ storyId: string }>;
+  params: { storyId: string };
 }
 
 export default async function StoryPage({ params }: PageProps) {
-  const resolvedParams = await params;
+  const resolvedParams = params;
   const storyId = resolvedParams.storyId?.trim();
 
   if (!storyId) {
