@@ -12,7 +12,7 @@ import Loader from '@/components/Loader/Loader';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import { api } from '@/lib/api/api';
 
-import styles from '@/components/AddStoryForm/EditStoryForm.module.css';
+import styles from '@/components/EditStoryForm/EditStoryForm.module.css';
 
 // ---------- Типи ----------
 type Category = {
