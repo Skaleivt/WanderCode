@@ -21,10 +21,10 @@ export default function NotFound() {
           404
         </h1>
         <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>
-          Старонка не знойдзена
+          Сторінка не знайдена
         </h2>
         <p style={{ fontSize: '18px', marginBottom: '40px' }}>
-          На жаль, мы не змаглі знайсці запытаны вамі рэсурс.
+          На жаль, ми не змогли знайти запитаний вами сервіс.
         </p>
         <Link
           href="/"
@@ -37,7 +37,7 @@ export default function NotFound() {
             fontWeight: 'bold',
           }}
         >
-          Перайсці на Галоўную
+          Перейти на Галовну
         </Link>
       </Container>
     </section>

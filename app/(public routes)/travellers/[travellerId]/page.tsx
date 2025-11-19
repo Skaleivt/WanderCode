@@ -106,10 +106,6 @@ export default async function TravellerProfilePage({ params }: PageProps) {
         };
   const isStories = safeStories.data.totalItems > 0;
 
-  if (!traveller) {
-    return notFound();
-  }
-
   return (
     <Container>
       <div className={css.profile}>

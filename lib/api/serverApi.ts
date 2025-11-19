@@ -2,9 +2,10 @@
 
 import { cookies } from 'next/headers';
 import { api } from './api';
-import { Category, DetailedStory, StoriesResponse } from '@/types/story';
-import { User } from '@/types/user';
+import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
+import { UserResponse } from '@/types/user';
 import { AxiosError, AxiosResponse } from 'axios';
+import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
 async function getServerCookies(): Promise<string> {
   const cookieStore = await cookies();
@@ -67,9 +68,9 @@ export async function fetchAllStoriesServer({
   };
 }
 
-export const getMeServer = async (): Promise<User | null> => {
+export const getMeServer = async (): Promise<UserResponse> => {
   try {
-    const res = await api.get<User>('/users/current', {
+    const res = await api.get<UserResponse>('/users/current', {
       headers: {
         Cookie: await getServerCookies(),
       },
@@ -78,17 +79,14 @@ export const getMeServer = async (): Promise<User | null> => {
     console.log('SERVER DEBUG: User fetched successfully (200 OK).');
 
     return res.data;
-  } catch (err: unknown) {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 401) {
-        return null;
-      }
-      console.error('Failed to fetch user on server:', err.message);
-      return null;
+  } catch (error) {
+    console.error('Помилка fetchStoryByIdServer:', error);
+
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      throw new Error('Story Not Found (404)');
     }
-    // Якщо помилка не AxiosError
-    console.error('Unexpected error on server:', err);
-    return null;
+
+    throw new Error('Не вдалося завантажити історію (SSR)');
   }
 };
 
@@ -154,4 +152,39 @@ export async function fetchStoryByIdServer(
 
     throw new Error('Не вдалося завантажити історію (SSR)');
   }
+}
+
+interface OwnStoriesResponse {
+  stories: StoryWithStatus[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
+  const res = await api.get('stories/saved', {
+    headers: { Cookie: await getServerCookies() },
+  });
+
+  const storiesArray: Story[] = Array.isArray(res.data?.data)
+    ? res.data.data.data
+    : [];
+
+  const normalizedStories: StoryWithStatus[] = storiesArray.map((story) => ({
+    ...story,
+    isFavorite: story.isFavorite ?? false,
+  }));
+
+  return {
+    stories: normalizedStories,
+    page: res.data.data.page,
+    perPage: res.data.data.perPage,
+    totalItems: res.data.data.totalItems,
+    totalPages: res.data.data.totalPages,
+    hasNextPage: res.data.data.hasNextPage,
+    hasPreviousPage: res.data.data.hasPreviousPage,
+  };
 }

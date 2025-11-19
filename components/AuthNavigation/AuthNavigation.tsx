@@ -47,7 +47,7 @@ export default function AuthNavigation() {
           <ul className={css.container}>
             <li className={css.navigationItem}>
               <Link
-                href="/profile"
+                href="/profile/saved"
                 prefetch={false}
                 className={css.navigationLink}
               >

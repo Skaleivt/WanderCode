@@ -8,7 +8,6 @@ export interface Story {
   ownerId: string;
   date: string;
   favoriteCount: number;
-
   shortDesc?: string;
   body: string;
   coverUrl?: string;
