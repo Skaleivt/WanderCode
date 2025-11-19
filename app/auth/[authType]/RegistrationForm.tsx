@@ -1,7 +1,7 @@
 'use client';
 import css from './AuthPage.module.css';
 import { getMe, RegisterRequest, registerUser } from '@/lib/api/clientApi';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ApiError } from 'next/dist/server/api-utils';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
@@ -33,20 +33,11 @@ export default function RegistrationForm() {
       setError((error as ApiError).message ?? 'Oops... some error');
     }
   };
-  // переписати матадані
-  useEffect(() => {
-    document.title = `Sign-up | NoteHub`;
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        `Create a new account on NoteHub. Sign up with your email and password to get started.`
-      );
-  });
 
   return (
     <main className={css.mainContent}>
       <h1 className={css.formTitle}>Реєстрація</h1>
+      <p className={css.formText}>Раді вас бачити у спільноті мандрівників!</p>
       <form onSubmit={handleSubmit} className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="name">Імʼя та Прізвище*</label>
