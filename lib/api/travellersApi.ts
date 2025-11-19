@@ -1,4 +1,6 @@
 // lib/api/travellersApi.ts
+import { nextServer } from './api';
+import { ApiTravellerResponse } from '../store/travellerStore';
 import { api } from './api';
 
 export type Traveller = {
@@ -202,3 +204,16 @@ export async function getTravellerById(id: string): Promise<Traveller | null> {
     throw err;
   }
 }
+
+export const getTravellerInfoById = async (travellerId: string) => {
+  const res = await nextServer.get<ApiTravellerResponse>(
+    `/users/${travellerId}`
+  );
+
+  const user = res.data.data.user;
+
+  return {
+    ...user,
+    avatarUrl: user.avatarUrl || '/default-avatar.png',
+  };
+};
