@@ -15,7 +15,7 @@ const TravellerInfo: React.FC<TravellerInfoProps> = ({ traveller }) => {
       <div className={styles.avatarSection}>
         {traveller.avatarUrl && (
           <Image
-            src={traveller.avatarUrl}
+            src={traveller.avatarUrl || '/file.svg'}
             alt={traveller.name}
             width={199}
             height={199}

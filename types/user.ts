@@ -5,4 +5,7 @@ export interface User {
   avatarUrl?: string;
   selectedStories?: [];
 }
-//types/user.ts
+
+export interface UserResponse {
+  data: User;
+}
