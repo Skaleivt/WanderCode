@@ -8,19 +8,15 @@ import { User } from '@/types/user';
 import { AxiosError, AxiosResponse } from 'axios';
 import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
-async function getServerCookies(): Promise<string> {
+export const getServerCookies = async (): Promise<string> => {
   const cookieStore = await cookies();
-
-  const cookieString = cookieStore
+  const cookieArray = cookieStore
     .getAll()
-    .map(
-      (cookie: { name: string; value: string }) =>
-        `${cookie.name}=${cookie.value}`
-    )
-    .join('; ');
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .filter(Boolean);
 
-  return cookieString;
-}
+  return cookieArray.length > 0 ? cookieArray.join('; ') : '';
+};
 
 export const checkServerSession = async (): Promise<AxiosResponse> => {
   const res = await api.get('/auth/refresh', {
@@ -138,23 +134,30 @@ export async function fetchAllStoriesServer({
   }
 }
 
-export const getMeServer = async (): Promise<UserResponse> => {
+const PUBLIC_ROUTES = ['/', '/stories', '/travellers'];
+
+export const getMeServer = async (
+  pathname: string
+): Promise<UserResponse | null> => {
+  if (
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(route)
+    )
+  ) {
+    return null;
+  }
+
+  const cookieString = await getServerCookies();
+  if (!cookieString) return null;
+
   try {
     const res = await api.get<UserResponse>('/users/current', {
-      headers: {
-        Cookie: await getServerCookies(),
-      },
+      headers: { Cookie: cookieString },
     });
-
     return res.data;
   } catch (error) {
-    console.error('Помилка fetchStoryByIdServer:', error);
-
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      throw new Error('Story Not Found (404)');
-    }
-
-    throw new Error('Не вдалося завантажити історію (SSR)');
+    console.error('Помилка getMeServer:', error);
+    return null; // не кидаємо помилку на SSR
   }
 };
 

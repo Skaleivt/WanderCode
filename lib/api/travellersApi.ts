@@ -180,10 +180,10 @@ export async function fetchTravellersClient(
 }
 
 /* Fetch single traveller (user) by id */
-export async function getTravellerById(id: string): Promise<Traveller | null> {
+export async function getTravellerById(id: string): Promise<Traveller> {
   try {
     const res = await api.get(`/users/${id}`);
-    const payload: unknown = res.data;
+    const payload = res.data;
 
     if (isObject(payload) && isObject(payload.data)) {
       const inner = payload.data as Record<string, unknown>;
@@ -194,8 +194,7 @@ export async function getTravellerById(id: string): Promise<Traveller | null> {
     if (isObject(payload)) {
       return normalizeRaw(payload, 0);
     }
-
-    return null;
+    return payload;
   } catch (err) {
     throw err;
   }
