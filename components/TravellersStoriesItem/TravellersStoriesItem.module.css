@@ -1,3 +1,9 @@
+/* components/TravellersStoriesItem/TravellersStoriesItem.module.css */
+
+/* ======================================================== */
+/* 1. СТЫЛІ ДЛЯ АДНОЙ КАРТКІ (.card) */
+/* ======================================================== */
+
 .card {
   display: flex;
   flex-direction: column;
@@ -13,6 +19,7 @@
   display: block;
   width: 100%;
   height: 240px;
+  /* Базавая вышыня для мабільнага */
   overflow: hidden;
 }
 
@@ -26,7 +33,9 @@
   display: flex;
   flex-direction: column;
   padding: 16px 20px 20px;
-  gap: 12px;
+
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 
 .categoryBadge {
@@ -35,39 +44,33 @@
   font-weight: 400;
   color: #4b5563;
   margin-bottom: 4px;
-  /* Падсунуць катэгорыю да загалоўка */
 }
 
+/* Абмежаванне для загалоўка: 2 радкі */
 .title {
   font-size: 18px;
   line-height: 1.3;
   font-weight: 600;
   color: #111827;
-  margin: 0 0 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* 🛑 Загаловак: 2 радкі */
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
 }
 
+/* Абмежаванне для апісання: 3 радкі */
 .description {
   font-size: 14px;
   line-height: 1.6;
   color: #4b5563;
-  margin: 0 0 12px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
-  /* 🛑 Апісанне: 3 радкі */
   -webkit-box-orient: vertical;
   line-clamp: 3;
   overflow: hidden;
 }
 
-/* 🛑 ВЫДАЛІЦЕ СТАРЫЯ СТЫЛІ .meta І .metaInfo (бо яны заменены) */
-
-/* ✅ НОВЫЯ СТЫЛІ ДЛЯ БЛОКА АЎТАРА */
 
 .authorMetaBlock {
   display: flex;
@@ -98,21 +101,19 @@
 .dateAndBookmarks {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  /* Дата злева, закладкі справа */
   width: 100%;
 }
 
 .publishedDate {
   font-size: 13px;
   font-weight: 400;
+  margin-right: 16px;
 }
 
-/* 🛑 ЗМЕНА: Закладкі цяпер унутры dateAndBookmarks, але мы перавызначаем, каб захаваць знешні выгляд */
 .bookmarks {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
 }
 
 .bookmarksCount {
@@ -185,4 +186,59 @@
 .bookmarkButtonDisabled {
   cursor: wait;
   opacity: 0.8;
+}
+
+/* ======================================================== */
+/* 2. СТЫЛІ ДЛЯ СПАГАДЛІВАГА МАКЕТА GRID (.storiesGrid) */
+/* ======================================================== */
+
+/* Базавы макет (Mobile < 375px) - Гумовая вёрстка, 1 калонка */
+.storiesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+
+}
+
+/* 📱 Мабільны (375px - 767px) - Фіксаваная шырыня 375px */
+@media (min-width: 375px) and (max-width: 767px) {
+  .storiesGrid {
+    height: 500px;
+    max-width: 375px;
+    padding: 0;
+  }
+}
+
+
+/* 💻 Планшэт (768px - 1439px) - 2 карткі, Фіксаваная шырыня 768px */
+@media (min-width: 768px) {
+  .storiesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 калонкі */
+    max-width: 768px;
+  }
+
+  .imageLink {
+    height: 280px;
+    /* Карэкціроўка вышыні выявы */
+  }
+}
+
+
+/* 🖥️ Дэсктоп (1440px+) - 3 карткі, Фіксаваная шырыня 1440px */
+@media (min-width: 1440px) {
+  .storiesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 калонкі (6 гісторый на 2 радкі) */
+    max-width: 1440px;
+  }
+
+  .imageLink {
+    height: 300px;
+    /* Карэкціроўка вышыні выявы */
+  }
 }

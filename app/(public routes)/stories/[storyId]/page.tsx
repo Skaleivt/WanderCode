@@ -1,5 +1,9 @@
+// app/(public routes)/stories/[storyId]/page.tsx
+
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchStoryByIdServer } from '@/lib/api/serverApi';
+import type { DetailedStory } from '@/types/story';
 
 import {
   dehydrate,
@@ -14,11 +18,13 @@ interface PageProps {
   params: { storyId: string };
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const storyId = resolvedParams.storyId?.trim();
+// 🛑 ВЫПРАЎЛЕННЕ: Выкарыстоўваем 'any' для аргумента generateMetadata
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateMetadata(props: any): Promise<Metadata> {
+  // Прывядзенне тыпу для бяспечнай працы ўнутры функцыі
+  const { params } = props as PageProps;
+
+  const storyId = params.storyId?.trim();
 
   if (!storyId) {
     return {
@@ -36,6 +42,7 @@ export async function generateMetadata({
     };
   }
 
+  // ... (астатні код generateMetadata)
   const fullTitle = `${story.title} | Історія від ${story.owner.name} | WanderCode`;
   const canonicalUrl = `https://wander-code.vercel.app/stories/${storyId}`;
 
@@ -62,10 +69,12 @@ export async function generateMetadata({
     },
   };
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function StoryPage(props: any) {
+  // Прывядзенне тыпу для бяспечнай працы ўнутры функцыі
+  const { params } = props as PageProps;
 
-export default async function StoryPage({ params }: PageProps) {
-  const resolvedParams = params;
-  const storyId = resolvedParams.storyId?.trim();
+  const storyId = params.storyId?.trim();
 
   if (!storyId) {
     return notFound();
@@ -86,10 +95,7 @@ export default async function StoryPage({ params }: PageProps) {
       <section className={styles.section}>
         <div className={styles.container}>
           <HydrationBoundary state={dehydrate(queryClient)}>
-            {/* Деталі історії */}
             <StoryDetailsClient storyId={storyId} />
-
-            {/* Блок популярних статей */}
             <PopularSection />
           </HydrationBoundary>
         </div>

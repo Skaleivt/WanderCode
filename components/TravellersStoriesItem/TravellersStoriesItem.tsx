@@ -114,9 +114,7 @@ const TravellersStoriesItem = ({
 
   return (
     <article className={styles.card}>
-           {' '}
       <Link href={`/stories/${storyId}`} className={styles.imageLink}>
-               {' '}
         <Image
           src={imageUrl}
           alt={title}
@@ -124,27 +122,17 @@ const TravellersStoriesItem = ({
           height={320}
           className={styles.image}
         />
-                {/* 🛑 Катэгорыя: перанесена ўнутр content блока для версткі */}
-             {' '}
       </Link>
-           {' '}
       <div className={styles.content}>
-                {/* ✅ Катэгорыя (зверху) */}       {' '}
-        <span className={styles.categoryBadge}>{categoryName}</span>           
-           {' '}
+        <span className={styles.categoryBadge}>{categoryName}</span>
         <header>
-                   {' '}
           <Link href={`/stories/${storyId}`}>
-                        <h3 className={styles.title}>{title}</h3>{' '}
-            {/* 🛑 Загаловак: 2 радкі */}         {' '}
+            <h3 className={styles.title}>{title}</h3>{' '}
           </Link>
-                 {' '}
         </header>
-                <p className={styles.description}>{description}</p>{' '}
-        {/* 🛑 Апісанне: 3 радкі */}        {/* 🛑 СТАРЫ МЕТА-БЛОК ВЫДАЛЕНЫ */} 
-              {/* ✅ 3. НОВЫ БЛОК АЎТАРА */}       {' '}
+        <p className={styles.description}>{description}</p>
+
         <div className={styles.authorMetaBlock}>
-                   {' '}
           <Image
             src={authorAvatar}
             alt={authorName}
@@ -152,38 +140,31 @@ const TravellersStoriesItem = ({
             height={40}
             className={styles.authorAvatar}
           />
-                   {' '}
+
           <div className={styles.authorInfoWrapper}>
-                        <span className={styles.authorName}>{authorName}</span> 
-                     {' '}
+            <span className={styles.authorName}>{authorName}</span>
+
             <div className={styles.dateAndBookmarks}>
-                           {' '}
-              <span className={styles.publishedDate}>{dateStr}</span>           
-               {' '}
+              <span className={styles.publishedDate}>{dateStr}</span>
+
               <span className={styles.bookmarks}>
-                                 {' '}
-                <span className={styles.bookmarksCount}>{bookmarks}</span>     
-                           {' '}
+                <span className={styles.bookmarksCount}>{bookmarks}</span>
+
                 {saved ? (
                   <BookmarkCheck className="h-4 w-4" />
                 ) : (
                   <Bookmark className="h-4 w-4" />
                 )}
-                             {' '}
               </span>
-                         {' '}
             </div>
-                     {' '}
           </div>
-                 {' '}
         </div>
-               {' '}
+
         <div className={styles.actions}>
-                   {' '}
           <Link href={`/stories/${storyId}`} className={styles.viewButton}>
-                        Переглянути статтю          {' '}
+            Переглянути статтю
           </Link>
-                   {' '}
+
           <button
             type="button"
             onClick={onBookmarkClick}
@@ -200,31 +181,24 @@ const TravellersStoriesItem = ({
               .filter(Boolean)
               .join(' ')}
           >
-                        {/* ... (Кнопка зберагчы) ... */}           {' '}
             {isPending ? (
               <span className="inline-flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin" />   
-                            Збереження...              {' '}
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Збереження...
               </span>
             ) : (
               <span className="inline-flex items-center gap-2">
-                               {' '}
                 {saved ? (
                   <BookmarkCheck className="h-4 w-4" />
                 ) : (
                   <Bookmark className="h-4 w-4" />
                 )}
-                                {saved ? 'Видалити з збережених' : 'Зберегти'} 
-                           {' '}
+                {saved ? '' : ''}
               </span>
             )}
-                     {' '}
           </button>
-                 {' '}
         </div>
-             {' '}
       </div>
-         {' '}
     </article>
   );
 };

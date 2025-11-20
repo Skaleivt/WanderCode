@@ -1,3 +1,5 @@
+// app/(public routes)/travellers/[travellerId]/page.tsx
+
 import React from 'react';
 import { Metadata } from 'next';
 import {
@@ -13,12 +15,18 @@ import TravellersStories from '@/components/TravellersStories/TravellersStories'
 import { fetchAllStoriesServer } from '@/lib/api/serverApi';
 
 type Props = {
-  params: Promise<{ travellerId: string }>;
+  params: { travellerId: string };
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { travellerId } = await params;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const { travellerId } = props.params as Props['params'];
+
   const traveller = await getTravellerInfoById(travellerId);
+  if (!traveller) {
+    return { title: `Мандрівник не знайдений` };
+  }
+
   return {
     title: `Профіль Мандрівника: ${traveller.name}`,
     description: `Історії подорожей, фото та пригоди з усього світу.`,
@@ -39,9 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TravellerProfilePage({ params }: Props) {
-  const resolvedParams = await params;
-  const travellerId = resolvedParams.travellerId?.trim();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function TravellerProfilePage(props: any) {
+  const { params } = props as Props;
+  const travellerId = params.travellerId?.trim();
 
   if (!travellerId) {
     return notFound();
@@ -52,6 +61,7 @@ export default async function TravellerProfilePage({ params }: Props) {
   if (!traveller) {
     return notFound();
   }
+
   const stories = await fetchAllStoriesServer({ filter });
   const safeStories =
     stories && stories.data
@@ -73,9 +83,10 @@ export default async function TravellerProfilePage({ params }: Props) {
 
   return (
     <Container>
+           {' '}
       <div className={css.profile}>
-        <TravellersInfo traveller={traveller} />
-        <h2 className={css.title}>Історії Мандрівника</h2>
+                <TravellersInfo traveller={traveller} />       {' '}
+        <h2 className={css.title}>Історії Мандрівника</h2>       {' '}
         {isStories ? (
           <TravellersStories initialStories={safeStories} filter={filter} />
         ) : (
@@ -84,7 +95,9 @@ export default async function TravellerProfilePage({ params }: Props) {
             buttonText={'Назад до історій'}
           />
         )}
+             {' '}
       </div>
+         {' '}
     </Container>
   );
 }
