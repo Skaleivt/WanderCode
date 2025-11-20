@@ -4,7 +4,7 @@ import { User } from '@/types/user';
 import { api } from './api';
 import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
 
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export type { StoriesResponse, Story, DetailedStory, Category };
 
@@ -116,10 +116,18 @@ export async function loginUser(data: AuthorizationRequest): Promise<User> {
 }
 
 export const getMe = async () => {
-  const res = await api.get('/users/current', {
-    withCredentials: true,
-  });
-  return res.data.data;
+  try {
+    const res = await api.get('/users/current', { withCredentials: true });
+    return res.data.data;
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status === 401) {
+        return null; // токен прострочився, користувач не авторизований
+      }
+    }
+
+    throw err; // важливо: пробросити інші помилки
+  }
 };
 
 export const checkSession = async (): Promise<boolean> => {

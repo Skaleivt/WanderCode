@@ -45,16 +45,6 @@ export default function AuthNavigation() {
       {isAuthenticated ? (
         <>
           <ul className={css.container}>
-            <li className={css.navigationItem}>
-              <Link
-                href="/profile/saved"
-                prefetch={false}
-                className={css.navigationLink}
-              >
-                Мій профіль
-              </Link>
-            </li>
-
             <li>
               <Image
                 src={user?.avatarUrl || '/default-avatar.png'}

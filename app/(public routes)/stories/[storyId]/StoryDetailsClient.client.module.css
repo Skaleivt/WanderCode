@@ -60,6 +60,8 @@
   font-size: 12px;
   line-height: 150%;
   color: var(--color-neutral-darkest);
+
+  margin-bottom: 16px;
 }
 
 .image {
@@ -69,6 +71,14 @@
   margin-bottom: 20px;
   margin-top: 16px;
   border-radius: 24px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 24px; /* закруглення */
+  overflow: hidden; /* щоб внутрішнє <img> теж було закруглене */
 }
 
 .infoBlock {
@@ -170,6 +180,11 @@
 
   margin-top: 96px;
 }
+.leftBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 /* ==== RESPONSIVE ==== */
 
@@ -194,7 +209,7 @@
   .infoBlock {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
     width: 100%;
     gap: 48px;

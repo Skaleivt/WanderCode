@@ -3,7 +3,7 @@
   border-bottom: 1px solid #ddd;
   padding: 12px 0;
   position: sticky;
-  top: 0;
+  bottom: 72px;
   z-index: 20;
 }
 .createStory {
@@ -138,23 +138,52 @@
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .navDesktop {
+.navigationItem {
+  display: none;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+.authButtons {
+  display: none;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .navigationItem {
+    display: flex;
+  }
+  .navigationItem > :first-child {
+    display: none;
+  }
+}
+@media (max-width: 1439px) {
+  .navDesktop a {
     display: none;
   }
 
   .menuToggle {
     display: block;
   }
-}
-@media (min-width: 769px) {
-  .menuToggle {
+  .navigationItem > li:first-child {
     display: none;
   }
 }
-.navigationItem {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  align-items: center;
+@media (min-width: 1440px) {
+  .menuToggle {
+    display: none;
+  }
+  .navigationItem > li:first-child {
+    display: block;
+  }
+  .authButtons {
+    display: block;
+  }
+  .header {
+    background-color: transparent;
+    border-bottom: none;
+  }
 }

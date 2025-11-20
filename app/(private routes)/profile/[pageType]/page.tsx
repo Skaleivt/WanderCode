@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import Container from '@/components/Container/Container';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
-import StoriesList from '@/components/StoriesList/StoriesList';
+// import StoriesList from '@/components/StoriesList/StoriesList';
 import TravellerInfo from '@/components/Travellers/TravellerInfo/TravellerInfo';
 import TravellersStories from '@/components/TravellersStories/TravellersStories';
 import css from './ProfilePage.module.css';
@@ -15,6 +15,8 @@ import {
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import StoriesListWrapper from './ProfilePage.client';
+import { User } from '@/types/user';
+import { toast } from 'react-toastify';
 
 type PageProps = {
   params: Promise<{ pageType: string }>;
@@ -27,8 +29,14 @@ export default async function ProfilePage({ params }: PageProps) {
     notFound();
   }
 
-  const userResponse = await getMeServer();
-  const user = userResponse?.data ?? userResponse;
+  const userResponse = await getMeServer(pageType);
+
+  if (!userResponse || !userResponse.data) {
+    toast.error('Користувач не знайдений');
+    return;
+  }
+
+  const user: User = userResponse.data;
   const filter = user._id;
   const stories = await fetchAllStoriesServer({ filter });
 
@@ -52,13 +60,10 @@ export default async function ProfilePage({ params }: PageProps) {
 
   const savedStories = await fetchOwnStories();
 
-  console.log('dssdfsd', savedStories);
+  console.log('saved stories', savedStories.stories);
 
   const isMyStories = savedStories.totalItems > 0;
 
-  const handleToggleFavorite = (storyId: string, isAdding: boolean) => {
-    console.log('Toggled story', storyId, isAdding);
-  };
   return (
     <Container>
       <TravellerInfo traveller={user} />

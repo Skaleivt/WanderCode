@@ -2,13 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchStoryById, saveStory } from '@/lib/api/clientApi';
-import css from './routesStory.client.module.css';
+import css from './StoryDetailsClient.client.module.css';
 import { DetailedStory } from '@/types/story';
 import Loader from '@/components/Loader/Loader';
 import { toast } from 'react-toastify';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { getCategories } from '@/lib/api/categories';
 
 interface PageParams {
   storyId: string;
@@ -17,6 +18,7 @@ interface PageParams {
 export function StoryDetailsClient({ storyId }: PageParams) {
   const queryClient = useQueryClient();
   const [imgSrc, setImgSrc] = useState<string>('/file.svg');
+  const [categoryName, setCategoryName] = useState<string>('–');
 
   const {
     data: story,
@@ -25,10 +27,10 @@ export function StoryDetailsClient({ storyId }: PageParams) {
   } = useQuery<DetailedStory, Error>({
     queryKey: ['story', storyId],
     queryFn: () => fetchStoryById(storyId),
-    // Використовуємо SSR data, щоб не робити повторний запит
+
     initialData: () =>
       queryClient.getQueryData<DetailedStory>(['story', storyId]),
-    enabled: !!storyId, // запит тільки якщо storyId існує
+    enabled: !!storyId,
   });
 
   useEffect(() => {
@@ -36,10 +38,35 @@ export function StoryDetailsClient({ storyId }: PageParams) {
   }, [story]);
 
   useEffect(() => {
-    setImgSrc(story?.img ?? '/default-avatar.png');
+    if (!story?.category?._id) return;
+
+    console.log(
+      'Fetching categories for story category _id:',
+      story.category._id
+    );
+
+    getCategories()
+      .then((apiCategories) => {
+        console.log('API categories received:', apiCategories);
+
+        const categories: { _id: string; name: string }[] = apiCategories.map(
+          (c) => ({
+            _id: c._id,
+            name: c.name,
+          })
+        );
+
+        const cat = categories.find((c) => c._id === story.category._id);
+        console.log('Matched category:', cat);
+
+        setCategoryName(cat?.name ?? '–');
+      })
+      .catch((err) => {
+        console.error('Failed to fetch categories:', err);
+        setCategoryName('–');
+      });
   }, [story]);
 
-  // Мутація для кнопки "Зберегти"
   const mutation = useMutation({
     mutationFn: () => saveStory(storyId),
     onSuccess: () => {
@@ -65,19 +92,22 @@ export function StoryDetailsClient({ storyId }: PageParams) {
   return (
     <div className={css.container}>
       <h2 className={css.title}>{story.title}</h2>
+
       <div className={css.infoBlock}>
-        <p className={css.author}>
-          <span className={css.label}>Автор статті:</span>
-          <span className={css.value}>{story.owner?.name || '–'}</span>
-        </p>
-        <p className={css.date}>
-          <span className={css.label}>Опубліковано:</span>
-          <span className={css.value}>
-            {story.date ? new Date(story.date).toLocaleDateString() : '–'}
-          </span>
-        </p>
+        <div className={css.leftBlock}>
+          <p className={css.data}>
+            <span className={css.label}>Автор статті:</span>
+            <span className={css.value}>{story.owner?.name ?? '–'}</span>
+          </p>
+          <p className={css.data}>
+            <span className={css.label}>Опубліковано:</span>
+            <span className={css.value}>
+              {story.date ? new Date(story.date).toLocaleDateString() : '–'}
+            </span>
+          </p>
+        </div>
         <p className={css.country}>
-          <span className={css.value}>{story.category?.title ?? '–'}</span>
+          <span className={css.value}>{categoryName}</span>
         </p>
       </div>
 

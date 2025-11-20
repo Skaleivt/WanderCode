@@ -1,78 +1,297 @@
-/* components/TravellersStories/TravellersStories.module.css */
-
-.stories {
-    /* Замяняе .section */
-    padding: 64px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* Для цэнтравання кнопкі */
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 335px;
+  max-width: 335px;
+  height: 575px;
+  border-radius: 16px;
+  background-color: var(--color-scheme-2-foreground);
+  border: 0px solid var(--color-scheme-1-border);
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-/* Стылі для кнопкі "Переглянути ще" */
-.loadMoreWrap {
-    display: flex;
-    justify-content: center;
-    /* Аналаг margin-top: 48px/72px */
-    margin-top: 48px;
+.imageLink {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 223px;
+  overflow: hidden;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 
-.loadMoreBtn {
-    /* Стылі з .button */
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--color-white);
-
-    border: 1px solid var(--color-royal-blue);
-    border-radius: 8px;
-    min-width: 147px;
-    min-height: 48px;
-    background-color: var(--color-royal-blue);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.loadMoreBtn:hover:not(:disabled) {
-    background-color: var(--color-royal-blue-lighter);
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  width: 100%;
+  height: 352px;
+  box-sizing: border-box;
 }
 
-.loadMoreBtn:disabled {
-    background-color: var(--color-royal-blue);
-    opacity: 0.3;
-    cursor: not-allowed;
+@media (min-width: 768px) {
+  .card {
+    width: 340px;
+    max-width: none;
+    height: 578px;
+  }
+
+  .imageLink {
+    width: 100%;
+    height: 226px;
+  }
+
+  .content {
+    width: 100%;
+    height: 352px;
+  }
 }
 
-/* Стылі для Loading (Loader) */
-.storiesLoader {
-    /* Пазбягаем дублявання Loader, калі ён ужо ёсць у кнопцы */
-    /* Калі Loader выкарыстоўваецца асобна ўнізе: */
-    margin-top: 20px;
-    text-align: center;
+@media (min-width: 1440px) {
+  .card {
+    width: 421px;
+    height: 677px;
+  }
+
+  .imageLink {
+    width: 100%;
+    height: 280px;
+  }
+
+  .content {
+    height: 397px;
+    padding: 24px;
+  }
 }
 
-/* TAB */
-@media screen and (min-width: 768px) {
-    .stories {
-        padding: 64px 0;
-    }
-
-    .loadMoreWrap {
-        margin-top: 48px;
-    }
+.categoryBadge {
+  display: block;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-neutral-darkest);
+  margin-bottom: 8px;
+  width: 100%;
 }
 
-/* DESK */
-@media screen and (min-width: 1440px) {
-    .stories {
-        padding: 72px 0;
-    }
+@media (max-width: 767px) {
+  .categoryBadge {
+    border: 1px solid var(--opacity-transparent);
+    border-radius: 6px;
+    width: 67px;
+    height: 18px;
+  }
+}
 
-    .loadMoreBtn {
-        min-width: 173px;
-    }
+.title {
+  font-family: var(--font-family);
+  font-weight: 700;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  margin: 0;
+  /* margin-bottom: 8px; */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  width: 100%;
+}
 
-    .loadMoreWrap {
-        margin-top: 72px;
-    }
+.title {
+  font-size: 18px;
+  min-height: 54px;
+}
+
+@media (min-width: 1440px) {
+  .title {
+    font-size: 26px;
+    min-height: 78px;
+  }
+}
+
+.description {
+  display: block;
+  font-family: var(--font-family);
+  font-weight: 400;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  margin: 0;
+  margin-bottom: 24px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  overflow: hidden;
+  width: 100%;
+}
+
+.description {
+  font-size: 16px;
+}
+
+@media (min-width: 1440px) {
+  .description {
+    font-size: 18px;
+    margin-bottom: 0;
+    line-height: 150%;
+    height: 81px;
+  }
+}
+
+.authorMetaBlock {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 1439px) {
+  .description {
+    margin-bottom: 0;
+  }
+
+  .authorMetaBlock {
+    margin-top: 24px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .authorMetaBlock {
+    margin-top: 24px;
+    height: 54px;
+    width: 100%;
+  }
+}
+
+.authorAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.authorInfoWrapper {
+  display: flex;
+  flex-direction: column;
+  margin-left: 16px;
+  flex-grow: 1;
+}
+
+.authorName {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  margin-bottom: 0;
+}
+
+.dateAndBookmarks {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.publishedDate {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  position: static;
+  margin-right: 0;
+}
+
+.bookmarks {
+  display: flex;
+  align-items: center;
+}
+
+.bookmarksCount {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  margin-right: 2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bookmarks :global(.h-4) {
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+.actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.viewButton {
+  flex: 1;
+  height: 48px;
+  border-radius: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-scheme-2-border);
+  background-color: var(--opacity-neutral-darkest-5);
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 150%;
+  color: var(--color-neutral-darkest);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.viewButton:hover {
+  background-color: #e0e7ff;
+}
+
+.bookmarkButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  padding: 6px;
+  border: 1px solid var(--color-scheme-2-border);
+  background-color: var(--opacity-neutral-darkest-5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.bookmarkButtonSaved {
+  background-color: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.bookmarkButton:hover {
+  background-color: #e0e7ff;
 }

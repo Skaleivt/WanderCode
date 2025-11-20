@@ -53,16 +53,16 @@ export default function Header() {
             </svg>
             Подорожники
           </Link>
-
-          <nav className={styles.navDesktop}>
-            <Link href="/">Головна</Link>
-            <Link href="/stories">Історії</Link>
-            <Link href="/travellers">Мандрівники</Link>
-
+          <div className={styles.nav}>
+            <nav className={styles.navDesktop}>
+              <Link href="/">Головна</Link>
+              <Link href="/stories">Історії</Link>
+              <Link href="/travellers">Мандрівники</Link>
+            </nav>
             {isAuthenticated && (
               <ul className={styles.navigationItem}>
                 <li>
-                  <Link href="/profile/" prefetch={false}>
+                  <Link href="/profile/saved" prefetch={false}>
                     Мій профіль
                   </Link>
                 </li>
@@ -82,13 +82,13 @@ export default function Header() {
             <div className={styles.authButtons}>
               <AuthNavigation />
             </div>
-          </nav>
 
-          <button className={styles.menuToggle} onClick={handleToggleMenu}>
-            <svg width={24} height={24}>
-              <use href="/symbol-defs.svg#icon-menu"></use>
-            </svg>
-          </button>
+            <button className={styles.menuToggle} onClick={handleToggleMenu}>
+              <svg width={24} height={24}>
+                <use href="/symbol-defs.svg#icon-menu"></use>
+              </svg>
+            </button>
+          </div>
         </div>
 
         {isMenuOpen &&

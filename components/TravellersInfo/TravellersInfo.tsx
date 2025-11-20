@@ -16,7 +16,9 @@ export function TravellersInfo({ traveller }: Props) {
     <>
       <div className={css.userProfile}>
         <Image
-          src={traveller.avatarUrl || '/file.svg'}
+          src={
+            traveller.avatarUrl ? traveller.avatarUrl : '/default-avatar.png'
+          }
           alt={traveller.name || 'avatar'}
           width={200}
           height={200}

@@ -12,8 +12,6 @@ import Loader from '@/components/Loader/Loader';
 import StoriesList from '@/components/StoriesList/StoriesList';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import { Story } from '@/types/story';
-
-// ✅ ІМПАРТУЕМ СТЫЛІ
 import styles from './TravellersStories.module.css';
 
 interface StoryWithStatus extends Story {
@@ -29,7 +27,7 @@ const TravellersStories = ({
   initialStories,
   filter,
 }: TravellersStoriesProps) => {
-  const data = initialStories?.data; // Канвертацыя серверных дадзеных у фармат, які чакае React Query
+  const data = initialStories?.data;
 
   const initialPage: StoriesPage = {
     stories: data?.data || [],

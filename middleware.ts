@@ -3,66 +3,81 @@ import { cookies } from 'next/headers';
 import { parse } from 'cookie';
 import { checkServerSession } from './lib/api/serverApi';
 
-const privateRoutes = ['/profile', '/stories/create'];
-const publicRoutes = ['/auth/login', '/auth/register', '/stories'];
+const PUBLIC_ROUTES = [
+  '/', // головна сторінка
+  '/auth/login',
+  '/auth/register',
+  '/stories',
+  '/travellers',
+];
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Пропускаємо системні файли
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname.startsWith('/favicon') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Публічні маршрути не потребують авторизації
+  if (
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(route)
+    )
+  ) {
+    return NextResponse.next();
+  }
+
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
   const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isPrivateRoute = privateRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // Якщо accessToken є — пропускаємо
+  if (accessToken) return NextResponse.next();
 
-  // Публічні маршрути доступні всім
-  if (isPublicRoute) {
-    return NextResponse.next();
-  }
+  // Якщо токена нема, але є refreshToken — пробуємо оновити сесію
+  if (refreshToken) {
+    const session = await checkServerSession();
+    const setCookie = session.headers['set-cookie'];
 
-  // Для приватних маршрутів перевіряємо токени
-  if (isPrivateRoute) {
-    if (!accessToken) {
-      if (refreshToken) {
-        // Перевіряємо сесію тільки для приватних маршрутів
-        const data = await checkServerSession();
-        const setCookie = data.headers['set-cookie'];
-        if (setCookie) {
-          const cookieArray = Array.isArray(setCookie)
-            ? setCookie
-            : [setCookie];
-          for (const cookieStr of cookieArray) {
-            const parsed = parse(cookieStr);
-            const options = {
-              expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
-              path: parsed.Path,
-              maxAge: Number(parsed['expires']),
-            };
-            if (parsed.accessToken)
-              cookieStore.set('accessToken', parsed.accessToken, options);
-            if (parsed.refreshToken)
-              cookieStore.set('refreshToken', parsed.refreshToken, options);
-          }
-          return NextResponse.next({
-            headers: { Cookie: cookieStore.toString() },
-          });
-        }
+    if (setCookie) {
+      const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
+
+      for (const cookieStr of cookieArray) {
+        const parsed = parse(cookieStr);
+        const options = {
+          expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
+          path: parsed.Path || '/',
+          maxAge: parsed['Max-Age'] ? Number(parsed['Max-Age']) : undefined,
+        };
+
+        if (parsed.accessToken)
+          cookieStore.set('accessToken', parsed.accessToken, options);
+        if (parsed.refreshToken)
+          cookieStore.set('refreshToken', parsed.refreshToken, options);
       }
-      // Якщо немає токенів або сесія не вдалася — редірект на /sign-in
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+
+      return NextResponse.next({
+        headers: { Cookie: cookieStore.toString() },
+      });
     }
-    // accessToken є — доступ дозволено
-    return NextResponse.next();
   }
 
-  // Інші маршрути доступні без перевірки
-  return NextResponse.next();
+  // Якщо немає токенів або рефреш не пройшов — редірект на логін
+  return NextResponse.redirect(new URL('/auth/login', req.url));
 }
 
 export const config = {
-  matcher: ['/profile/:path*', '/auth/login', '/auth/register'],
+  matcher: [
+    '/profile/saved',
+    '/profile/own',
+    '/stories/create',
+    '/stories/edit',
+    '/api/:path*',
+  ],
 };

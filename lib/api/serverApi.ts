@@ -4,23 +4,18 @@ import { cookies } from 'next/headers';
 import { api } from './api';
 import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
 import { UserResponse } from '@/types/user';
-import { User } from '@/types/user';
 import { AxiosError, AxiosResponse } from 'axios';
 import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
-async function getServerCookies(): Promise<string> {
+export const getServerCookies = async (): Promise<string> => {
   const cookieStore = await cookies();
-
-  const cookieString = cookieStore
+  const cookieArray = cookieStore
     .getAll()
-    .map(
-      (cookie: { name: string; value: string }) =>
-        `${cookie.name}=${cookie.value}`
-    )
-    .join('; ');
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .filter(Boolean);
 
-  return cookieString;
-}
+  return cookieArray.length > 0 ? cookieArray.join('; ') : '';
+};
 
 export const checkServerSession = async (): Promise<AxiosResponse> => {
   const res = await api.get('/auth/refresh', {
@@ -112,7 +107,7 @@ export async function fetchAllStoriesServer({
         hasNextPage: response1.data.hasNextPage || false,
         hasPreviousPage: response1.data.hasPreviousPage || false,
 
-        currentPage: page || 1, // Corrected values for the frontend
+        currentPage: page || 1,
 
         data: storiesData as Story[],
         page: page || 1,
@@ -121,8 +116,7 @@ export async function fetchAllStoriesServer({
     };
 
     return correctedResponse;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_: unknown) {
+  } catch {
     return {
       data: {
         data: [],
@@ -138,23 +132,33 @@ export async function fetchAllStoriesServer({
   }
 }
 
-export const getMeServer = async (): Promise<UserResponse> => {
+const PUBLIC_ROUTES = ['/', '/stories', '/travellers'];
+
+export const getMeServer = async (
+  pathname: string
+): Promise<UserResponse | null> => {
+  if (!pathname) {
+    return null;
+  }
+  if (
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname?.startsWith(route)
+    )
+  ) {
+    return null;
+  }
+
+  const cookieString = await getServerCookies();
+  if (!cookieString) return null;
+
   try {
     const res = await api.get<UserResponse>('/users/current', {
-      headers: {
-        Cookie: await getServerCookies(),
-      },
+      headers: { Cookie: cookieString },
     });
-
     return res.data;
   } catch (error) {
-    console.error('Помилка fetchStoryByIdServer:', error);
-
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      throw new Error('Story Not Found (404)');
-    }
-
-    throw new Error('Не вдалося завантажити історію (SSR)');
+    console.error('Помилка getMeServer:', error);
+    return null; // не кидаємо помилку на SSR
   }
 };
 
@@ -227,12 +231,14 @@ interface OwnStoriesResponse {
 }
 
 export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
-  const res = await api.get('stories/saved', {
+  const res = await api.get('/stories/saved', {
     headers: { Cookie: await getServerCookies() },
   });
 
-  const storiesArray: Story[] = Array.isArray(res.data?.data)
-    ? res.data.data.data
+  const payload = res.data?.data;
+
+  const storiesArray: Story[] = Array.isArray(payload?.data)
+    ? payload.data
     : [];
 
   const normalizedStories: StoryWithStatus[] = storiesArray.map((story) => ({
