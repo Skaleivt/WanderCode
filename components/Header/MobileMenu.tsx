@@ -50,7 +50,7 @@ export const MobileMenu = ({ onClose }: MobileMenuProps) => {
 
           {isAuthenticated && (
             <>
-              <Link href="/profile" onClick={onClose}>
+              <Link href="/profile/saved" onClick={onClose}>
                 Мій Профіль
               </Link>
               <button className={styles.publishBtn} onClick={onClose}>

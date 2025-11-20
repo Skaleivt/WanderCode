@@ -23,17 +23,7 @@ const navAuth = [
   { label: 'Мандрівники', href: '/travellers' },
 ];
 
-const navGuest = [
-  { label: 'Головна', href: '/auth/register' },
-  { label: 'Історії', href: '/auth/register' },
-  { label: 'Мандрівники', href: '/auth/register' },
-];
-
 export default function Footer() {
-  const isAuthenticated = false; // заміниш на свій стейт
-
-  const navLinks = isAuthenticated ? navAuth : navGuest;
-
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -78,7 +68,7 @@ export default function Footer() {
 
           {/* Навігація */}
           <ul className={styles.navList}>
-            {navLinks.map(({ label, href }) => (
+            {navAuth.map(({ label, href }) => (
               <li key={label}>
                 <Link href={href} className={styles.navLink}>
                   {label}
