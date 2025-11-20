@@ -8,9 +8,27 @@ export const storiesKeys = {
   all: ['stories'] as const,
   saved: () => ['stories', 'saved'] as const,
   mine: () => ['stories', 'mine'] as const,
-    // 🔹 для сторінки деталей / редагування
+  // for detail / edit page
   detail: (id: string) => ['stories', 'detail', id] as const,
+  // Key for main stories list with optional filter
+  list: (filter?: string) => ['stories', 'list', { filter }] as const,
 };
+
+// Function to fetch all stories with pagination and filtering
+export async function getStories(
+  page = 1,
+  limit = 9,
+  filter?: string // Category ID for filtering
+): Promise<StoriesResponse> {
+  const { data } = await api.get('/stories', {
+    params: {
+      page,
+      perPage: limit,
+      category: filter === 'all' ? undefined : filter,
+    },
+  });
+  return data;
+}
 
 export async function getSavedStories(
   page = 1,
@@ -41,21 +59,21 @@ export async function createStory(values: AddStoryFormValues) {
   const res = await api.post('/stories', form);
   return res.data;
 }
-// 🔹 Отримати одну історію для префілу форми (Edit)
+// Get one story for form prefill (Edit)
 export async function getStoryById(storyId: string): Promise<Story> {
   const { data } = await api.get(`/stories/${storyId}`);
   // якщо бек повертає { data: {...} } → поміняй на return data.data;
-  return data;
+  return data.data;
 }
 
-// 🔹 Оновити існуючу історію (PATCH)
+// Update existing story (PATCH)
 export async function updateStory(
   storyId: string,
   values: AddStoryFormValues
 ): Promise<Story> {
   const form = new FormData();
 
-  // ⚠️ Надсилаємо файл тільки якщо це новий File
+  // Send file only if it is a new File
   if (values.cover instanceof File) {
     form.append('cover', values.cover);
   }

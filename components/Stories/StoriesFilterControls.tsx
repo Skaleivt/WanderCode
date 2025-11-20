@@ -1,50 +1,49 @@
-// src/components/Stories/StoriesFilterControls.tsx
+// components/Stories/StoriesFilterControls.tsx (Абноўлены, адпраўляе ID)
+
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
-
-// Імпартуем тып Category, каб ён працаваў з пропсам categories
 import { Category } from '@/types/story';
 import styles from './StoriesFilterControls.module.css';
 
 interface StoriesFilterControlsProps {
-  // Зробім неабавязковым, але лагічна: ён павінен быць перададзены
   categories?: Category[];
 }
 
-// ✅ ВЫПРАЎЛЕННЕ: Дадаем значэнне па змаўчанні [] для categories, каб пазбегнуць .map на undefined
 const StoriesFilterControls = ({
   categories = [],
 }: StoriesFilterControlsProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams(); // Ствараем поўны спіс, аб'ядноўваючы 'Усе гісторыі' з дынамічнымі дадзенымі
+  const searchParams = useSearchParams();
 
+  // 1. Выкарыстоўваем _id для адсочвання стану
   const FULL_CATEGORIES = [
-    // 'all' будзе мець _id = 'all', бо гэта не ID катэгорыі
-    { _id: 'all', name: 'Всі історії' }, // Пераўтвараем загружаныя катэгорыі (цяпер бяспечна, бо categories гарантавана з'яўляецца масівам)
+    { _id: 'all', name: 'Всі історії' },
     ...categories.map((cat) => ({ _id: cat._id, name: cat.name })),
-  ]; // Атрымліваем бягучы актыўны фільтр з URL (цяпер чакаем ID або 'all')
+  ];
 
-  const activeFilter = searchParams.get('filter') || 'all'; // Handler to update the URL when filter changes
+  // activeFilter = _id або 'all'
+  const activeFilter = searchParams.get('filter') || 'all';
 
   const handleFilterChange = useCallback(
     (newValue: string) => {
-      // Ствараем новы URLSearchParams
       const current = new URLSearchParams(Array.from(searchParams.entries()));
 
       if (newValue === 'all') {
-        // Калі абрана 'all', выдаляем параметр 'filter'
+        // If 'all' is selected, remove the 'filter' parameter
         current.delete('filter');
       } else {
-        // Цяпер newValue - гэта фактычны ID катэгорыі
-        current.set('filter', newValue); // Скідаем пагінацыю пры змене фільтра
+        // Set the category ID as the filter
+        current.set('filter', newValue); // newValue - гэта ID
+        // Reset pagination when filter changes
         current.delete('page');
-      } // Канструюйце новы шлях
+      }
 
       const query = current.toString();
-      const newPath = query ? `?${query}` : ''; // Пераходзім на новы URL
+      const newPath = query ? `?${query}` : '';
 
+      // Navigate to the new URL
       router.push(`/stories${newPath}`);
     },
     [searchParams, router]
@@ -55,12 +54,12 @@ const StoriesFilterControls = ({
       <div className={styles.filtersRow}>
         {FULL_CATEGORIES.map((cat) => (
           <button
-            key={cat._id} // Выкарыстоўваем _id як ключ
+            key={cat._id}
             type="button"
             className={`${styles.filterBtn} ${
               activeFilter === cat._id ? styles.filterBtnActive : ''
             }`}
-            onClick={() => handleFilterChange(cat._id)} // Перадаем _id для фільтрацыі
+            onClick={() => handleFilterChange(cat._id)} // <-- Адпраўляем ID
           >
             {cat.name}
           </button>
