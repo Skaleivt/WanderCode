@@ -5,6 +5,10 @@ import Container from '@/components/Container/Container';
 import Loader from '@/components/Loader/Loader';
 import StoriesPageWrapper from '@/components/Stories/StoriesPageWrapper';
 import { Metadata } from 'next';
+import css from './StoriesPage.module.css';
+import CategoriesFilterControls from '@/components/Stories/StoriesFilterControls';
+import { fetchCategoriesServer } from '@/lib/api/serverApi';
+import { Category } from '@/types/story';
 
 export const metadata: Metadata = {
   title: 'Всі Історії Мандрівників | WanderCode',
@@ -28,13 +32,26 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
+  let categories: Category[] = [];
+
+  try {
+    const categoriesData = await fetchCategoriesServer();
+    categories = categoriesData?.data || [];
+  } catch (error) {
+    console.error('Failed to fetch categories on server:', error);
+  }
+
   return (
     <Container>
-      <h1 className="main-title">Всі Історії</h1>
-
-      <Suspense fallback={<Loader />}>
-        <StoriesPageWrapper />
-      </Suspense>
+      <section className={css.section}>
+        <div className={css.headerContentWrap}>
+          <h1 className={css.heading}>Історії Мандрівників</h1>
+          <CategoriesFilterControls categories={categories} />
+        </div>
+        <Suspense fallback={<Loader />}>
+          <StoriesPageWrapper />
+        </Suspense>
+      </section>
     </Container>
   );
 }

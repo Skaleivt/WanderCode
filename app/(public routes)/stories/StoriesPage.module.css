@@ -1,97 +1,76 @@
 /* app/(public routes)/stories/StoriesPage.module.css */
-.page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-/* Section background */
 .section {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   background: #f7f9ff;
-  padding: 32px 20px 64px;
+  padding: 32px 0 40px;
 }
 
-/* Container */
-.container {
+.headerContentWrap {
   width: 100%;
-  max-width: 704px;
+  max-width: 100%;
+  padding: 0 20px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
-}
-
-/* Header (Heading + Filters) */
-.header {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
 }
 
 /* H1 Heading */
 .heading {
   width: 100%;
+  font-family: var(--second-family);
   font-weight: 700;
-  font-size: 48px;
+  font-size: 32px;
   line-height: 110%;
   letter-spacing: -0.01em;
   text-align: center;
-  color: #000000;
-  text-align: center;
+  color: var(--color-scheme-1-text, #000000);
+  max-width: 260px;
+  margin: 0 auto 16px;
 }
 
 /* ==== RESPONSIVE ==== */
 
-/* Tablet / small desktop */
-@media (min-width: 768px) {
+/* Tablet / small desktop (768px - 1439px) */
+@media (min-width: 768px) and (max-width: 1439px) {
   .section {
-    padding: 32px 32px 64px;
+    padding: 32px 0 40px;
   }
 
-  .container {
-    max-width: 704px;
+  .headerContentWrap {
+    /* Mimics Container max-width: 768px, padding-x: 32px */
+    max-width: 768px;
+    padding: 0 32px;
   }
 
   .heading {
     font-size: 48px;
-    max-width: 704px;
+    max-width: 100%;
+    margin-bottom: 24px;
   }
 }
 
-/* Mobile up to 767px */
-@media (max-width: 767px) {
+/* Desktop (1440px and up) */
+@media (min-width: 1440px) {
   .section {
-    padding: 32px 20px 64px;
+    padding: 48px 0 40px;
   }
 
-  .container {
-    max-width: 335px;
+  .headerContentWrap {
+    /* Mimics Container max-width: 1440px, padding-x: 64px */
+    max-width: 1440px;
+    padding: 0 64px;
   }
 
   .heading {
-    font-size: 32px;
-    max-width: 260px;
-    margin: 0 auto;
-  }
-}
-
-/* Desktop (1280px and up) */
-@media (min-width: 1280px) {
-  .section {
-    padding: 48px 64px 72px;
-  }
-
-  .container {
-    max-width: 1312px;
-  }
-
-  .heading {
-    font-size: 56px;
-    max-width: 1312px;
+    font-size: 48px;
+    max-width: 100%;
+    margin-bottom: 24px;
   }
 }
