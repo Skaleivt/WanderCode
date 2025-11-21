@@ -221,21 +221,9 @@ export const saveStory = async (id: string) => {
 
 export const fetchAllCategories = async (): Promise<Category[]> => {
   try {
-    const response = await fetch('/api/stories/categories');
+    const response = await api.get('/api/stories/categories');
 
-    if (!response.ok) {
-      let errorData;
-      try {
-        errorData = await response.json();
-      } catch {
-        throw new Error(`Памылка атрымання катэгорый: ${response.status}`);
-      }
-      throw new Error(
-        errorData.message || `Памылка атрымання катэгорый: ${response.status}`
-      );
-    }
-
-    const result = await response.json();
+    const result = response;
     return result.data || result;
   } catch (error) {
     console.error('Error in fetchAllCategories:', error);

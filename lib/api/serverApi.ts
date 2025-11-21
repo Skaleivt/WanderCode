@@ -167,13 +167,6 @@ export interface CategoryResponse {
   message: string;
   data: Category[];
 }
-// export async function fetchCategoriesServer(): Promise<CategoryResponse> {
-//   const response = await api.get<CategoryResponse>(`/stories/categories`);
-
-//   return {
-//     ...response.data,
-//   };
-// }
 
 export async function fetchCategoriesServer(): Promise<CategoryResponse> {
   try {
