@@ -85,7 +85,7 @@ const TravellersStoriesItem = ({
   const initiallySaved = story.isFavorite;
 
   // Выкарыстоўваем ownerId як ID аўтара
-  const authorId = story.ownerId;
+  const authorId = story.ownerId._id;
 
   // 1. АТРАМАННЕ ДАДЗЕНЫХ АЎТАРА (useQuery)
   const {
@@ -118,11 +118,12 @@ const TravellersStoriesItem = ({
   const finalAuthorAvatar = authorData?.avatarUrl; // string | undefined
 
   const categoryName = useMemo(() => {
-    if (categoriesData && categoryId) {
-      const categoryObj = categoriesData.find((cat) => cat._id === categoryId);
-      return categoryObj?.name || categoryId;
-    }
-    return categoryId;
+    if (!categoriesData) return '–';
+
+    const id = categoryId?._id ?? ''; // categoryId може бути undefined
+    const categoryObj = categoriesData.find((cat) => cat._id === id);
+
+    return categoryObj?.name ?? id ?? '–'; // завжди string
   }, [categoriesData, categoryId]);
 
   const [saved, setSaved] = useState<boolean>(initiallySaved);

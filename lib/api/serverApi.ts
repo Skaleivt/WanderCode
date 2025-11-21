@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { api } from './api';
 import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
 import { UserResponse } from '@/types/user';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 
 export const getServerCookies = async (): Promise<string> => {

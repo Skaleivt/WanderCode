@@ -15,7 +15,7 @@ import PopularSection from '@/components/PopularSection/PopularSection';
 import styles from './page.module.css';
 
 interface PageProps {
-  params: { storyId: string };
+  params: Promise<{ storyId: string }>;
 }
 
 export async function generateMetadata({
