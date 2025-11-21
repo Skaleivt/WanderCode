@@ -8,5 +8,5 @@ export interface Category {
 
 export async function getCategories(): Promise<Category[]> {
   const res = await api.get('/stories/categories');
-  return res.data.data; // бекенд повертає data: { data: [] }
+  return res.data.data;
 }

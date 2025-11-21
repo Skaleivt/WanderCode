@@ -167,12 +167,21 @@ export interface CategoryResponse {
   message: string;
   data: Category[];
 }
-export async function fetchCategoriesServer(): Promise<CategoryResponse> {
-  const response = await api.get<CategoryResponse>(`/stories/categories`);
+// export async function fetchCategoriesServer(): Promise<CategoryResponse> {
+//   const response = await api.get<CategoryResponse>(`/stories/categories`);
 
-  return {
-    ...response.data,
-  };
+//   return {
+//     ...response.data,
+//   };
+// }
+
+export async function fetchCategoriesServer(): Promise<CategoryResponse> {
+  try {
+    const response = await api.get<CategoryResponse>(`/stories/categories`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function fetchStoryByIdServer(id: string): Promise<DetailedStory> {

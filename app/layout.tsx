@@ -22,7 +22,7 @@ const sora = Sora({
   variable: '--second-family',
   display: 'swap',
 });
-
+export const metadataBase = new URL('https://wander-code.vercel.app');
 export const metadata: Metadata = {
   title: 'Подорожники - WanderCode | Ваші історії про подорожі',
   description:
