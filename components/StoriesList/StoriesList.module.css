@@ -1,4 +1,5 @@
-/* stories-list-grid styles (ДАДАЦЬ) */
+/*components/StoriesList.module.css*/
+/* stories-list-grid styles  */
 
 .stories-list-grid {
     display: grid;
@@ -12,7 +13,7 @@
     }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
     .stories-list-grid {
         grid-template-columns: repeat(3, 1fr);
         /* 3 слупкі па 3 карткі */

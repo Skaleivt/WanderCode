@@ -18,13 +18,13 @@ interface PageProps {
   params: { storyId: string };
 }
 
-// 🛑 ВЫПРАЎЛЕННЕ: Выкарыстоўваем 'any' для аргумента generateMetadata
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function generateMetadata(props: any): Promise<Metadata> {
-  // Прывядзенне тыпу для бяспечнай працы ўнутры функцыі
-  const { params } = props as PageProps;
-
-  const storyId = params.storyId?.trim();
+// 1. ПРАВІЛЬНАЯ ТЫПІЗАЦЫЯ (без 'any')
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  // 2. ЗАЎСЁДЫ ВЫКАРЫСТОЎВАЙЦЕ AWAIT ДЛЯ ПАРАМЕТРАЎ, КАЛІ ПАПЯРЭДЖВАЕ NEXT.JS
+  const awaitedParams = await params;
+  const storyId = awaitedParams.storyId?.trim();
 
   if (!storyId) {
     return {
@@ -69,12 +69,12 @@ export async function generateMetadata(props: any): Promise<Metadata> {
     },
   };
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function StoryPage(props: any) {
-  // Прывядзенне тыпу для бяспечнай працы ўнутры функцыі
-  const { params } = props as PageProps;
 
-  const storyId = params.storyId?.trim();
+// 3. ПРАВІЛЬНАЯ ТЫПІЗАЦЫЯ І AWAIT У КАМПАНЕНЦЕ
+export default async function StoryPage({ params }: PageProps) {
+  // 4. ЗАЎСЁДЫ ВЫКАРЫСТОЎВАЙЦЕ AWAIT ДЛЯ ПАРАМЕТРАЎ
+  const awaitedParams = await params;
+  const storyId = awaitedParams.storyId?.trim();
 
   if (!storyId) {
     return notFound();

@@ -59,28 +59,31 @@ export const fetchStoriesPage = async ({
   pageParam,
   filter,
   travellerId,
-  perPage, // ✅ ДАДАДЗЕНА
-  sortField, // ✅ ДАДАДЗЕНА
-  sortOrder, // ✅ ДАДАДЗЕНА
+  perPage = ITEMS_PER_PAGE,
+  sortField,
+  sortOrder,
 }: {
-  pageParam: number;
+  pageParam: number | undefined;
   filter?: string;
   travellerId?: string;
-  perPage?: number; // ✅ ДАДАДЗЕНА
-  sortField?: string; // ✅ ДАДАДЗЕНА
-  sortOrder?: string; // ✅ ДАДАДЗЕНА
+  perPage?: number;
+  sortField?: string;
+  sortOrder?: string;
 }): Promise<StoriesPage> => {
+  const page =
+    Number(pageParam) > 0 && !isNaN(Number(pageParam)) ? Number(pageParam) : 1;
+
   const params = new URLSearchParams({
-    page: String(pageParam),
+    page: String(page),
+    perPage: String(perPage),
     ...(filter && { filter }),
     ...(travellerId && { travellerId }),
-    ...(perPage && { perPage: String(perPage) }), // ПАВІНЕН БЫЦЬ ЛІК
     ...(sortField && { sortField }),
     ...(sortOrder && { sortOrder }),
   }).toString();
 
   const res = await fetch(`/api/stories?${params}`);
-  if (!res.ok) throw new Error('Не вдалося завантажыць гісторыі');
+  if (!res.ok) throw new Error('Failed to load stories');
 
   const fullResponse: StoriesResponse = await res.json();
   const paginationData = fullResponse.data;
@@ -122,11 +125,11 @@ export const getMe = async () => {
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       if (err.response?.status === 401) {
-        return null; // токен прострочився, користувач не авторизований
+        return null;
       }
     }
 
-    throw err; // важливо: пробросити інші помилки
+    throw err;
   }
 };
 
@@ -149,7 +152,7 @@ export async function addStoryToSaved(storyId: string): Promise<void> {
   try {
     await api.post('/users/saved', { storyId });
   } catch (error: unknown) {
-    let message = 'Не вдалося додати в збережені';
+    let message = 'Failed to add to saved';
     if (error instanceof Error) {
       message = error.message || message;
     }
@@ -161,7 +164,7 @@ export async function removeStoryFromSaved(storyId: string): Promise<void> {
   try {
     await api.delete('/users/saved', { data: { storyId } });
   } catch (error: unknown) {
-    let message = 'Не вдалося выдаліць із збережаных';
+    let message = 'Failed to remove from saved';
     if (error instanceof Error) {
       message = error.message || message;
     }
@@ -185,8 +188,8 @@ export const fetchUserById = async (id: string): Promise<User> => {
     const response = await api.get(`/users/${id}`);
     return response.data.data;
   } catch (error: unknown) {
-    console.error('Помилка fetchUserById:', error);
-    throw new Error('Не вдалося завантажыць дадзеныя карыстальніка');
+    console.error('fetchUserById error:', error);
+    throw new Error('Failed to load user data');
   }
 };
 
@@ -195,11 +198,11 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
     const response = await api.get(`/stories/${id}`);
     return response.data.data;
   } catch (error) {
-    console.error('Помилка fetchStoryByIdServer:', error);
+    console.error('fetchStoryByIdServer error:', error);
     if (error instanceof AxiosError && error.response?.status === 404) {
       throw new Error('Story Not Found (404)');
     }
-    throw new Error('Не вдалося завантажити історію (SSR)');
+    throw new Error('Failed to load story (SSR)');
   }
 };
 
@@ -208,10 +211,35 @@ export const saveStory = async (id: string) => {
     const response = await api.post(`/stories/save/${id}`, {});
     return response.data;
   } catch (error: unknown) {
-    let message = 'Не вдалося зберагчы гісторыю';
+    let message = 'Failed to save story';
     if (error instanceof Error) {
       message = error.message || message;
     }
     throw new Error(message);
+  }
+};
+
+export const fetchAllCategories = async (): Promise<Category[]> => {
+  try {
+    // 🛑 ВЫПРАЎЛЕННЕ: Выкарыстоўваем правільны маршрут для Next.js API
+    const response = await fetch('/api/stories/categories');
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (_) {
+        throw new Error(`Памылка атрымання катэгорый: ${response.status}`);
+      }
+      throw new Error(
+        errorData.message || `Памылка атрымання катэгорый: ${response.status}`
+      );
+    }
+
+    const result = await response.json();
+    return result.data || result;
+  } catch (error) {
+    console.error('Error in fetchAllCategories:', error);
+    throw error;
   }
 };

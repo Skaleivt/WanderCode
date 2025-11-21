@@ -7,11 +7,10 @@ import type { Story } from '@/types/story';
 export const storiesKeys = {
   all: ['stories'] as const,
   saved: () => ['stories', 'saved'] as const,
-  mine: () => ['stories', 'mine'] as const,
-  // for detail / edit page
-  detail: (id: string) => ['stories', 'detail', id] as const,
-  // Key for main stories list with optional filter
-  list: (filter?: string) => ['stories', 'list', { filter }] as const,
+  mine: () => ['stories', 'mine'] as const, // for detail / edit page
+  detail: (id: string) => ['stories', 'detail', id] as const, // ✅ ЗМЕНА: Дадаем initialLimit і stepLimit у ключ для аўтаматычнага скіду!
+  list: (filter?: string, initialLimit?: number, stepLimit?: number) =>
+    ['stories', 'list', { filter, initialLimit, stepLimit }] as const,
 };
 
 // Function to fetch all stories with pagination and filtering

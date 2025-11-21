@@ -1,10 +1,11 @@
 // components/StoriesList/StoriesList.tsx
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Story } from '@/types/story';
 import TravellersStoriesItem from '../TravellersStoriesItem/TravellersStoriesItem';
 import styles from './StoriesList.module.css';
+
 export interface StoryWithStatus extends Story {
   isFavorite: boolean;
 }
@@ -18,26 +19,41 @@ const StoriesList: React.FC<StoriesListProps> = ({
   stories,
   onToggleSuccess,
 }) => {
-  if (!stories || stories.length === 0) {
+  // Выкарыстоўваем useMemo для дадатковай дэдуплікацыі і фільтрацыі
+  const uniqueStories = useMemo(() => {
+    if (!stories || stories.length === 0) {
+      return [];
+    }
+
+    const uniqueMap = new Map<string, StoryWithStatus>();
+
+    stories.forEach((story) => {
+      // Фільтруем null/undefined і тыя, у якіх няма _id
+      if (story && story._id) {
+        // Гарантуем, што мы дадаем элемент, толькі калі яго яшчэ няма (дэдуплікацыя)
+        if (!uniqueMap.has(story._id)) {
+          uniqueMap.set(story._id, story);
+        }
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [stories]);
+
+  if (uniqueStories.length === 0) {
     return null;
   }
 
   return (
     <div className={styles['stories-list-grid']}>
-      {stories.map((story, index) => {
-        if (!story) {
-          return null;
-        }
-
-        const key = story._id || index;
-
+      {uniqueStories.map((story) => {
+        // Выкарыстоўваем story._id як адзіны і ўпэўнены ключ
         return (
-          <div key={key}>
-            <TravellersStoriesItem
-              story={story} // Тут TypeScript вже не сваритиметься
-              onToggleSuccess={onToggleSuccess}
-            />
-          </div>
+          <TravellersStoriesItem
+            key={story._id}
+            story={story}
+            onToggleSuccess={onToggleSuccess}
+          />
         );
       })}
     </div>

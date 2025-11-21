@@ -1,7 +1,7 @@
 // components/TravellersStories/TravellersStories.tsx
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
 import {
   fetchStoriesPage,
@@ -13,6 +13,33 @@ import StoriesList from '@/components/StoriesList/StoriesList';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import { Story } from '@/types/story';
 import styles from './TravellersStories.module.css';
+
+const useStoriesPerPage = (): number => {
+  const getInitialPerPage = () => {
+    if (typeof window === 'undefined') return 9;
+    if (window.innerWidth >= 1440) return 9;
+    if (window.innerWidth >= 768) return 8;
+    return 8;
+  };
+
+  const [perPage, setPerPage] = useState<number>(getInitialPerPage);
+
+  useEffect(() => {
+    const calculatePerPage = () => {
+      if (window.innerWidth >= 1440) return 9;
+      if (window.innerWidth >= 768) return 8;
+      return 8;
+    };
+
+    const handleResize = () => setPerPage(calculatePerPage());
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return perPage;
+};
 
 interface StoryWithStatus extends Story {
   isFavorite: boolean;
@@ -28,6 +55,8 @@ const TravellersStories = ({
   filter,
 }: TravellersStoriesProps) => {
   const data = initialStories?.data;
+
+  const perPage = useStoriesPerPage();
 
   const initialPage: StoriesPage = {
     stories: data?.data || [],
@@ -56,13 +85,17 @@ const TravellersStories = ({
     StoriesPage,
     Error,
     InfiniteData<StoriesPage, number>,
-    ['travellerStories', { filter: string }],
+    ['travellerStories', { filter: string; perPage: number }],
     number
   >({
-    queryKey: ['travellerStories', { filter }],
+    queryKey: ['travellerStories', { filter, perPage }],
 
     queryFn: ({ pageParam = 1 }) => {
-      return fetchStoriesPage({ pageParam: pageParam as number, filter });
+      return fetchStoriesPage({
+        pageParam: pageParam as number,
+        filter,
+        perPage,
+      });
     },
 
     initialPageParam: initialPage.nextPage || 1,
@@ -71,7 +104,18 @@ const TravellersStories = ({
   });
 
   const allStories: StoryWithStatus[] = useMemo(() => {
-    const stories = queryData?.pages.flatMap((page) => page.stories) ?? [];
+    const flatList = queryData?.pages.flatMap((page) => page.stories) ?? [];
+
+    const uniqueMap = flatList.reduce((map, story) => {
+      if (story?._id) {
+        if (!map.has(story._id)) {
+          map.set(story._id, story);
+        }
+      }
+      return map;
+    }, new Map<string, (typeof flatList)[number]>());
+
+    const stories = Array.from(uniqueMap.values());
 
     return stories
       .filter((story): story is Story => !!story)
@@ -90,6 +134,7 @@ const TravellersStories = ({
       showErrorToast(message);
     }
   }, [isError, error]);
+
   if (isLoading) {
     return (
       <div className={styles.storiesLoader}>
@@ -105,7 +150,7 @@ const TravellersStories = ({
       <div className={styles.storiesEmpty}>
         <h2 className={styles.storiesEmpty__title}>{noStoriesMessage}</h2>
         <p className={styles.storiesEmpty__text}>
-          Станьце першим, хто поділиться власною подорожжю та надихне іншых!
+          Станьте першим, хто поділиться власною подорожжю та надихне іншых!
         </p>
       </div>
     );
@@ -114,6 +159,7 @@ const TravellersStories = ({
   const handleLoadMore = () => {
     fetchNextPage();
   };
+
   const handleToggleSuccess = (storyId: string, isAdding: boolean) => {
     console.log(
       `Закладка для ${storyId}: ${isAdding ? 'дададзена' : 'выдалена'}`

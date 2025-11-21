@@ -3,18 +3,37 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'; // ✅ ДАДАДЗЕНЫ useQuery
-import { Bookmark, BookmarkCheck, Loader2 } from 'lucide-react'; // 🛑 UserRound і CalendarDays ВЫДАЛЕНЫ
+import { useMemo, useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 import { Story } from '@/types/story';
-// ✅ ВЫПРАЎЛЕННЕ ІМПАРТУ: Змяняем шлях да api-функцый
-import { toggleStoryBookmark, fetchUserById } from '@/lib/api/clientApi';
+import {
+  toggleStoryBookmark,
+  fetchUserById,
+  fetchAllCategories,
+} from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 import { showErrorToast } from '@/components/ShowErrorToast/ShowErrorToast';
 import styles from './TravellersStoriesItem.module.css';
-import { User } from '@/types/user'; // ✅ ТРЭБА ІМПАРТАВАЦЬ ТЫП User
+import { User } from '@/types/user';
+
+// 🛑 ВЫЗНАЧЭННЕ ТЫПАЎ, ЯКІЯ БУДУЦЬ ВЫКАРЫСТАНЫЯ
+export type ProfileProps = {
+  avatarUrl?: string; // string | undefined
+  name?: string; // string | undefined
+  description?: string;
+};
+
+// interface Props { // ВЫДАЛЕНА, каб пазбегнуць памылкі ESLint, бо не выкарыстоўваецца тут
+// 	traveller: ProfileProps;
+// }
+
+interface Category {
+  _id: string;
+  name: string;
+}
 
 interface StoryWithStatus extends Story {
   isFavorite: boolean;
@@ -29,6 +48,25 @@ interface MutationContext {
   currentSaved: boolean;
 }
 
+// 🛑 УНУТРАНАЯ ФУНКЦЫЯ: Тыпізаваная праз ProfileProps
+const AuthorDisplay = ({ name, avatarUrl }: ProfileProps) => (
+  <>
+    <Image
+      // Выкарыстоўваем дэфолт, калі avatarUrl не перададзены
+      src={avatarUrl || '/default-avatar.png'}
+      alt={name || 'avatar'}
+      width={40}
+      height={40}
+      className={styles.authorAvatar}
+    />
+    <div className={styles.authorInfoWrapper}>
+      {/* Паказваем імя або "Невядомы аўтар" */}
+      <span className={styles.authorName}>{name || 'Невядомы аўтар'}</span>
+      {/* Астатнія элементы ўнутры authorInfoWrapper (дата і закладкі) будуць дададзены ніжэй */}
+    </div>
+  </>
+);
+
 const TravellersStoriesItem = ({
   story,
   onToggleSuccess,
@@ -39,27 +77,58 @@ const TravellersStoriesItem = ({
 
   const storyId = story._id;
   const imageUrl = story.img;
-  const category = story.category;
+  const categoryId = story.category;
   const title = story.title;
-  const description = story.article; // 🛑 Выдалены старыя заглушкі: authorName, authorAvatar
+  const description = story.article;
   const publishedAt = story.date;
   const initialBookmarksCount = story.favoriteCount ?? 0;
-  const initiallySaved = story.isFavorite; // ✅ 1. ЗАГРУЗКА ДАДЗЕНЫХ АЎТАРА ПА ID
+  const initiallySaved = story.isFavorite;
 
-  const { data: authorData } = useQuery<User>({
-    queryKey: ['user', story.ownerId],
-    queryFn: () => fetchUserById(story.ownerId),
-    enabled: !!story.ownerId,
-    staleTime: Infinity, // Дадзеныя аўтара звычайна статычныя
+  // Выкарыстоўваем ownerId як ID аўтара
+  const authorId = story.ownerId;
+
+  // 1. АТРАМАННЕ ДАДЗЕНЫХ АЎТАРА (useQuery)
+  const {
+    data: authorData,
+    isLoading: isAuthorLoading,
+    isError: isAuthorError,
+    error: authorError,
+  } = useQuery<User>({
+    queryKey: ['user', authorId],
+    queryFn: () => fetchUserById(authorId),
+    enabled: !!authorId,
+    staleTime: Infinity,
   });
 
-  const authorName = authorData?.name || 'Невядомы аўтар';
-  const authorAvatar = authorData?.avatarUrl || '/default-avatar.svg'; // Калі катэгорыя - гэта ID, ён будзе адлюстроўвацца як ID, калі не знойдзены назва.
-  const categoryName = category;
+  // АТРАМАННЕ ДАДЗЕНЫХ КАТЭГОРЫЙ
+  const { data: categoriesData } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: fetchAllCategories,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+
+  // 2. ВЫЛІЧЭННЕ ПАЛЕЙ АЎТАРА (для перадачы ў AuthorDisplay)
+  const finalAuthorName = isAuthorLoading
+    ? 'Загрузка автора...'
+    : isAuthorError
+      ? 'Памылка аўтара'
+      : authorData?.name; // string | undefined
+
+  const finalAuthorAvatar = authorData?.avatarUrl; // string | undefined
+
+  const categoryName = useMemo(() => {
+    if (categoriesData && categoryId) {
+      const categoryObj = categoriesData.find((cat) => cat._id === categoryId);
+      return categoryObj?.name || categoryId;
+    }
+    return categoryId;
+  }, [categoriesData, categoryId]);
 
   const [saved, setSaved] = useState<boolean>(initiallySaved);
-  const [bookmarks, setBookmarks] = useState<number>(initialBookmarksCount); // ✅ 2. ФАРМАТАВАННЕ ДАТЫ (ДД.ММ.ГГГГ)
+  const [bookmarks, setBookmarks] = useState<number>(initialBookmarksCount);
 
+  // ФАРМАТАВАННЕ ДАТЫ
   const dateStr = useMemo(() => {
     const d = new Date(publishedAt);
     return d.toLocaleDateString('uk-UA', {
@@ -68,6 +137,13 @@ const TravellersStoriesItem = ({
       day: '2-digit',
     });
   }, [publishedAt]);
+
+  // Дыягностыка памылак аўтара
+  useEffect(() => {
+    if (isAuthorError) {
+      console.error('Error fetching author data:', authorError);
+    }
+  }, [isAuthorError, authorError]);
 
   const { mutate: handleToggleBookmark, isPending } = useMutation<
     unknown,
@@ -82,7 +158,7 @@ const TravellersStoriesItem = ({
       setSaved((prev) => !prev);
       setBookmarks((prev) => (currentSaved ? Math.max(0, prev - 1) : prev + 1));
       return { currentSaved };
-    }, // ... (onError, onSuccess logic remains unchanged)
+    },
     onError: (error: unknown, variables, context) => {
       showErrorToast(
         error instanceof Error
@@ -127,36 +203,27 @@ const TravellersStoriesItem = ({
         <span className={styles.categoryBadge}>{categoryName}</span>
         <header>
           <Link href={`/stories/${storyId}`}>
-            <h3 className={styles.title}>{title}</h3>{' '}
+            <h3 className={styles.title}>{title}</h3>
           </Link>
         </header>
         <p className={styles.description}>{description}</p>
 
         <div className={styles.authorMetaBlock}>
-          <Image
-            src={authorAvatar}
-            alt={authorName}
-            width={40}
-            height={40}
-            className={styles.authorAvatar}
-          />
+          {/* 🛑 ВЫКАРЫСТАННЕ AUTHOR DISPLAY */}
+          <AuthorDisplay name={finalAuthorName} avatarUrl={finalAuthorAvatar} />
 
-          <div className={styles.authorInfoWrapper}>
-            <span className={styles.authorName}>{authorName}</span>
+          <div className={styles.dateAndBookmarks}>
+            <span className={styles.publishedDate}>{dateStr}</span>
 
-            <div className={styles.dateAndBookmarks}>
-              <span className={styles.publishedDate}>{dateStr}</span>
+            <span className={styles.bookmarks}>
+              <span className={styles.bookmarksCount}>{bookmarks}</span>
 
-              <span className={styles.bookmarks}>
-                <span className={styles.bookmarksCount}>{bookmarks}</span>
-
-                {saved ? (
-                  <BookmarkCheck className="h-4 w-4" />
-                ) : (
-                  <Bookmark className="h-4 w-4" />
-                )}
-              </span>
-            </div>
+              {saved ? (
+                <BookmarkCheck className="h-4 w-4" />
+              ) : (
+                <Bookmark className="h-4 w-4" />
+              )}
+            </span>
           </div>
         </div>
 
@@ -193,7 +260,7 @@ const TravellersStoriesItem = ({
                 ) : (
                   <Bookmark className="h-4 w-4" />
                 )}
-                {saved ? '' : ''}
+                {saved ? 'Збережено' : ''}
               </span>
             )}
           </button>

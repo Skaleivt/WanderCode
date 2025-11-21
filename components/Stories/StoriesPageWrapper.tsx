@@ -21,6 +21,8 @@ const useScreenSize = () => {
   );
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const checkSize = () => {
       if (window.innerWidth < 768) {
         setScreenSize('mobile');
@@ -53,18 +55,16 @@ const getPaginationSettings = (screenSize: 'mobile' | 'tablet' | 'desktop') => {
 };
 
 // Type for list item (required by StoriesList)
-interface StoryWithStatus extends Story {
+export interface StoryWithStatus extends Story {
   isFavorite: boolean;
 }
 
 const StoriesPageWrapper: React.FC = () => {
   const searchParams = useSearchParams();
-  const screenSize = useScreenSize();
+  const screenSize = useScreenSize(); // 1. Determine the category filter from URL (ID or 'all')
 
-  // 1. Determine the category filter from URL (ID or 'all')
-  const categoryFilter = searchParams.get('filter') || 'all';
+  const categoryFilter = searchParams.get('filter') || 'all'; // 2. Determine pagination settings dynamically
 
-  // 2. Determine pagination settings dynamically
   const { initial, step } = useMemo(
     () => getPaginationSettings(screenSize),
     [screenSize]
@@ -77,8 +77,7 @@ const StoriesPageWrapper: React.FC = () => {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
-    refetch,
+    isFetchingNextPage, // refetch, // refetch больш не патрэбны
   } = useInfiniteQuery<
     StoriesResponse,
     Error,
@@ -86,29 +85,26 @@ const StoriesPageWrapper: React.FC = () => {
     ReturnType<typeof storiesKeys.list>,
     number
   >({
-    // Key changes when filter changes -> triggers refetch
-    queryKey: storiesKeys.list(categoryFilter),
+    // ✅ ЗМЕНА: Уключаем initial і step у queryKey. Гэта забяспечвае
+    // аўтаматычны скід стану пагінацыі пры змене памеру экрана або фільтра.
+    queryKey: storiesKeys.list(categoryFilter, initial, step),
 
     queryFn: async ({ pageParam = 1 }) => {
       // Calculate limit: initial for the first page, step for subsequent pages
-      const limit = pageParam === 1 ? initial : step;
+      const limit = pageParam === 1 ? initial : step; // Call getStories with filter and limit
 
-      // Call getStories with filter and limit
       const response = await getStories(pageParam, limit, categoryFilter);
 
       return response;
     },
 
-    initialPageParam: 1,
-    // Correctly determine the next page number from API response
+    initialPageParam: 1, // Correctly determine the next page number from API response
     getNextPageParam: (lastPage) =>
       lastPage.data?.hasNextPage ? lastPage.data.page + 1 : undefined,
-    staleTime: 1000 * 60 * 5,
-    // Refetch when screen size changes to get the correct initial amount
+    staleTime: 1000 * 60 * 5, // Refetch when screen size changes to get the correct initial amount
     enabled: true,
-  });
+  }); // Extract and flatten stories from all pages
 
-  // Extract and flatten stories from all pages
   const allStories: StoryWithStatus[] = useMemo(() => {
     // Accessing the actual data: page.data?.data
     const stories =
@@ -120,14 +116,12 @@ const StoriesPageWrapper: React.FC = () => {
         ...story,
         isFavorite: (story as StoryWithStatus).isFavorite ?? false,
       })) as StoryWithStatus[];
-  }, [queryData]);
-
-  // Refetch logic to reset pagination when filter changes
-  useEffect(() => {
-    refetch();
-  }, [categoryFilter, initial, refetch]);
-
+  }, [queryData]); // 🛑 ВЫДАЛЕНА: Гэты useEffect больш не патрэбны. Скід адбываецца праз змену queryKey.
+  // useEffect(() => {
+  //   refetch();
+  // }, [categoryFilter, initial, refetch]);
   // Show toasts on error
+
   useEffect(() => {
     if (isError) {
       const message =
@@ -140,54 +134,58 @@ const StoriesPageWrapper: React.FC = () => {
 
   const handleLoadMore = () => {
     fetchNextPage();
-  };
+  }; // Placeholder for bookmark handler
 
-  // Placeholder for bookmark handler
   const handleToggleSuccess = (storyId: string, isAdding: boolean) => {
     console.log(`Bookmark for ${storyId}: ${isAdding ? 'added' : 'removed'}`);
-  };
+  }; // 1. Loading State
 
-  // 1. Loading State
   if (isLoading && !isFetchingNextPage) {
     return (
       <div className={styles.storiesLoader}>
-        <Loader />
+                <Loader />       {' '}
       </div>
     );
   }
 
-  const noStoriesMessage = 'На жаль, не знайдено історій.';
+  const noStoriesMessage = 'На жаль, не знайдено історій.'; // 2. Empty State (Filter works, but no data found)
 
-  // 2. Empty State (Filter works, but no data found)
   if (!allStories.length && !hasNextPage) {
     return (
       <div className={styles.storiesEmpty}>
-        <h2 className={styles.storiesEmpty__title}>{noStoriesMessage}</h2>
+               {' '}
+        <h2 className={styles.storiesEmpty__title}>{noStoriesMessage}</h2>     
+         {' '}
         <p className={styles.storiesEmpty__text}>
-          Спробуйте пізніше або змініть фільтри.
+                    Спробуйте пізніше або змініть фільтри.        {' '}
         </p>
+             {' '}
       </div>
     );
-  }
+  } // 3. Main Rendering
 
-  // 3. Main Rendering
   return (
     <section className={styles.storiesSection}>
+           {' '}
       <StoriesList stories={allStories} onToggleSuccess={handleToggleSuccess} />
-      {/* Check for next page based on the API response */}
+            {/* Check for next page based on the API response */}     {' '}
       {hasNextPage && (
         <div className={styles.loadMoreWrap}>
+                   {' '}
           <button
             type="button"
             className={styles.loadMoreBtn}
             onClick={handleLoadMore}
             disabled={isFetchingNextPage}
           >
-            {isFetchingNextPage ? 'Завантаження...' : 'Переглянути ще'}
+                       {' '}
+            {isFetchingNextPage ? 'Завантаження...' : 'Переглянути ще'}       
+             {' '}
           </button>
+                 {' '}
         </div>
       )}
-      {isFetchingNextPage && <Loader />}
+            {isFetchingNextPage && <Loader />}   {' '}
     </section>
   );
 };

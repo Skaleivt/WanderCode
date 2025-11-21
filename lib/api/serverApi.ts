@@ -56,6 +56,7 @@ async function executeStoriesRequest({
   return response.data;
 }
 
+// ✅ АПТЫМІЗАЦЫЯ: Выкарыстоўваем адзін запыт замест двух
 export async function fetchAllStoriesServer({
   page,
   perPage,
@@ -70,60 +71,46 @@ export async function fetchAllStoriesServer({
   sortOrder?: string;
 }): Promise<StoriesResponse> {
   const requestedPerPage = perPage || 4;
-  const backendPerPage = 3;
+  const requestedPage = page || 1;
 
   try {
-    // 1. Query 1st page
-    const response1 = await executeStoriesRequest({
-      page: 1,
-      perPage: backendPerPage,
-      filter,
-      sortField,
-      sortOrder,
-    }); // 2. Query 2nd page
-
-    const response2 = await executeStoriesRequest({
-      page: 2,
-      perPage: backendPerPage,
+    // Выконваем адзін запыт з запытанымі параметрам page і perPage
+    const response = await executeStoriesRequest({
+      page: requestedPage,
+      perPage: requestedPerPage,
       filter,
       sortField,
       sortOrder,
     });
 
-    let storiesData: Story[] = [];
-
-    const data1 = response1?.data?.data || [];
-    const data2 = response2?.data?.data || []; // Concatenate and slice to the requested amount (4)
-
-    storiesData = [...data1, ...data2];
-    storiesData = storiesData.slice(0, requestedPerPage);
-
-    const totalReturned = storiesData.length;
+    const storiesData = response?.data?.data || [];
+    const totalReturned = storiesData.length; // Фарміраванне выпраўленага адказу
 
     const correctedResponse: StoriesResponse = {
       data: {
-        totalItems: response1.data.totalItems || totalReturned,
-        totalPages: response1.data.totalPages || 1,
-        hasNextPage: response1.data.hasNextPage || false,
-        hasPreviousPage: response1.data.hasPreviousPage || false,
+        totalItems: response.data?.totalItems || totalReturned,
+        totalPages: response.data?.totalPages || 1,
+        hasNextPage: response.data?.hasNextPage || false,
+        hasPreviousPage: response.data?.hasPreviousPage || false,
 
-        currentPage: page || 1,
+        currentPage: requestedPage,
 
         data: storiesData as Story[],
-        page: page || 1,
+        page: requestedPage,
         perPage: requestedPerPage,
       },
     };
 
     return correctedResponse;
   } catch {
+    // Апрацоўка памылак
     return {
       data: {
         data: [],
         totalItems: 0,
         totalPages: 0,
-        currentPage: page || 1,
-        page: page || 1,
+        currentPage: requestedPage,
+        page: requestedPage,
         perPage: requestedPerPage,
         hasNextPage: false,
         hasPreviousPage: false,
@@ -230,6 +217,7 @@ interface OwnStoriesResponse {
   hasPreviousPage: boolean;
 }
 
+// ✅ ВЫПРАЎЛЕННЕ: Бяспечны доступ да ўласцівасцей адказу
 export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
   const res = await api.get('/stories/saved', {
     headers: { Cookie: await getServerCookies() },
@@ -248,11 +236,11 @@ export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
 
   return {
     stories: normalizedStories,
-    page: res.data.data.page,
-    perPage: res.data.data.perPage,
-    totalItems: res.data.data.totalItems,
-    totalPages: res.data.data.totalPages,
-    hasNextPage: res.data.data.hasNextPage,
-    hasPreviousPage: res.data.data.hasPreviousPage,
+    page: payload?.page || 1, // Бяспечны доступ
+    perPage: payload?.perPage || 9, // Бяспечны доступ
+    totalItems: payload?.totalItems || 0, // Бяспечны доступ
+    totalPages: payload?.totalPages || 1, // Бяспечны доступ
+    hasNextPage: payload?.hasNextPage || false, // Бяспечны доступ
+    hasPreviousPage: payload?.hasPreviousPage || false, // Бяспечны доступ
   };
 }

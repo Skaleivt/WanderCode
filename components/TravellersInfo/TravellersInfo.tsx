@@ -1,3 +1,4 @@
+// components/TravellersInfo/TravellersInfo.tsx
 import Image from 'next/image';
 import css from './TravellersInfo.module.css';
 
