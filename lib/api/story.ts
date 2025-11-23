@@ -50,14 +50,28 @@ export async function getMyStories(
   return data;
 }
 
-export async function createStory(values: AddStoryFormValues) {
+
+type CreateStoryResponse = {
+  message: string;
+  data: Story;
+};
+
+export async function createStory(values: AddStoryFormValues) : Promise<Story>{
   const form = new FormData();
-  if (values.cover) form.append('cover', values.cover);
+    // ❗ бекенд чекає поле `img`, а не `cover`
+  if (values.cover) form.append('img', values.cover);
+
+  // if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
   form.append('description', values.description);
-  const res = await api.post('/stories', form);
-  return res.data;
+  // const res = await api.post('/stories', form);
+  // return res.data;
+    const { data } = await api.post<CreateStoryResponse>('/stories', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  return data.data; // <-- повертаємо саму історію
 }
 // Get one story for form prefill (Edit)
 export async function getStoryById(storyId: string): Promise<Story> {
@@ -71,19 +85,18 @@ export async function updateStory(
   storyId: string,
   values: AddStoryFormValues
 ): Promise<Story> {
-  const form = new FormData();
+  const body = {
+    title: values.title,
+    description: values.description,
+    category: values.category,
+  };
 
-  // Send file only if it is a new File
-  if (values.cover instanceof File) {
-    form.append('cover', values.cover);
-  }
+  const { data } = await api.patch(`/stories/${storyId}`, body, {
+    headers: { 'Content-Type': 'application/json' },
+  });
 
-  form.append('title', values.title);
-  form.append('category', values.category);
-  form.append('description', values.description);
-
-  const { data } = await api.patch(`/stories/${storyId}`, form);
-  return data;
+  // якщо бек повертає { data: {...} } – повертаємо внутрішні дані
+  return data.data ?? data;
 }
 export async function getCategories() {
   const res = await api.get('/stories/categories');

@@ -13,7 +13,7 @@ import styles from './AddStoryForm.module.css';
 // import { useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
 import { createStory, getCategories } from '@/lib/api/story';
-import { Category } from '@/types/story';
+import { Category, Story } from '@/types/story';
 
 // // ---- Лічильник символів для короткого опису
 // const ShortDescLiveCounter = () => {
@@ -82,11 +82,15 @@ export default function AddStoryForm() {
     queryKey: ['categories'],
     queryFn: getCategories,
   });
-  const mutation = useMutation<{ id: string }, Error, AddStoryFormValues>({
+
+ 
+
+  const mutation = useMutation<Story, Error, AddStoryFormValues>({
     mutationFn: createStory,
-    onSuccess: async (data) => {
+    onSuccess: async (story) => {
       await qc.invalidateQueries({ queryKey: ['profile', 'my-stories'] });
-      setCreatedId(data.id); // зберігаємо ID нової історії
+       await qc.invalidateQueries({ queryKey: ['stories'] });
+      setCreatedId(story._id); // зберігаємо ID нової історії
       setPublishedOpen(true); // відкриваємо модалку успіху
     },
     onError: (err: ApiError) => {
