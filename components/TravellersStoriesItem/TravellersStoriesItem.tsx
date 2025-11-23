@@ -12,6 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { showErrorToast } from '../ShowErrorToast/ShowErrorToast';
 import { addStoryToSaved, removeStoryFromSaved } from '@/lib/api/clientApi';
+import { useRouter } from 'next/navigation';
 
 export type ProfileProps = {
   avatarUrl?: string;
@@ -63,6 +64,11 @@ export default function TravellersStoriesItem({
       showErrorToast('Щось пішло не так');
     },
   });
+  const router = useRouter();
+
+  const goToRegister = () => {
+    router.push('/auth/login');
+  };
 
   return (
     <article className={styles.card}>
@@ -118,9 +124,16 @@ export default function TravellersStoriesItem({
 
           <button
             className={saved ? styles.bookmarkBtnSave : styles.bookmarkBtn}
-            onClick={() =>
-              toggleSaveMutation.mutate({ storyId: story._id, isSaved: saved })
-            }
+            onClick={() => {
+              if (!isAuthenticated) {
+                goToRegister();
+              } else {
+                toggleSaveMutation.mutate({
+                  storyId: story._id,
+                  isSaved: saved,
+                });
+              }
+            }}
           >
             <svg
               className={

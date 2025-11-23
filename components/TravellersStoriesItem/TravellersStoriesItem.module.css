@@ -56,27 +56,36 @@
 .title {
   font-size: 18px;
   line-height: 1.3;
-  font-weight: 600;
-  color: #111827;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
   margin-bottom: 8px;
+  min-height: calc(16px * 1.3 * 2);
 }
 
 /* Абмежаванне для апісання: 3 радкі */
 .description {
   font-size: 14px;
   line-height: 1.6;
-  color: #4b5563;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   line-clamp: 3;
   overflow: hidden;
   margin-bottom: 24px;
+  min-height: calc(16px * 1.5 * 3);
 }
 
 .authorMetaBlock {
@@ -232,39 +241,13 @@
   background: var(--opacity-neutral-darkest-5);
   cursor: pointer;
 }
-
-@media (min-width: 375px) and (max-width: 767px) {
-  .storiesGrid {
-    height: 500px;
-    max-width: 375px;
-    padding: 0;
-  }
-}
-
-/* 💻 Планшэт (768px - 1439px) - 2 карткі, Фіксаваная шырыня 768px */
-@media (min-width: 768px) {
-  .storiesGrid {
-    grid-template-columns: repeat(2, 1fr);
-    /* 2 калонкі */
-    max-width: 768px;
-  }
-
-  .imageLink {
-    height: 280px;
-    /* Карэкціроўка вышыні выявы */
-  }
-}
-
-/* 🖥️ Дэсктоп (1440px+) - 3 карткі, Фіксаваная шырыня 1440px */
 @media (min-width: 1440px) {
-  .storiesGrid {
-    grid-template-columns: repeat(3, 1fr);
-    /* 3 калонкі (6 гісторый на 2 радкі) */
-    max-width: 1440px;
+  .title {
+    font-size: 26px;
+    min-height: calc(26px * 1.5 * 2);
   }
-
-  .imageLink {
-    height: 300px;
-    /* Карэкціроўка вышыні выявы */
+  .description {
+    font-size: 18px;
+    min-height: calc(18px * 1.5 * 3);
   }
 }

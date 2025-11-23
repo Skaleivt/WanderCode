@@ -77,55 +77,103 @@ function StoriesList({ categories }: { categories: CategoryResponse }) {
     }
   }, [isError]);
 
+  // mob categories
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const calculateMobCategories = () => {
+      const width = window.innerWidth;
+      return width < 768;
+    };
+    setIsMobile(calculateMobCategories());
+    const handleResize = () => {
+      setIsMobile(calculateMobCategories());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState({
+    _id: '',
+    name: 'Всі історії',
+  });
+
+  const handleSelect = (cat: Category) => {
+    setSelected(cat);
+    handleFilter(cat._id || undefined);
+    setOpen(false);
+  };
+
   return (
     <>
-      ({' '}
-      <ul>
-        <option
-          className={styles.categoriesBtn}
-          value={''}
-          onClick={() => handleFilter(undefined)}
-        >
-          Всі історії
-        </option>
-        {Array.isArray(categories.data) &&
-          categories.data.map((cat: Category) => (
-            <option
-              className={styles.categoriesBtn}
-              value={cat._id}
-              key={cat._id}
-              onClick={() => handleFilter(cat._id)}
-            >
-              {cat.name}
-            </option>
-          ))}
-      </ul>
-      ): (
-      <ul>
-        <button
-          className={styles.categoriesBtn}
-          onClick={() => handleFilter(undefined)}
-        >
-          Всі історії
-        </button>
-        {Array.isArray(categories.data) &&
-          categories.data.map((cat: Category) => (
+      {isMobile ? (
+        <div className={styles.wrapperMob}>
+          <label className={styles.label}>Категорії</label>
+
+          <div className={styles.dropdown}>
             <button
-              className={styles.categoriesBtn}
-              key={cat._id}
-              onClick={() => handleFilter(cat._id)}
+              className={styles.toggleBtn}
+              onClick={() => setOpen((prev) => !prev)}
             >
-              {cat.name}
+              {selected.name}
+              <svg className={styles.btnIcon}>
+                <use href="/symbol-defs.svg#icon-keyboard_arrow_down"></use>
+              </svg>
             </button>
-          ))}
-      </ul>
-      )
+
+            {open && (
+              <ul className={styles.menu}>
+                <li
+                  className={styles.item}
+                  onClick={() => handleSelect({ _id: '', name: 'Всі історії' })}
+                >
+                  Всі історії
+                </li>
+
+                {Array.isArray(categories.data) &&
+                  categories.data.map((cat: Category) => (
+                    <li
+                      className={styles.item}
+                      key={cat._id}
+                      onClick={() => handleSelect(cat)}
+                    >
+                      {cat.name}
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className={styles.wrapper}>
+          <button
+            className={styles.categoriesBtn}
+            onClick={() => handleFilter(undefined)}
+          >
+            Всі історії
+          </button>
+          {Array.isArray(categories.data) &&
+            categories.data.map((cat: Category) => (
+              <button
+                className={styles.categoriesBtn}
+                key={cat._id}
+                onClick={() => handleFilter(cat._id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+        </div>
+      )}
       {data && (
-        <ul>
+        <ul className={styles.storyList}>
           {data.pages.flatMap((page) => {
             console.log('Сторіз з API:', page.data.data);
             return page.data.data.map((story) => (
-              <li key={story._id}>
+              <li className={styles.storyItem} key={story._id}>
                 <TravellersStoriesItem story={story} />
               </li>
             ));
