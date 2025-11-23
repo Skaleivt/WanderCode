@@ -162,7 +162,9 @@ export async function addStoryToSaved(storyId: string): Promise<void> {
 
 export async function removeStoryFromSaved(storyId: string): Promise<void> {
   try {
-    await api.delete('/users/saved', { data: { storyId } });
+    await api.delete('/users/saved', {
+      data: { storyId },
+    });
   } catch (error: unknown) {
     let message = 'Failed to remove from saved';
     if (error instanceof Error) {

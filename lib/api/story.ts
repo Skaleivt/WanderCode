@@ -15,17 +15,18 @@ export const storiesKeys = {
 
 // Function to fetch all stories with pagination and filtering
 export async function getStories(
-  page = 1,
-  limit = 9,
-  filter?: string // Category ID for filtering
+  page: number,
+  perPage: number,
+  filter?: string
 ): Promise<StoriesResponse> {
   const { data } = await api.get('/stories', {
     params: {
       page,
-      perPage: limit,
-      category: filter === 'all' ? undefined : filter,
+      perPage,
+      category: filter === '' ? undefined : filter,
     },
   });
+
   return data;
 }
 

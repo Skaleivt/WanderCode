@@ -25,7 +25,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  padding: 16px 20px 20px;
+  padding: 24px;
 
   flex-grow: 1;
   box-sizing: border-box;
@@ -36,10 +36,23 @@
   font-size: 12px;
   font-weight: 400;
   color: #4b5563;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+}
+.bookmarkBtnSave {
+  background: var(--color-royal-blue-darker);
+  border: 1px solid var(--opacity-transparent);
+  border-radius: 8px;
+  padding: 6px;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+}
+.bookmarksSavedIconSave {
+  fill: var(--color-white);
+  width: 24px;
+  height: 24px;
 }
 
-/* Абмежаванне для загалоўка: 2 радкі */
 .title {
   font-size: 18px;
   line-height: 1.3;
@@ -50,6 +63,7 @@
   -webkit-box-orient: vertical;
   line-clamp: 2;
   overflow: hidden;
+  margin-bottom: 8px;
 }
 
 /* Абмежаванне для апісання: 3 радкі */
@@ -62,12 +76,14 @@
   -webkit-box-orient: vertical;
   line-clamp: 3;
   overflow: hidden;
+  margin-bottom: 24px;
 }
 
 .authorMetaBlock {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .authorAvatar {
@@ -99,7 +115,7 @@
 .publishedDate {
   font-size: 13px;
   font-weight: 400;
-  margin-right: 16px;
+  margin-right: 8px;
 }
 
 .bookmarks {
@@ -112,12 +128,25 @@
   font-size: 13px;
   font-weight: 500;
 }
+.point {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 150%;
+  color: var(--color-scheme-1-text);
+  margin-right: 8px;
+}
+.bookmarksCountIcon {
+  width: 16px;
+  height: 16px;
+  fill: var(--color-neutral-darkest);
+}
 
 .actions {
   margin-top: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .viewButton {
@@ -179,11 +208,6 @@
   opacity: 0.8;
 }
 
-/* ======================================================== */
-/* 2. СТЫЛІ ДЛЯ СПАГАДЛІВАГА МАКЕТА GRID (.storiesGrid) */
-/* ======================================================== */
-
-/* Базавы макет (Mobile < 375px) - Гумовая вёрстка, 1 калонка */
 .storiesGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -194,7 +218,21 @@
   max-width: 100%;
 }
 
-/* 📱 Мабільны (375px - 767px) - Фіксаваная шырыня 375px */
+.bookmarksSavedIcon {
+  width: 24px;
+  height: 24px;
+  fill: var(--color-neutral-darkest);
+}
+.bookmarkBtn {
+  border: 1px solid var(--color-scheme-2-border);
+  border-radius: 8px;
+  padding: 6px;
+  width: 48px;
+  height: 48px;
+  background: var(--opacity-neutral-darkest-5);
+  cursor: pointer;
+}
+
 @media (min-width: 375px) and (max-width: 767px) {
   .storiesGrid {
     height: 500px;

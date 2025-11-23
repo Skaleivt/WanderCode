@@ -2,10 +2,40 @@
 
 import { cookies } from 'next/headers';
 import { api } from './api';
-import { Category, DetailedStory, StoriesResponse, Story } from '@/types/story';
+import {
+  // Category,
+  CategoryResponse,
+  DetailedStory,
+  StoriesResponse,
+  Story,
+} from '@/types/story';
 import { UserResponse } from '@/types/user';
 import { AxiosResponse } from 'axios';
-import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
+// import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
+export const getStoriesServer = async ({
+  page,
+  perPage,
+  filter,
+  sortField,
+  sortOrder,
+}: {
+  page?: number;
+  perPage?: number;
+  filter?: string;
+  sortField?: string;
+  sortOrder?: string;
+}) => {
+  const response = await api.get<StoriesResponse>(`/stories`, {
+    params: {
+      page,
+      perPage,
+      filter,
+      sortField,
+      sortOrder,
+    },
+  });
+  return response.data;
+};
 
 export const getServerCookies = async (): Promise<string> => {
   const cookieStore = await cookies();
@@ -162,16 +192,10 @@ export const getMeServer = async (
   }
 };
 
-export interface CategoryResponse {
-  status: number;
-  message: string;
-  data: Category[];
-}
-
 export async function fetchCategoriesServer(): Promise<CategoryResponse> {
   try {
-    const response = await api.get<CategoryResponse>(`/stories/categories`);
-    return response.data;
+    const { data } = await api.get<CategoryResponse>(`/stories/categories`);
+    return data;
   } catch (err) {
     throw err;
   }
@@ -192,7 +216,7 @@ export async function fetchStoryByIdServer(id: string): Promise<DetailedStory> {
 }
 
 interface OwnStoriesResponse {
-  stories: StoryWithStatus[];
+  stories: StoriesResponse;
   page: number;
   perPage: number;
   totalItems: number;

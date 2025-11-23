@@ -15,11 +15,7 @@ interface StoriesListProps {
   onToggleSuccess: (storyId: string, isAdding: boolean) => void;
 }
 
-const StoriesList: React.FC<StoriesListProps> = ({
-  stories,
-  onToggleSuccess,
-}) => {
-  // Выкарыстоўваем useMemo для дадатковай дэдуплікацыі і фільтрацыі
+const StoriesList = ({ stories, onToggleSuccess }: StoriesListProps) => {
   const uniqueStories = useMemo(() => {
     if (!stories || stories.length === 0) {
       return [];
@@ -28,9 +24,7 @@ const StoriesList: React.FC<StoriesListProps> = ({
     const uniqueMap = new Map<string, StoryWithStatus>();
 
     stories.forEach((story) => {
-      // Фільтруем null/undefined і тыя, у якіх няма _id
       if (story && story._id) {
-        // Гарантуем, што мы дадаем элемент, толькі калі яго яшчэ няма (дэдуплікацыя)
         if (!uniqueMap.has(story._id)) {
           uniqueMap.set(story._id, story);
         }
@@ -47,7 +41,6 @@ const StoriesList: React.FC<StoriesListProps> = ({
   return (
     <div className={styles['stories-list-grid']}>
       {uniqueStories.map((story) => {
-        // Выкарыстоўваем story._id як адзіны і ўпэўнены ключ
         return (
           <TravellersStoriesItem
             key={story._id}

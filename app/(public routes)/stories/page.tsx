@@ -3,12 +3,24 @@
 import React, { Suspense } from 'react';
 import Container from '@/components/Container/Container';
 import Loader from '@/components/Loader/Loader';
-import StoriesPageWrapper from '@/components/Stories/StoriesPageWrapper';
 import { Metadata } from 'next';
 import css from './StoriesPage.module.css';
-import CategoriesFilterControls from '@/components/Stories/StoriesFilterControls';
-import { fetchCategoriesServer } from '@/lib/api/serverApi';
-import { Category } from '@/types/story';
+import {
+  fetchAllStoriesServer,
+  fetchCategoriesServer,
+} from '@/lib/api/serverApi';
+
+import StoriesClient from '@/components/Stories/Stories.client';
+import { dehydrate, QueryClient } from '@tanstack/react-query';
+import { Story } from '@/types/story';
+
+type StoriesPage = {
+  data: {
+    data: Story[]; // масив сторіз
+    page: number; // номер сторінки
+    hasNextPage: boolean;
+  };
+};
 
 export const metadata: Metadata = {
   title: 'Всі Історії Мандрівників | WanderCode',
@@ -32,24 +44,33 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
-  let categories: Category[] = [];
+  const queryClient = new QueryClient();
 
-  try {
-    const categoriesData = await fetchCategoriesServer();
-    categories = categoriesData?.data || [];
-  } catch (error) {
-    console.error('Failed to fetch categories on server:', error);
-  }
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ['stories', undefined, 9],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchAllStoriesServer({ page: pageParam, perPage: 9 }),
+    getNextPageParam: (lastPage: StoriesPage) =>
+      lastPage.data.hasNextPage ? lastPage.data.page + 1 : undefined,
+    initialPageParam: 1,
+  });
+
+  const categories = await fetchCategoriesServer();
 
   return (
     <Container>
       <section className={css.section}>
         <div className={css.headerContentWrap}>
           <h1 className={css.heading}>Історії Мандрівників</h1>
-          <CategoriesFilterControls categories={categories} />
+
+          {/* <CategoriesFilterControls categories={categories} /> */}
         </div>
+        <StoriesClient
+          dehydratedState={dehydrate(queryClient)}
+          categories={categories}
+        />
         <Suspense fallback={<Loader />}>
-          <StoriesPageWrapper />
+          {/* <StoriesPageWrapper /> */}
         </Suspense>
       </section>
     </Container>

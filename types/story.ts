@@ -6,9 +6,13 @@ export interface Story {
   article: string;
   category: Category;
   ownerId: {
+    selectedStories: [];
+    default: [];
     _id: string;
     name: string;
-    avatarUrl: string;
+    avatarUrl?: string;
+    articlesAmount?: number;
+    description?: string;
   };
   date: string;
   favoriteCount: number;
@@ -22,9 +26,7 @@ export interface Story {
 }
 
 export interface StoriesResponse {
-  // Калі бэкэнд вяртае ўсё ўнутры поля 'data':
   data: {
-    // 🛑 ВЫПРАЎЛЕННЕ: Перайменоўваем 'items' у 'data'
     data: Story[];
     totalItems: number;
     totalPages: number;
@@ -48,6 +50,10 @@ export interface NewStory {
 export interface Category {
   _id: string;
   name: string;
+}
+
+export interface CategoryResponse {
+  data: Category[];
 }
 
 export interface DetailedStory {
