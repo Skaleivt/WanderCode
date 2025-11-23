@@ -65,7 +65,7 @@ export interface DetailedStory {
     _id: string;
     name: string;
   };
-  owner: {
+  ownerId: {
     _id: string;
     name: string;
     avatarUrl: string;

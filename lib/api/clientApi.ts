@@ -208,16 +208,12 @@ export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
   }
 };
 
-export const saveStory = async (id: string) => {
+export const saveStory = async (storyId: string) => {
   try {
-    const response = await api.post(`/stories/save/${id}`, {});
-    return response.data;
-  } catch (error: unknown) {
-    let message = 'Failed to save story';
-    if (error instanceof Error) {
-      message = error.message || message;
-    }
-    throw new Error(message);
+    const res = await api.post('/stories/saved', { storyId });
+    return res.data;
+  } catch (error) {
+    throw new Error('Failed to save story');
   }
 };
 

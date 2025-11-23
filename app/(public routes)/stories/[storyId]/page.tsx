@@ -1,5 +1,3 @@
-// app/(public routes)/stories/[storyId]/page.tsx
-
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchStoryByIdServer } from '@/lib/api/serverApi';
@@ -25,9 +23,7 @@ export async function generateMetadata({
   const storyId = awaitedParams.storyId?.trim();
 
   if (!storyId) {
-    return {
-      title: 'Сторінка не знайдена | WanderCode',
-    };
+    return { title: 'Сторінка не знайдена | WanderCode' };
   }
 
   let story: DetailedStory;
@@ -40,8 +36,7 @@ export async function generateMetadata({
     };
   }
 
-  // ... (астатні код generateMetadata)
-  const fullTitle = `${story.title} | Історія від ${story.owner.name} | WanderCode`;
+  const fullTitle = `${story?.title ?? 'Історія'} | Історія від ${story?.ownerId?.name ?? '–'} | WanderCode`;
   const canonicalUrl = `https://wander-code.vercel.app/stories/${storyId}`;
 
   return {
@@ -67,14 +62,11 @@ export async function generateMetadata({
     },
   };
 }
-
 export default async function StoryPage({ params }: PageProps) {
   const awaitedParams = await params;
   const storyId = awaitedParams.storyId?.trim();
 
-  if (!storyId) {
-    return notFound();
-  }
+  if (!storyId) return notFound();
 
   const queryClient = new QueryClient();
   try {
