@@ -4,8 +4,9 @@ import { AxiosError, isAxiosError } from 'axios';
 
 import { api } from '../../api';
 
+// ✅ ВЫПРАЎЛЕНЫ ІНТЭРФЕЙС
 interface RouteParams {
-  params: Promise<{ storyId: string }>;
+  params: { storyId: string };
 }
 
 function logErrorResponse(error: AxiosError) {
@@ -13,8 +14,12 @@ function logErrorResponse(error: AxiosError) {
   console.error('API Proxy Error Data:', error.response?.data);
 }
 
+// -----------------------------------------------------------
+// GET /api/stories/[storyId]
+// -----------------------------------------------------------
 export async function GET(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   if (!storyId) {
     return NextResponse.json(
@@ -24,7 +29,12 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   }
 
   try {
-    const res = await api.get(`/stories/${storyId}`);
+    const res = await api.get(`/stories/${storyId}`, {
+      // 💡 Перадача кукі для падтрымання сесіі/аўтарызацыі
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
@@ -40,17 +50,20 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(
       axiosError.response?.data || {
-        message: 'Server error during GET traveller profile',
+        message: 'Server error during GET story details',
       },
       { status: axiosError.response?.status || 500 }
     );
   }
 }
 
-// PATCH /api/stories/[storyId]
+// -----------------------------------------------------------
+// PATCH /api/stories/[storyId] (Патэнцыйнае абнаўленне/захаванне)
+// -----------------------------------------------------------
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
-  const cookieStore = await cookies();
+  // ✅ Выдалена 'await'
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   try {
     const formData = await req.formData();
@@ -80,10 +93,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   }
 }
 
+// -----------------------------------------------------------
 // DELETE /api/stories/[storyId]
+// -----------------------------------------------------------
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
-  const { storyId } = await params;
-  const cookieStore = await cookies();
+  // ✅ Выдалена 'await'
+  const { storyId } = params;
+  const cookieStore = cookies();
 
   try {
     const res = await api.delete(`/stories/${storyId}`, {

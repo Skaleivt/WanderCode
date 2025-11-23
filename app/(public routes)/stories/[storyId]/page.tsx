@@ -30,7 +30,7 @@ export async function generateMetadata({
     };
   }
 
-  let story: DetailedStory;
+  let story: DetailedStory | null = null;
   try {
     story = await fetchStoryByIdServer(storyId);
   } catch {
@@ -40,30 +40,50 @@ export async function generateMetadata({
     };
   }
 
-  // ... (астатні код generateMetadata)
-  const fullTitle = `${story.title} | Історія від ${story.owner.name} | WanderCode`;
-  const canonicalUrl = `https://wander-code.vercel.app/stories/${storyId}`;
+  if (!story) {
+    return {
+      title: 'Історія не знайдена | WanderCode',
+      description: 'Вибачте, запитана історія подорожі не знайдена.',
+    };
+  }
+
+  // Безпечні звернення до owner та img — використовуємо optional chaining і fallback
+  const ownerName =
+    story.owner?.name ?? story.ownerId?.name ?? 'Автор невідомий';
+  const titleText = story.title ?? 'Історія';
+  const descriptionText =
+    typeof story.article === 'string' && story.article.length > 0
+      ? story.article
+      : 'Історія подорожі';
+
+  const fullTitle = `${titleText} | Історія від ${ownerName} | WanderCode`;
+  const base =
+    process.env.NEXT_PUBLIC_BASE_URL ?? 'https://wander-code.vercel.app';
+  const canonicalUrl = `${base.replace(/\/$/, '')}/stories/${storyId}`;
+
+  const ogImages = [];
+  if (story.img && typeof story.img === 'string') {
+    ogImages.push({
+      url: story.img,
+      width: 1200,
+      height: 630,
+      alt: titleText,
+    });
+  }
 
   return {
     title: fullTitle,
-    description: story.article,
+    description: descriptionText,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
       title: fullTitle,
-      description: story.article,
+      description: descriptionText,
       url: canonicalUrl,
       siteName: 'WanderCode',
       type: 'article',
-      images: [
-        {
-          url: story.img,
-          width: 1200,
-          height: 630,
-          alt: story.title,
-        },
-      ],
+      images: ogImages,
     },
   };
 }
@@ -83,6 +103,7 @@ export default async function StoryPage({ params }: PageProps) {
       queryFn: () => fetchStoryByIdServer(storyId),
     });
   } catch {
+    console.log('Запитаний Story ID:', storyId);
     return notFound();
   }
 

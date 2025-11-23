@@ -21,12 +21,12 @@ export type ProfileProps = {
 };
 
 type TravellersStoriesItemProps = {
-  story: Story; // !!! ДАДАДЗЕНА ЎЛАСЦІВАСЦЬ ДЛЯ КАМУНІКАЦЫІ З БАЦЬКАМІ !!!
+  story: Story;
   onToggleSuccess: (storyId: string, isAdding: boolean) => void;
 };
 
 export default function TravellersStoriesItem({
-  story, // !!! УЛАСЦІВАСЦЬ ПРЫНЯТА ПРАЗ ДЭСТРУКТУРЫЗАЦЫЮ !!!
+  story,
   onToggleSuccess,
 }: TravellersStoriesItemProps) {
   const { isAuthenticated, user } = useAuthStore();
@@ -37,7 +37,7 @@ export default function TravellersStoriesItem({
     year: 'numeric',
   });
 
-  const [saved, setSaved] = useState(false); // перевірка користувача
+  const [saved, setSaved] = useState(false);
   useEffect(() => {
     if (isAuthenticated && user) {
       setSaved(user.selectedStories?.includes(story._id) ?? false);
@@ -60,8 +60,8 @@ export default function TravellersStoriesItem({
     },
     onSuccess: () => {
       setSaved((prev) => {
-        const newSavedState = !prev; // !!! ВЫКЛІК ФУНКЦЫІ БАЦЬКОЎСКАГА КАМПАНЕНТА !!!
-        // Паведамляем, што статус захавання змяніўся
+        const newSavedState = !prev;
+
         onToggleSuccess(story._id, newSavedState);
         return newSavedState;
       });
