@@ -1,8 +1,8 @@
 // app/(public routes)/stories/page.tsx
 
-import React, { Suspense } from 'react';
+import React from 'react';
 import Container from '@/components/Container/Container';
-import Loader from '@/components/Loader/Loader';
+
 import { Metadata } from 'next';
 import css from './StoriesPage.module.css';
 import {
@@ -62,16 +62,11 @@ export default async function StoriesPage() {
       <section className={css.section}>
         <div className={css.headerContentWrap}>
           <h1 className={css.heading}>Історії Мандрівників</h1>
-
-          {/* <CategoriesFilterControls categories={categories} /> */}
         </div>
         <StoriesClient
           dehydratedState={dehydrate(queryClient)}
           categories={categories}
         />
-        <Suspense fallback={<Loader />}>
-          {/* <StoriesPageWrapper /> */}
-        </Suspense>
       </section>
     </Container>
   );

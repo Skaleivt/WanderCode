@@ -182,7 +182,11 @@ function StoriesList({ categories }: { categories: CategoryResponse }) {
       )}
       {hasNextPage && (
         <div className={styles.loadMoreWrap}>
-          <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          <button
+            className={styles.loadMoreBtn}
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
             {isFetchingNextPage ? 'Завантаження...' : 'Переглянути ще'}
           </button>
         </div>
