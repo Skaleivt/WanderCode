@@ -2,12 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  fetchAllStoriesClient,
-  getMe,
-  addStoryToSaved,
-  removeStoryFromSaved,
-} from '@/lib/api/clientApi';
+import { fetchAllStoriesClient, getMe } from '@/lib/api/clientApi';
 import Link from 'next/link';
 
 import css from './PopularSection.module.css';
@@ -30,6 +25,7 @@ interface UserDataResponse {
   selectedStories: string[];
 }
 
+// Канстанта для запыту
 const INITIAL_REQUEST_COUNT = 4;
 
 export default function PopularSectionClient({
@@ -38,9 +34,7 @@ export default function PopularSectionClient({
   sortField,
   sortOrder,
 }: PopularClientProps) {
-  const [selectedStories, setSelectedStories] = useState<string[]>(
-    initialUser ?? []
-  );
+  // const queryClient = useQueryClient();
 
   const [stories] = useState<Story[]>(initialData.data.data ?? []);
   const [hasNextPage] = useState(initialData.data.hasNextPage ?? false);
@@ -65,32 +59,37 @@ export default function PopularSectionClient({
     enabled: false,
   });
 
-  const onToggleSuccess = async (
-    storyId: string,
-    isCurrentlySaved: boolean
-  ) => {
-    try {
-      if (isCurrentlySaved) {
-        await removeStoryFromSaved(storyId);
-        setSelectedStories((prev) => prev.filter((id) => id !== storyId));
-      } else {
-        await addStoryToSaved(storyId);
-        setSelectedStories((prev) =>
-          prev.includes(storyId) ? prev : [...prev, storyId]
-        );
-      }
-    } catch (err) {
-      console.error('Failed to toggle saved story', err);
-    }
-  };
+  const selectedStories = userData?.selectedStories ?? [];
 
-  const effectiveSelectedStories = userData?.selectedStories ?? selectedStories;
+  // const updateSelectedStories = useCallback(
+  //   (storyId: string, isAdding: boolean) => {
+  //     queryClient.setQueryData<UserDataResponse | undefined>(
+  //       ['user'],
+  //       (prevData) => {
+  //         if (!prevData) return prevData;
+
+  //         let newSelectedStories;
+  //         if (isAdding) {
+  //           newSelectedStories = prevData.selectedStories.includes(storyId)
+  //             ? prevData.selectedStories
+  //             : [...prevData.selectedStories, storyId];
+  //         } else {
+  //           newSelectedStories = prevData.selectedStories.filter(
+  //             (id) => id !== storyId
+  //           );
+  //         }
+  //         return { ...prevData, selectedStories: newSelectedStories };
+  //       }
+  //     );
+  //   },
+  //   [queryClient]
+  // );
 
   return (
     <div className={css.section}>
       <ul className={css.list}>
         {stories.map((story) => {
-          const isStorySaved = effectiveSelectedStories.includes(story._id);
+          const isStorySaved = selectedStories.includes(story._id);
           const storyWithStatus: StoryWithSaveStatus = {
             ...story,
             isFavorite: isStorySaved,
@@ -98,12 +97,7 @@ export default function PopularSectionClient({
 
           return (
             <li key={story._id} className={css.listItem}>
-              <TravellersStoriesItem
-                story={storyWithStatus}
-                onToggleSuccess={(id: string, currentlySaved: boolean) =>
-                  onToggleSuccess(id, currentlySaved)
-                }
-              />
+              <TravellersStoriesItem story={storyWithStatus} />
             </li>
           );
         })}

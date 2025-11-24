@@ -21,18 +21,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-
-  // Proxy client /api requests to your Express backend in development
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: process.env.BACKEND_URL
-          ? `${process.env.BACKEND_URL}/api/:path*`
-          : 'http://localhost:3000/api/:path*',
-      },
-    ];
-  },
 };
 
 export default nextConfig;

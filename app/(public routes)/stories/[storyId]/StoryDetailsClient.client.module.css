@@ -77,10 +77,8 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
-  border-radius: 24px;
-  /* закруглення */
-  overflow: hidden;
-  /* щоб внутрішнє <img> теж було закруглене */
+  border-radius: 24px; /* закруглення */
+  overflow: hidden; /* щоб внутрішнє <img> теж було закруглене */
 }
 
 .infoBlock {
@@ -182,16 +180,10 @@
 
   margin-top: 96px;
 }
-
 .leftBlock {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.authorMeta {
-  display: flex;
-  gap: 8px;
 }
 
 /* ==== RESPONSIVE ==== */
@@ -208,7 +200,6 @@
 
     width: 100%;
   }
-
   .leftBlock {
     display: flex;
     flex-direction: row;
@@ -243,7 +234,6 @@
     align-items: center;
     text-align: center;
   }
-
   .stories {
     font-size: 44px;
   }
@@ -286,7 +276,6 @@
     justify-content: space-between;
     margin-top: 96px;
   }
-
   .stories {
     font-size: 52px;
   }

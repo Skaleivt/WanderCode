@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const nextUrl = request.nextUrl.searchParams.get('next') || '/';
 
     if (!refreshToken || !sessionId) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      return NextResponse.redirect(new URL('/sign-in', request.url));
     }
 
     const apiRes = await api.post('/auth/refresh', null, {
@@ -50,11 +50,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL(nextUrl, request.url));
   } catch {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
-}
-export async function POST(request: NextRequest) {
-  // Паколькі логіка абнаўлення токена ў вас аднолькавая,
-  // і вы проста чытаеце кукі, можна выкарыстоўваць GET-логіку.
-  return GET(request);
 }

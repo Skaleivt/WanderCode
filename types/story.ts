@@ -65,16 +65,10 @@ export interface DetailedStory {
     _id: string;
     name: string;
   };
-  // Keep both shapes to be tolerant to backend shape:
-  owner?: {
+  owner: {
     _id: string;
     name: string;
-    avatarUrl?: string;
-  };
-  ownerId?: {
-    _id: string;
-    name: string;
-    avatarUrl?: string;
+    avatarUrl: string;
   };
   date: string;
   favoriteCount: number;

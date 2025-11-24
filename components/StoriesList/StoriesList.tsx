@@ -12,14 +12,9 @@ export interface StoryWithStatus extends Story {
 
 interface StoriesListProps {
   stories: (StoryWithStatus | null | undefined)[];
-  // made optional so the component can be used without a parent-provided handler
-  onToggleSuccess?: (storyId: string, isAdding: boolean) => void;
 }
 
-const StoriesList = ({
-  stories,
-  onToggleSuccess = () => {},
-}: StoriesListProps) => {
+const StoriesList = ({ stories }: StoriesListProps) => {
   const uniqueStories = useMemo(() => {
     if (!stories || stories.length === 0) {
       return [];
@@ -45,13 +40,7 @@ const StoriesList = ({
   return (
     <div className={styles['stories-list-grid']}>
       {uniqueStories.map((story) => {
-        return (
-          <TravellersStoriesItem
-            key={story._id}
-            story={story}
-            onToggleSuccess={onToggleSuccess}
-          />
-        );
+        return <TravellersStoriesItem key={story._id} story={story} />;
       })}
     </div>
   );
