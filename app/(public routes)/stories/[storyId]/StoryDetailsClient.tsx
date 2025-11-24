@@ -1,15 +1,16 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchStoryById, saveStory } from '@/lib/api/clientApi';
-import css from './StoryDetailsClient.client.module.css';
+import { fetchStoryById, addStoryToSaved } from '@/lib/api/clientApi';
 import { DetailedStory } from '@/types/story';
 import Loader from '@/components/Loader/Loader';
-import { toast } from 'react-toastify';
 import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { getCategories } from '@/lib/api/categories';
+import { toast } from 'react-toastify';
+import css from './StoryDetailsClient.client.module.css';
+import { useAuthStore } from '@/lib/store/authStore';
+import { useRouter } from 'next/navigation';
 
 interface PageParams {
   storyId: string;
@@ -18,7 +19,6 @@ interface PageParams {
 export function StoryDetailsClient({ storyId }: PageParams) {
   const queryClient = useQueryClient();
   const [imgSrc, setImgSrc] = useState<string>('/file.svg');
-  const [categoryName, setCategoryName] = useState<string>('–');
 
   const {
     data: story,
@@ -27,7 +27,6 @@ export function StoryDetailsClient({ storyId }: PageParams) {
   } = useQuery<DetailedStory, Error>({
     queryKey: ['story', storyId],
     queryFn: () => fetchStoryById(storyId),
-
     initialData: () =>
       queryClient.getQueryData<DetailedStory>(['story', storyId]),
     enabled: !!storyId,
@@ -37,46 +36,29 @@ export function StoryDetailsClient({ storyId }: PageParams) {
     if (story?.img) setImgSrc(story.img);
   }, [story]);
 
-  useEffect(() => {
-    if (!story?.category?._id) return;
-
-    console.log(
-      'Fetching categories for story category _id:',
-      story.category._id
-    );
-
-    getCategories()
-      .then((apiCategories) => {
-        console.log('API categories received:', apiCategories);
-
-        const categories: { _id: string; name: string }[] = apiCategories.map(
-          (c) => ({
-            _id: c._id,
-            name: c.name,
-          })
-        );
-
-        const cat = categories.find((c) => c._id === story.category._id);
-        console.log('Matched category:', cat);
-
-        setCategoryName(cat?.name ?? '–');
-      })
-      .catch((err) => {
-        console.error('Failed to fetch categories:', err);
-        setCategoryName('–');
-      });
-  }, [story]);
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const mutation = useMutation({
-    mutationFn: () => saveStory(storyId),
+    mutationFn: () => addStoryToSaved(storyId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['story', storyId] });
       toast.success('Історія збережена!');
+      queryClient.invalidateQueries({ queryKey: ['story', storyId] });
+      queryClient.invalidateQueries({ queryKey: ['savedStories'] }); // оновлюємо список збережених
     },
     onError: () => {
       toast.error('Не вдалося зберегти історію');
     },
   });
+
+  const handleSave = () => {
+    if (!isAuthenticated) {
+      toast.info('Будь ласка, увійдіть, щоб зберегти історію');
+      router.push('/auth/login');
+      return;
+    }
+    mutation.mutate();
+  };
 
   if (isLoading) return <Loader />;
 
@@ -97,7 +79,7 @@ export function StoryDetailsClient({ storyId }: PageParams) {
         <div className={css.leftBlock}>
           <p className={css.data}>
             <span className={css.label}>Автор статті:</span>
-            <span className={css.value}>{story.owner?.name ?? '–'}</span>
+            <span className={css.value}>{story.ownerId?.name ?? '–'}</span>
           </p>
           <p className={css.data}>
             <span className={css.label}>Опубліковано:</span>
@@ -107,7 +89,7 @@ export function StoryDetailsClient({ storyId }: PageParams) {
           </p>
         </div>
         <p className={css.country}>
-          <span className={css.value}>{categoryName}</span>
+          <span className={css.value}>{story.category?.name ?? '–'}</span>
         </p>
       </div>
 
@@ -117,9 +99,8 @@ export function StoryDetailsClient({ storyId }: PageParams) {
       >
         <Image
           src={imgSrc}
-          alt={story.title}
+          alt={story.title ? `Image for story: ${story.title}` : 'Story image'}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
           onError={() => setImgSrc('/file.svg')}
           unoptimized
@@ -136,7 +117,7 @@ export function StoryDetailsClient({ storyId }: PageParams) {
           </p>
           <button
             className={css.saveButton}
-            onClick={() => mutation.mutate()}
+            onClick={handleSave}
             disabled={mutation.isPending}
           >
             {mutation.isPending ? 'Зберігаємо...' : 'Зберегти'}
