@@ -32,6 +32,8 @@ export interface AddStoryFormValues {
   // shortDesc?: string;
   description: string;
 }
+// ❗ єдиний ліміт для title – поміняй число під swagger
+const MAX_TITLE_LENGTH = 100;
 // ---- Валідація
 const schema = Yup.object({
   cover: Yup.mixed<File>()
@@ -42,7 +44,7 @@ const schema = Yup.object({
   title: Yup.string()
     .trim()
     .min(3, 'мін. 3 символи')
-    .max(100, 'макс. 100')
+    .max(MAX_TITLE_LENGTH, `макс. ${MAX_TITLE_LENGTH} символів`)
     .required('Обовʼязково'),
   category: Yup.string().required('оберіть категорію'),
   description: Yup.string()
@@ -64,8 +66,14 @@ type ApiError = Error & {
   status?: number;
   response?: {
     status: number;
-    data: unknown;
+    data: ApiErrorResponse;
   };
+};
+type ApiErrorResponse = {
+  status?: number;
+  message?: string;
+  details?: string | string[];
+  data?: string | string[] | null;
 };
 
 export default function AddStoryForm() {
@@ -91,6 +99,22 @@ export default function AddStoryForm() {
     },
     onError: (err: ApiError) => {
       const status = err?.response?.status || err?.status;
+      const payload = err.response?.data;
+    if (status === 400) {
+    const rawDetails =
+      payload?.data ??
+      payload?.details ??
+      payload?.message ??
+      'Некоректні дані. Перевірте заповнені поля.';
+
+    const text = Array.isArray(rawDetails)
+      ? rawDetails.join('\n')
+      : String(rawDetails);
+
+    showErrorToast(text);
+    return;
+  }
+
 
       if (status === 401 || status === 403) {
         setErrorOpen(true);
@@ -193,7 +217,7 @@ export default function AddStoryForm() {
                     <span className={styles.label}>Заголовок</span>
                     <Field
                       name="title"
-                      maxLength={100}
+                      maxLength={MAX_TITLE_LENGTH} 
                       placeholder="Введіть заголовок історії"
                     />
                     <ErrorMessage
