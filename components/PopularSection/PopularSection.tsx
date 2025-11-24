@@ -9,7 +9,7 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { StoriesResponse } from '@/types/story';
-
+import ClientQueryProvider from '../QueryClientProvider/QueryClientProvider';
 interface UserResponse {
   selectedStories: string[];
 }
@@ -68,12 +68,14 @@ export default async function PopularSection({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PopularSectionClient
-        initialData={initialData}
-        initialUser={initialUserData?.selectedStories}
-        sortField={sortField}
-        sortOrder={sortOrder}
-      />
+      <ClientQueryProvider>
+        <PopularSectionClient
+          initialData={initialData}
+          initialUser={initialUserData?.selectedStories}
+          sortField={sortField}
+          sortOrder={sortOrder}
+        />
+      </ClientQueryProvider>
     </HydrationBoundary>
   );
 }

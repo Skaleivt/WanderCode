@@ -1,10 +1,90 @@
 // lib/api/clientApi.ts
 import { User } from '@/types/user';
-import { api } from './api';
 import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
-import axios, { AxiosError } from 'axios';
+
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 export type { StoriesResponse, Story, DetailedStory, Category };
+
+// Axios instance that uses relative '/api' path (proxied by Next)
+export const api = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+});
+
+// ---- Types for queue and request with retry flag ----
+type QueueItem = {
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
+};
+
+type AxiosRequestWithRetry = AxiosRequestConfig & {
+  _retry?: boolean;
+};
+
+// ---- Refresh queue handling ----
+let isRefreshing = false;
+let failedQueue: QueueItem[] = [];
+
+const processQueue = (error: unknown, token?: unknown) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
+// ---- Axios interceptor: if 401, try to refresh and retry original request ----
+// Note: when calling refresh we use the global axios (not `api`) to avoid triggering this same interceptor.
+api.interceptors.response.use(
+  (response) => response,
+  async (err: unknown) => {
+    // Narrow unknown to AxiosError only after checking with axios.isAxiosError
+    if (!axios.isAxiosError(err)) {
+      return Promise.reject(err);
+    }
+
+    const error = err as AxiosError;
+    const originalRequest = error?.config as AxiosRequestWithRetry | undefined;
+
+    if (!error?.response || error.response.status !== 401 || !originalRequest) {
+      return Promise.reject(error);
+    }
+
+    if (originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    if (isRefreshing) {
+      // queue the request until refresh finished
+      return new Promise<unknown>((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then(() => api(originalRequest))
+        .catch((e) => Promise.reject(e));
+    }
+
+    isRefreshing = true;
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Use global axios to perform refresh so it does not go through this interceptor again
+        await axios.post('/api/auth/refresh', null, { withCredentials: true });
+        processQueue(null, true);
+        resolve(api(originalRequest));
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    });
+  }
+);
+
+// ---- API wrappers / helpers ----
 
 export type StoriesPage = {
   stories: Story[];
@@ -133,7 +213,8 @@ export const getMe = async () => {
 
 export const checkSession = async (): Promise<boolean> => {
   try {
-    const res = await api.post('/auth/refresh', {
+    // Use global axios for refresh on client to avoid accidental interceptor loops
+    const res = await axios.post('/api/auth/refresh', null, {
       withCredentials: true,
     });
     return res.status === 200;
@@ -195,14 +276,18 @@ export const fetchUserById = async (id: string): Promise<User> => {
 
 export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
   try {
-    const response = await api.get(`/stories/${id}`);
-    return response.data.data;
-  } catch (error) {
-    console.error('fetchStoryByIdServer error:', error);
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      throw new Error('Story Not Found (404)');
+    const res = await fetch(`/api/stories/${id}`);
+
+    if (!res.ok) {
+      throw new Error(`Failed to load story: ${res.status}`);
     }
-    throw new Error('Failed to load story (SSR)');
+
+    const jsonRes = await res.json();
+
+    return jsonRes.data;
+  } catch (error) {
+    console.error('fetchStoryById error:', error);
+    throw new Error('Failed to load story (Client)');
   }
 };
 
