@@ -1,5 +1,4 @@
 // app/(public routes)/stories/[storyId]/page.tsx
-
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { fetchStoryByIdServer } from '@/lib/api/serverApi';
@@ -30,7 +29,7 @@ export async function generateMetadata({
     };
   }
 
-  let story: DetailedStory;
+  let story: DetailedStory | null = null;
   try {
     story = await fetchStoryByIdServer(storyId);
   } catch {
@@ -40,30 +39,47 @@ export async function generateMetadata({
     };
   }
 
-  // ... (астатні код generateMetadata)
-  const fullTitle = `${story.title} | Історія від ${story.owner.name} | WanderCode`;
+  if (!story) {
+    return {
+      title: 'Історія не знайдена | WanderCode',
+    };
+  }
+
+  const ownerName = story.owner?.name ?? 'Невідомий автор';
+  const storyTitle = story.title ?? 'Історія без назви';
+  const articleExcerpt =
+    typeof story.article === 'string' && story.article.length
+      ? story.article
+      : undefined;
+
+  const fullTitle = `${storyTitle} | Історія від ${ownerName} | WanderCode`;
   const canonicalUrl = `https://wander-code.vercel.app/stories/${storyId}`;
+
+  const images =
+    story.img && typeof story.img === 'string' && story.img.length
+      ? [
+          {
+            url: story.img,
+            width: 1200,
+            height: 630,
+            alt: storyTitle,
+          },
+        ]
+      : undefined;
 
   return {
     title: fullTitle,
-    description: story.article,
+    description: articleExcerpt,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
       title: fullTitle,
-      description: story.article,
+      description: articleExcerpt,
       url: canonicalUrl,
       siteName: 'WanderCode',
       type: 'article',
-      images: [
-        {
-          url: story.img,
-          width: 1200,
-          height: 630,
-          alt: story.title,
-        },
-      ],
+      images,
     },
   };
 }
