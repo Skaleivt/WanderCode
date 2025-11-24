@@ -1,9 +1,7 @@
 // lib/api/clientApi.ts
-'use client';
 import { User } from '@/types/user';
 import { api } from './api';
 import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
-
 import axios, { AxiosError } from 'axios';
 
 export type { StoriesResponse, Story, DetailedStory, Category };
@@ -233,3 +231,60 @@ export const fetchAllCategories = async (): Promise<Category[]> => {
     throw error;
   }
 };
+
+export interface OwnStoriesProp {
+  page: number;
+  perPage: number;
+  filter: string;
+}
+
+export const fetchOwnStoriesClient = async ({
+  page,
+  perPage,
+  filter,
+}: OwnStoriesProp) => {
+  try {
+    const res = await api.get<StoriesResponse>('/stories', {
+      params: {
+        page,
+        perPage,
+        ownerId: filter,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export interface SavedStoriesProp {
+  page: number;
+  perPage: number;
+}
+
+export interface OwnStoriesResponse {
+  stories: Story[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface SavedStoriesResponse {
+  data: OwnStoriesResponse;
+}
+export async function fetchOwnStories({ page, perPage }: SavedStoriesProp) {
+  try {
+    const res = await api.get<SavedStoriesResponse>('/stories/saved', {
+      params: {
+        page,
+        perPage,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}

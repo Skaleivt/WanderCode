@@ -1,0 +1,45 @@
+.storyList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+}
+.loadMoreBtn {
+  border: 1px solid var(--color-royal-blue);
+  border-radius: 8px;
+  padding-block: 6px;
+  padding-inline: 12px;
+  min-width: 335px;
+  height: 48px;
+  background: var(--color-royal-blue);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--color-white);
+}
+@media (min-width: 768px) {
+  .storyList {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .storyItem {
+    max-width: 340px;
+  }
+  .loadMoreBtn {
+    min-width: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .storyItem {
+    max-width: 421px;
+  }
+  .loadMoreBtn {
+    font-size: 18px;
+  }
+}

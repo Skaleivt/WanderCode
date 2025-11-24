@@ -11,6 +11,7 @@ import {
 } from '@/types/story';
 import { UserResponse } from '@/types/user';
 import { AxiosResponse } from 'axios';
+import { OwnStoriesProp } from './clientApi';
 // import { StoryWithStatus } from '@/components/StoriesList/StoriesList';
 export const getStoriesServer = async ({
   page,
@@ -84,6 +85,27 @@ async function executeStoriesRequest({
   });
 
   return response.data;
+}
+export async function fetchMyStoriesServer({
+  page,
+  perPage,
+  filter,
+}: OwnStoriesProp) {
+  try {
+    const res = await api.get<StoriesResponse>('/stories', {
+      params: {
+        page,
+        perPage,
+        ownerId: filter,
+      },
+      headers: {
+        Cookie: await getServerCookies(),
+      },
+    });
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function fetchAllStoriesServer({
@@ -223,16 +245,4 @@ export interface OwnStoriesResponse {
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
-}
-
-export async function fetchOwnStories(): Promise<OwnStoriesResponse> {
-  const res = await api.get('/stories/saved', {
-    headers: { Cookie: await getServerCookies() },
-  });
-
-  const payload = res.data?.data;
-
-  return {
-    ...payload,
-  };
 }

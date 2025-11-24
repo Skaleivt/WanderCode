@@ -5,18 +5,12 @@ import { isAxiosError } from 'axios';
 import { api } from '../api';
 import { logErrorResponse } from '../../../lib/api/api';
 
-/**
- * Мы вызначаем інтэрфейс, які гарантуе наяўнасць getAll(),
- * каб пазбегнуць выкарыстання 'any' (для ESLint).
- */
 interface CookieStoreWithGetAll {
   getAll: () => Array<{ name: string; value: string }>;
 }
 
 export async function GET(request: NextRequest) {
   try {
-    // ✅ КРЫТЫЧНАЕ ВЫПРАЎЛЕННЕ: Дадаем await для вырашэння памылкі выканання Next.js,
-    // а затым прыводзім тып, каб забяспечыць доступ да .getAll() без памылак тыпізацыі.
     const cookieStore = (await cookies()) as unknown as CookieStoreWithGetAll;
 
     const page = Number(request.nextUrl.searchParams.get('page') ?? 1);

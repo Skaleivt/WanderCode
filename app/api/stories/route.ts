@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
     const rawCategory = request.nextUrl.searchParams.get('category');
     const category =
       !rawCategory || rawCategory === 'undefined' ? undefined : rawCategory;
-
+    const rawOwnerId = request.nextUrl.searchParams.get('ownerId');
+    const ownerId =
+      !rawOwnerId || rawOwnerId === 'undefined' ? undefined : rawOwnerId;
     const sortField =
       request.nextUrl.searchParams.get('sortField') ?? undefined;
     const sortOrder =
@@ -23,6 +25,7 @@ export async function GET(request: NextRequest) {
         page,
         perPage,
         category,
+        ownerId,
         sortField,
         sortOrder,
       },

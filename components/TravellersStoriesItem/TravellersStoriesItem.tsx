@@ -107,7 +107,7 @@ export default function TravellersStoriesItem({
               <span className={styles.point}>•</span>
               <span className={styles.bookmarks}>
                 <span className={styles.bookmarksCount}>
-                  {story.favoriteCount}
+                  {story.favoriteCount || 0}
                 </span>
                 <svg className={styles.bookmarksCountIcon}>
                   <use href="/symbol-defs.svg#icon-bookmark"></use>

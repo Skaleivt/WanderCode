@@ -1,22 +1,14 @@
 export const dynamic = 'force-dynamic';
 import Container from '@/components/Container/Container';
-import MessageNoStories from '@/components/MessageNoStories/MessageNoStories';
 import TravellerInfo from '@/components/Travellers/TravellerInfo/TravellerInfo';
-import TravellersStories from '@/components/TravellersStories/TravellersStories';
 import css from './ProfilePage.module.css';
-
-import {
-  fetchAllStoriesServer,
-  fetchOwnStories,
-  getMeServer,
-  OwnStoriesResponse,
-} from '@/lib/api/serverApi';
+import { getMeServer } from '@/lib/api/serverApi';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { User } from '@/types/user';
 import { toast } from 'react-toastify';
-import TravellersStoriesItem from '@/components/TravellersStoriesItem/TravellersStoriesItem';
-import { Story } from '@/types/story';
+import ProfileOwnPage from './ProfileOwnPage.client';
+import ProfileSavedPage from './ProfileSavedPage.client';
 
 type PageProps = {
   params: Promise<{ pageType: string }>;
@@ -37,30 +29,8 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
   const user: User = userResponse.data;
+
   const filter = user._id;
-  const stories = await fetchAllStoriesServer({ filter });
-
-  const ownStories =
-    stories && stories.data
-      ? stories
-      : {
-          data: {
-            data: [],
-
-            totalItems: 0,
-            totalPages: 1,
-            currentPage: 1,
-            hasNextPage: false,
-            page: 1,
-            perPage: 9,
-            hasPreviousPage: false,
-          },
-        };
-  const isStories = ownStories.data.totalItems > 0;
-
-  const savedStories: OwnStoriesResponse = await fetchOwnStories();
-
-  const isMyStories = savedStories.totalItems > 0;
 
   return (
     <Container>
@@ -81,33 +51,9 @@ export default async function ProfilePage({ params }: PageProps) {
           </ul>
         </div>
         {pageType === 'saved' ? (
-          <div>
-            {isMyStories ? (
-              savedStories.stories.map((story: Story) => (
-                <TravellersStoriesItem key={story._id} story={story} />
-              ))
-            ) : (
-              <MessageNoStories
-                text={
-                  'У вас ще немає збережених історій, мершій збережіть вашу першу історію!'
-                }
-                buttonText={'До історій'}
-              />
-            )}
-          </div>
+          <ProfileSavedPage />
         ) : (
-          <div>
-            {isStories ? (
-              <TravellersStories initialStories={ownStories} filter={filter} />
-            ) : (
-              <MessageNoStories
-                text={
-                  'Ви ще нічого не публікували, поділіться своєю першою історією!'
-                }
-                buttonText={'Опублікувати історію'}
-              />
-            )}
-          </div>
+          <ProfileOwnPage filter={filter} />
         )}
       </div>
     </Container>
