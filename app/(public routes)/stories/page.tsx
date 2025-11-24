@@ -1,8 +1,6 @@
 // app/(public routes)/stories/page.tsx
 
 import React from 'react';
-import Container from '@/components/Container/Container';
-
 import { Metadata } from 'next';
 import css from './StoriesPage.module.css';
 import {
@@ -16,8 +14,8 @@ import { Story } from '@/types/story';
 
 type StoriesPage = {
   data: {
-    data: Story[]; // масив сторіз
-    page: number; // номер сторінки
+    data: Story[];
+    page: number;
     hasNextPage: boolean;
   };
 };
@@ -58,16 +56,14 @@ export default async function StoriesPage() {
   const categories = await fetchCategoriesServer();
 
   return (
-    <Container>
-      <section className={css.section}>
-        <div className={css.headerContentWrap}>
-          <h1 className={css.heading}>Історії Мандрівників</h1>
-        </div>
-        <StoriesClient
-          dehydratedState={dehydrate(queryClient)}
-          categories={categories}
-        />
-      </section>
-    </Container>
+    <section className={css.section}>
+      <div className={css.headerContentWrap}>
+        <h1 className={css.heading}>Історії Мандрівників</h1>
+      </div>
+      <StoriesClient
+        dehydratedState={dehydrate(queryClient)}
+        categories={categories}
+      />
+    </section>
   );
 }

@@ -5,9 +5,8 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import styles from './Header.module.css';
 import { MobileMenu } from './MobileMenu';
-
-import AuthNavigation from '../AuthNavigation/AuthNavigation';
 import Container from '../Container/Container';
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
 import { useAuthStore } from '@/lib/store/authStore';
 
 export default function Header() {
@@ -39,8 +38,8 @@ export default function Header() {
   }, [isMenuOpen, isLoginOpen, isRegisterOpen]);
 
   return (
-    <Container>
-      <header className={styles.header}>
+    <header className={styles.header}>
+      <Container>
         <div className={styles.container}>
           <Link href="/" className={styles.logo}>
             <svg
@@ -100,7 +99,7 @@ export default function Header() {
             />,
             document.body
           )}
-      </header>
-    </Container>
+      </Container>
+    </header>
   );
 }
