@@ -50,15 +50,24 @@ export async function getMyStories(
   return data;
 }
 
-export async function createStory(values: AddStoryFormValues) {
+type CreateStoryResponse = {
+  message: string;
+  data: Story;
+};
+
+export async function createStory(values: AddStoryFormValues):Promise<Story> {
   const form = new FormData();
   if (values.cover) form.append('cover', values.cover);
   form.append('title', values.title);
   form.append('category', values.category);
   form.append('description', values.description);
-  const res = await api.post('/stories', form);
-  return res.data;
+  // const res = await api.post('/stories', form);
+  // return res.data;
+   const { data } = await api.post<CreateStoryResponse>('/stories', form);
+  // повертаємо саме story
+  return data.data;
 }
+
 // Get one story for form prefill (Edit)
 export async function getStoryById(storyId: string): Promise<Story> {
   const { data } = await api.get(`/stories/${storyId}`);
