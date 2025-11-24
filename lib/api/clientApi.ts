@@ -1,9 +1,9 @@
 // lib/api/clientApi.ts
 'use client';
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
-
 import { User } from '@/types/user';
 import { StoriesResponse, Story, DetailedStory, Category } from '@/types/story';
+
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 export type { StoriesResponse, Story, DetailedStory, Category };
 
@@ -36,6 +36,7 @@ const processQueue = (error: unknown, token?: unknown) => {
 };
 
 // ---- Axios interceptor: if 401, try to refresh and retry original request ----
+// Note: when calling refresh we use the global axios (not `api`) to avoid triggering this same interceptor.
 api.interceptors.response.use(
   (response) => response,
   async (err: unknown) => {
@@ -70,8 +71,8 @@ api.interceptors.response.use(
 
     return new Promise(async (resolve, reject) => {
       try {
-        // POST /auth/refresh without body; credentials passed automatically
-        await api.post('/auth/refresh', null, { withCredentials: true });
+        // Use global axios to perform refresh so it does not go through this interceptor again
+        await axios.post('/api/auth/refresh', null, { withCredentials: true });
         processQueue(null, true);
         resolve(api(originalRequest));
       } catch (refreshError) {
@@ -213,7 +214,8 @@ export const getMe = async () => {
 
 export const checkSession = async (): Promise<boolean> => {
   try {
-    const res = await api.post('/auth/refresh', null, {
+    // Use global axios for refresh on client to avoid accidental interceptor loops
+    const res = await axios.post('/api/auth/refresh', null, {
       withCredentials: true,
     });
     return res.status === 200;
@@ -315,3 +317,60 @@ export const fetchAllCategories = async (): Promise<Category[]> => {
     throw error;
   }
 };
+
+export interface OwnStoriesProp {
+  page: number;
+  perPage: number;
+  filter: string;
+}
+
+export const fetchOwnStoriesClient = async ({
+  page,
+  perPage,
+  filter,
+}: OwnStoriesProp) => {
+  try {
+    const res = await api.get<StoriesResponse>('/stories', {
+      params: {
+        page,
+        perPage,
+        ownerId: filter,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export interface SavedStoriesProp {
+  page: number;
+  perPage: number;
+}
+
+export interface OwnStoriesResponse {
+  stories: Story[];
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface SavedStoriesResponse {
+  data: OwnStoriesResponse;
+}
+export async function fetchOwnStories({ page, perPage }: SavedStoriesProp) {
+  try {
+    const res = await api.get<SavedStoriesResponse>('/stories/saved', {
+      params: {
+        page,
+        perPage,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
