@@ -82,22 +82,55 @@ export const fetchStoriesPage = async ({
     ...(sortOrder && { sortOrder }),
   }).toString();
 
-  const res = await fetch(`/api/stories?${params}`);
-  if (!res.ok) throw new Error('Failed to load stories');
+  const url = `/api/stories?${params}`;
 
-  const fullResponse: StoriesResponse = await res.json();
-  const paginationData = fullResponse.data;
+  try {
+    console.log('fetchStoriesPage -> URL:', url);
+    const res = await fetch(url);
 
-  return {
-    stories: paginationData.data,
-    totalItems: paginationData.totalItems,
-    totalPages: paginationData.totalPages,
-    currentPage: paginationData.page,
-    nextPage:
-      paginationData.page < paginationData.totalPages
-        ? paginationData.page + 1
-        : undefined,
-  };
+    console.log('fetchStoriesPage -> status:', res.status, res.statusText);
+
+    // Якщо не OK — виводимо тіло відповіді (text) для діагностики
+    if (!res.ok) {
+      const text = await res.text().catch(() => '[could not read body]');
+      console.error('fetchStoriesPage -> non-ok response body:', text);
+      throw new Error('Failed to load stories');
+    }
+
+    // Спробуємо розпарсити JSON і логнути перші ключі
+    const fullResponse: StoriesResponse = await res.json();
+    console.log(
+      'fetchStoriesPage -> response JSON keys:',
+      Object.keys(fullResponse || {})
+    );
+    console.log('fetchStoriesPage -> response preview:', {
+      data: fullResponse?.data
+        ? {
+            page: fullResponse.data.page,
+            totalPages: fullResponse.data.totalPages,
+            totalItems: fullResponse.data.totalItems,
+            sampleItem:
+              (fullResponse.data.data && fullResponse.data.data[0]) || null,
+          }
+        : null,
+    });
+
+    const paginationData = fullResponse.data;
+
+    return {
+      stories: paginationData.data,
+      totalItems: paginationData.totalItems,
+      totalPages: paginationData.totalPages,
+      currentPage: paginationData.page,
+      nextPage:
+        paginationData.page < paginationData.totalPages
+          ? paginationData.page + 1
+          : undefined,
+    };
+  } catch (err) {
+    console.error('fetchStoriesPage -> unexpected error:', err);
+    throw err; // прокинемо далі, щоб твій tоast або UI побачили помилку
+  }
 };
 
 export async function registerUser(data: RegisterRequest): Promise<User> {
@@ -195,16 +228,27 @@ export const fetchUserById = async (id: string): Promise<User> => {
   }
 };
 
-export const fetchStoryById = async (id: string): Promise<DetailedStory> => {
+export const fetchStoryById = async (id: string) => {
+  if (!id) {
+    console.error('fetchStoryById: storyId is undefined');
+    return null;
+  }
+
   try {
+    const baseURL = api.defaults.baseURL;
+    const fullUrl = `${baseURL}/stories/${id}`;
+    console.log('API baseURL:', baseURL);
+    console.log('Full request URL:', fullUrl);
+
     const response = await api.get(`/stories/${id}`);
     return response.data.data;
-  } catch (error) {
-    console.error('fetchStoryByIdServer error:', error);
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      throw new Error('Story Not Found (404)');
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('fetchStoryById error:', error.message);
+    } else {
+      console.error('fetchStoryById error (unknown):', error);
     }
-    throw new Error('Failed to load story (SSR)');
+    return null;
   }
 };
 

@@ -99,7 +99,7 @@ export function StoryDetailsClient({ storyId }: PageParams) {
       >
         <Image
           src={imgSrc}
-          alt={story.title}
+          alt={story.title ? `Image for story: ${story.title}` : 'Story image'}
           fill
           style={{ objectFit: 'cover' }}
           onError={() => setImgSrc('/file.svg')}
