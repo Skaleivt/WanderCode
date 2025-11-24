@@ -14,7 +14,6 @@ import { StoriesResponse } from '@/lib/api/clientApi';
 type Props = {
   params: Promise<{ travellerId: string }>;
 };
-// export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props) {
   const travellerId = (await params).travellerId?.trim();

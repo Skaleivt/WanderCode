@@ -11,7 +11,6 @@ import { Loader2 } from 'lucide-react';
 
 import styles from './StorySection.module.css';
 import { Story } from '@/types/story';
-// import { Button } from '../ui/button'; // 🛑 ВЫДАЛЕНЫ ІМПАРТ: Выкарыстоўваем стандартны <button>
 
 interface StoryWithStatus extends Story {
   isFavorite: boolean;
@@ -49,9 +48,7 @@ const StorySection = ({
     status,
   } = useInfiniteQuery<StoriesPage>({
     queryKey: [queryKey, filter, sortField, travellerId],
-    queryFn: (
-      { pageParam = 1 } // ✅ ВЫПРАЎЛЕННЕ: Яўна прыводзім pageParam да number
-    ) =>
+    queryFn: ({ pageParam = 1 }) =>
       fetchStoriesPage({
         pageParam: pageParam as number,
         filter,
@@ -61,7 +58,7 @@ const StorySection = ({
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
-  }); // 2. Аб'яднанне ўсіх старонак і абрэзка да limit
+  });
 
   const displayedStories: StoryWithStatus[] = useMemo(() => {
     const stories = data?.pages.flatMap((page) => page.stories) || [];
@@ -81,40 +78,30 @@ const StorySection = ({
   }
   return (
     <section className={styles.storySection}>
-           {' '}
       <header className={styles.sectionHeader}>
-                <h2>{title}</h2>       {' '}
+        <h2>{title}</h2>
         {showViewAllButton && (
           <Link href={viewAllHref} className={styles.viewAllButton}>
-                        Показати всі          {' '}
+            Показати всі
           </Link>
         )}
-             {' '}
       </header>
-           {' '}
       {displayedStories.length === 0 ? (
         <p className={styles.noStories}>Гісторій не знайдено.</p>
       ) : (
         <div className={styles.storiesGrid}>
-                   {' '}
           {displayedStories.map((story) => (
             <TravellersStoriesItem key={story._id} story={story} />
           ))}
-                 {' '}
         </div>
       )}
-                {/* Кнопка "Загрузіць больш" (Пагінацыя) */}     {' '}
       {!showViewAllButton && hasNextPage && (
         <div className={styles.loadMoreContainer}>
-                   {' '}
-          {/* ✅ ВЫПРАЎЛЕННЕ: Выкарыстоўваем стандартны <button> замест <Button> */}
-                   {' '}
           <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className={styles.loadMoreButton} // Трэба дадаць стылі для гэтай кнопкі ў StorySection.module.css
+            className={styles.loadMoreButton}
           >
-                       {' '}
             {isFetchingNextPage ? (
               <span className="flex items-center">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />{' '}
@@ -123,12 +110,9 @@ const StorySection = ({
             ) : (
               `Показати ще історії`
             )}
-                     {' '}
           </button>
-                 {' '}
         </div>
       )}
-         {' '}
     </section>
   );
 };

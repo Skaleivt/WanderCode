@@ -77,8 +77,10 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
-  border-radius: 24px; /* закруглення */
-  overflow: hidden; /* щоб внутрішнє <img> теж було закруглене */
+  border-radius: 24px;
+  /* закруглення */
+  overflow: hidden;
+  /* щоб внутрішнє <img> теж було закруглене */
 }
 
 .infoBlock {
@@ -180,6 +182,7 @@
 
   margin-top: 96px;
 }
+
 .leftBlock {
   display: flex;
   flex-direction: column;
@@ -200,6 +203,7 @@
 
     width: 100%;
   }
+
   .leftBlock {
     display: flex;
     flex-direction: row;
@@ -234,13 +238,14 @@
     align-items: center;
     text-align: center;
   }
+
   .stories {
     font-size: 44px;
   }
 }
 
-/* Desktop (1280px and up) */
-@media (min-width: 1280px) {
+/* Desktop (1440px and up) */
+@media (min-width: 1440px) {
   .title {
     font-size: 56px;
     margin-top: 48px;
@@ -276,6 +281,7 @@
     justify-content: space-between;
     margin-top: 96px;
   }
+
   .stories {
     font-size: 52px;
   }
