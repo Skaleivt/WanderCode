@@ -58,7 +58,8 @@ export default function ProfileSavedPage() {
     }
   }, [isError]);
 
-  const isStories = data?.pages.length;
+  const isStories =
+    data?.pages?.some((page) => page.data.stories.length > 0) || false;
 
   return (
     <>

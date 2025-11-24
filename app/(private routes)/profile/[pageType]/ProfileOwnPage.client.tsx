@@ -52,22 +52,17 @@ export default function ProfileOwnPage({ filter }: TravellersStoriesProps) {
       lastPage.data.hasNextPage ? lastPage.data.page + 1 : undefined,
     initialPageParam: 1,
   });
-  const isStories = data?.pages.length;
+
+  const hasStories = data?.pages.some((page) => page.data.data.length > 0);
   useEffect(() => {
     if (isError) {
       showErrorToast('Something went wrong while fetching stories.');
     }
   }, [isError]);
 
-  console.log('pages:', data?.pages);
-  console.log('firstPageStories:', data?.pages?.[0]?.data.data);
-  console.log('currentPerPage:', currentPerPage);
-  console.log('isLoading:', isLoading);
-  console.log('hasNextPage:', hasNextPage);
-
   return (
     <>
-      {isStories ? (
+      {hasStories ? (
         <>
           <ul className={styles.storyList}>
             {data?.pages.flatMap((page) =>
